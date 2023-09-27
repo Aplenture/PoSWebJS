@@ -1,0 +1,9 @@
+{
+    "name": "<my_app_name>",
+    "start_url": "/index",
+    "background_color": "#0180D4",
+    "display": "standalone",
+    "scope": "/",
+    "theme_color": "#0180D4",
+    "description": "<description>"
+}

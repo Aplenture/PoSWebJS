@@ -1,0 +1,6 @@
+Options +FollowSymLinks -MultiViews
+
+RewriteEngine on
+RewriteCond %{REQUEST_URI} !^/index.html$
+RewriteCond %{REQUEST_URI} !.(gif|jpeg|png|css|js|json|otf|pdf)$
+RewriteRule .* /index.html [L]

@@ -1,0 +1,274 @@
+html,
+body,
+body>.root {
+    color: #555;
+    background-color: white;
+}
+
+.body-view-controller,
+.navigation-view-controller,
+.navigation-view-controller .container-view-controller {
+    background-color: white;
+}
+
+.body-view-controller .content.view-controller,
+.navigation-view-controller .content.view-controller,
+.navigation-view-controller .relative.view-controller {
+    background-color: white;
+}
+
+.navigation-view-controller .tab-bar-view {
+    border-top: 1px solid black;
+}
+
+.bar-view {
+    background-color: white;
+}
+
+.tab-bar-view .item {
+    color: #0180D4;
+}
+
+.menu-view .item {
+    color: #0180D4;
+}
+
+.tab-bar-view .item.disabled,
+.menu-view .item.disabled {
+    color: darkgray;
+}
+
+.tab-bar-view .item.selected,
+.menu-view .item.selected {
+    color: #C1E6FF;
+    background-color: #0180D4;
+}
+
+.tab-bar-view .item:hover,
+.menu-view .item:hover {
+    color: #C1E6FF;
+    background-color: #0099FF;
+}
+
+.tab-bar-view .item:active,
+.menu-view .item:active {
+    color: #0180D4;
+    background-color: #0099FF;
+}
+
+.button-view {
+    background-color: #0180D4;
+    color: white;
+}
+
+.button-view.disabled {
+    background-color: darkgray !important;
+}
+
+.button-view:hover {
+    background-color: #0099FF;
+}
+
+.button-view:active {
+    background-color: #0180D4;
+}
+
+.button-view.expose,
+.button-view.copy {
+    background-color: white !important;
+    color: #0180D4;
+    border: 1px solid #0180D4;
+}
+
+.button-view.expose.disabled,
+.button-view.copy.disabled {
+    color: darkgray;
+    border: 1px solid darkgray;
+}
+
+.button-view.expose:hover,
+.button-view.copy:hover {
+    background-color: white !important;
+}
+
+.button-view.expose:active,
+.button-view.copy:active {
+    background-color: white !important;
+}
+
+.button-view.delete,
+.button-view.cancel {
+    background-color: #D40101;
+}
+
+.button-view.delete:hover,
+.button-view.cancel:hover {
+    background-color: #FF0000;
+}
+
+.button-view.delete:active,
+.button-view.cancel:active {
+    background-color: #D40101;
+}
+
+.selected {
+    color: black;
+    background-color: #50b7fc;
+}
+
+.title-bar-view {
+    border-bottom: 1px solid gray;
+}
+
+.title-bar-view .button-view {
+    color: #0180D4;
+    border: none !important;
+    background-color: transparent !important;
+}
+
+.title-bar-view .button-view .label-view {
+    border: 1px solid #0180D4;
+}
+
+.title-bar-view .button-view.disabled .label-view {
+    border: 1px solid darkgray !important;
+}
+
+.title-bar-view .button-view.disabled {
+    color: darkgray !important;
+}
+
+.title-bar-view .button-view:hover {
+    color: #0099FF;
+    background-color: transparent !important;
+}
+
+.title-bar-view .button-view:active {
+    color: #0180D4;
+    background-color: transparent !important;
+}
+
+.title-bar-view .button-view.back .label-view,
+.title-bar-view .button-view.expose .label-view,
+.title-bar-view .button-view.copy .label-view {
+    border: none !important;
+}
+
+.title-bar-view .button-view.delete .label-view,
+.title-bar-view .button-view.cancel .label-view {
+    border: 1px solid rgb(212, 1, 1);
+}
+
+.title-bar-view .button-view.delete,
+.title-bar-view .button-view.cancel {
+    color: #D40101;
+    background-color: transparent !important;
+}
+
+.title-bar-view .button-view.delete:hover,
+.title-bar-view .button-view.cancel:hover {
+    color: #FF0000;
+    background-color: transparent !important;
+}
+
+.title-bar-view .button-view.delete:active,
+.title-bar-view .button-view.cancel:active {
+    color: #D40101;
+    background-color: transparent !important;
+}
+
+.popup-view-controller {
+    background-color: #00000088;
+}
+
+.popup-view-controller>div {
+    background-color: white;
+}
+
+.popup-view-controller .close {
+    border-color: #D40101;
+    background-color: white;
+}
+
+.popup-view-controller .close::before,
+.popup-view-controller .close::after {
+    background-color: #D40101;
+}
+
+.popup-view-controller .close:hover {
+    border-color: #FF0000;
+}
+
+.popup-view-controller .close:hover::before,
+.popup-view-controller .close:hover::after {
+    background-color: #FF0000;
+}
+
+.notification-body-view-controller {
+    background-color: #EEE;
+}
+
+.text-field-view input,
+.switch-view input,
+.dropbox-view>select {
+    background-color: #F4F4F4;
+}
+
+.dropbox-view>select {
+    background-color: #F4F4F4;
+}
+
+.text-field-view input::placeholder {
+    color: #AFAFAF;
+}
+
+.switch-view input:checked+span {
+    background-color: #03a734;
+}
+
+.switch-view>label>span {
+    background-color: #812717;
+}
+
+.switch-view>label>span>span {
+    background-color: white;
+}
+
+.table-view>.cell:first-child>div {
+    border-top: 1px solid #0180D4;
+}
+
+.table-view>div>div {
+    border-left: 1px solid #0180D4;
+    border-right: 1px solid #0180D4;
+}
+
+.table-view>div:last-child>div {
+    border-bottom: 1px solid #0180D4;
+}
+
+.table-view.alternatingBackgroundColor>.cell:nth-child(odd) {
+    background-color: #E9F1FA;
+}
+
+.table-view-controller>.title.label-view {
+    color: white;
+    background-color: #0180D4;
+}
+
+.table-view>.header {
+    color: white;
+    background-color: #0180D4;
+}
+
+.table-view>.cell:hover {
+    background-color: #B7D9F2 !important;
+}
+
+.spinner:after {
+    border-color: #3498db transparent #3498db transparent;
+}
+
+.spinner:after {
+    border: 12px solid #3498db;
+}

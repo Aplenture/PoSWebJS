@@ -1,0 +1,15 @@
+node_modules/
+dist/
+debug/
+setup/
+
+.DS_Store
+
+*.log
+
+config.json
+
+index.js*
+
+!/**/.gitkeep
+!config.template.json

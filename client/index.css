@@ -1,0 +1,616 @@
+* {
+    margin: 0;
+    padding: 0;
+    cursor: inherit;
+}
+
+html,
+body,
+body>.root {
+    width: 100%;
+    height: 100%;
+    font-family: Helvetica, Verdana;
+    overflow: hidden;
+}
+
+canvas {
+    height: 100%;
+    width: 100%;
+    display: block;
+}
+
+.body-view-controller,
+.menu-view-controller,
+.menu-view-controller .container-view-controller {
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.menu-view-controller {
+    flex-direction: row;
+}
+
+.body-title-bar {
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+}
+
+.body-view-controller .content.view-controller,
+.menu-view-controller .content.view-controller,
+.menu-view-controller .relative.view-controller {
+    position: relative;
+
+    width: calc(100% - 1em);
+    height: calc(100% - 1em);
+
+    padding: .5em;
+
+    overflow: auto;
+}
+
+.content.view-controller>.view-controller {
+    width: 100%;
+    height: 100%;
+}
+
+.bar-view {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+
+    width: calc(100% - 1em) !important;
+    height: 2.3em !important;
+    padding: .5em;
+}
+
+.tab-bar-view {
+    justify-content: space-between;
+
+    width: 100% !important;
+
+    padding: 0;
+    margin: 0;
+}
+
+.bar-view .label-view {
+    display: table;
+    text-align: center;
+}
+
+.bar-view .label-view span {
+    display: table-cell;
+}
+
+.tab-bar-view .item {
+    width: 100%;
+    height: 100%;
+}
+
+.tab-bar-view .item .label-view,
+.menu-view .item .label-view {
+    width: 100%;
+    height: 100%;
+}
+
+.title-bar-view {
+    justify-content: space-between;
+}
+
+.title-bar-view>.left {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+.title-bar-view>.middle {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.title-bar-view>.right {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
+.menu-view {
+    width: 10em;
+    height: 100%;
+}
+
+.menu-view .item {
+    width: 100%;
+    padding: 0.5em;
+}
+
+.view {
+    transition: all ease-in-out 150ms;
+}
+
+.label-view {
+    width: 100%;
+}
+
+.label-view>span {
+    vertical-align: middle;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.button-view {
+    display: flex;
+    min-width: 6em;
+    max-width: min-content;
+    height: 1.2em;
+    font-size: 1.1em;
+    padding: .5em;
+    margin: .3em;
+    user-select: none;
+    border-radius: .3em;
+    text-align: center;
+}
+
+.button-view:hover {
+    transform: scale(1.1);
+}
+
+.button-view:active {
+    transform: scale(1);
+}
+
+.button-view .label-view span {
+    white-space: nowrap;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.disabled {
+    pointer-events: none;
+}
+
+.clickable {
+    cursor: pointer !important;
+}
+
+.title-bar-view .button-view {
+    min-width: min-content !important;
+    max-width: min-content !important;
+    height: min-content !important;
+    padding: .2em;
+    margin: .1em;
+    border-radius: 0;
+    text-align: center;
+}
+
+.title-bar-view .button-view .label-view {
+    width: calc(100% - .4em);
+    border-radius: .3em;
+    padding: .2em;
+}
+
+.title-bar-view .title.label-view {
+    font-size: 1.1em;
+    font-weight: 700;
+    text-transform: uppercase;
+    text-align: center;
+    height: 100%;
+}
+
+.title-bar-view>div {
+    width: min-content;
+}
+
+.popup-view-controller {
+    z-index: 1000;
+}
+
+.notification-view-controller {
+    pointer-events: none;
+    z-index: 2000;
+}
+
+.popup-view-controller,
+.notification-view-controller {
+    position: absolute;
+
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+
+.popup-view-controller>div {
+    top: 50%;
+    left: 50%;
+
+    min-width: 20em;
+    max-width: 80vw;
+    max-height: 80vh;
+
+    transform: translate(-50%, -50%);
+}
+
+.notification-view-controller>div {
+    top: 0;
+    left: 50%;
+
+    width: 80vw;
+
+    transform: translate(-50%);
+}
+
+.notification-body-view-controller {
+    height: min-content !important;
+    border-bottom-left-radius: .5em;
+    border-bottom-right-radius: .5em;
+}
+
+.notification-body-view-controller div {
+    background-color: transparent !important;
+}
+
+.notification-view-controller .title-bar-view .title.label-view {
+    height: min-content;
+    font-size: 1em;
+    font-weight: normal;
+    text-transform: none;
+    text-align: left;
+}
+
+.notification-view-controller .title-bar-view {
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
+
+.notification-view-controller .content.view-controller {
+    padding-top: 0;
+    margin-top: 0;
+}
+
+.popup-view-controller>div,
+.notification-view-controller>div {
+    position: absolute;
+
+    padding: .75em;
+    border-radius: .5em;
+}
+
+.popup-view-controller>div>div:not(.close-button-container) {
+    position: relative !important;
+    overflow: auto;
+}
+
+.popup-view-controller .title-bar-view,
+.notification-view-controller .title-bar-view {
+    border: none;
+}
+
+.popup-view-controller .close-button-container {
+    position: absolute;
+    width: 100%;
+    z-index: 1100;
+}
+
+.popup-view-controller .close.button-view .label-view {
+    display: none;
+}
+
+.popup-view-controller .close-button-container .view {
+    position: absolute;
+
+    top: -10px;
+    right: -25px;
+
+    transform: translate(-50%, -50%);
+
+    border-radius: 50%;
+    padding: 0;
+    margin: 0;
+
+    min-width: 34px;
+    max-width: 34px;
+
+    min-height: 34px;
+    max-height: 34px;
+
+    border-width: 4px;
+    border-style: solid;
+}
+
+.popup-view-controller .close.view::before,
+.popup-view-controller .close.view::after {
+    content: " ";
+    position: absolute;
+    display: block;
+    width: 4px;
+    left: 15px;
+    top: 4px;
+    bottom: 4px;
+    border-radius: 2px;
+    transform: translate(-50%, -50%);
+}
+
+.popup-view-controller .close.view::before {
+    transform: rotate(45deg);
+}
+
+.popup-view-controller .close.view::after {
+    transform: rotate(-45deg);
+}
+
+.titled-label-view {
+    display: flex;
+    padding: .2em;
+}
+
+.titled-label-view>div:first-child {
+    max-width: 80%;
+}
+
+.titled-label-view .button-view {
+    height: .7em;
+}
+
+.titled-label-view .button-view.expose::before,
+.titled-label-view .button-view.copy::before,
+.titled-label-view .button-view.add::before {
+    transform: scale(2) translate(0, -50%);
+    -webkit-transform: scale(2) translate(0, -50%);
+}
+
+.titled-label-view span {
+    display: block;
+    padding: .2em;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.text-field-view,
+.switch-view,
+.dropbox-view {
+    width: 100%;
+    user-select: none;
+}
+
+.text-field-view>span,
+.switch-view>span,
+.dropbox-view>span,
+.titled-label-view span:first-child {
+    display: block;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: .9em;
+    padding: 0;
+    margin: 0;
+}
+
+.text-field-view input,
+.switch-view input,
+.dropbox-view>select {
+    width: calc(100% - 1em);
+    border: none;
+    font-size: 1em;
+    padding: .5em;
+    border-radius: .3em;
+}
+
+.dropbox-view>select {
+    width: 100%;
+}
+
+.text-field-view input::placeholder {
+    text-transform: lowercase;
+    /* font-style: italic; */
+}
+
+.switch-view {
+    padding: 0 0 .5em 0;
+}
+
+.switch-view span {
+    display: inline-block;
+    padding: 1.1em 0 0 0;
+}
+
+.switch-view label {
+    float: right;
+    position: relative;
+    /* display: inline-block; */
+    width: 4em;
+    height: 2.2em;
+    margin: .2em;
+}
+
+.switch-view input {
+    display: none;
+}
+
+.switch-view input:checked+span span {
+    transform: translate(1.8em, 0);
+}
+
+.switch-view>label>span {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    display: block;
+    transition: all 250ms;
+    border-radius: 2.2em;
+}
+
+.switch-view>label>span>span {
+    position: absolute;
+    content: "";
+    width: 1.7em;
+    border-radius: 100%;
+    display: block;
+    top: .25em;
+    left: .25em;
+    bottom: .25em;
+    transition: all 250ms;
+}
+
+.table-view {
+    display: table;
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: .5em 0;
+}
+
+.table-view-controller>.title.label-view {
+    width: calc(100% - 3em);
+
+    padding: .3em 1em;
+    margin: 0 0 .5em .5em;
+}
+
+.table-view>.header {
+    width: calc(100% - 1em);
+    white-space: nowrap;
+}
+
+.table-view>div {
+    display: table-row;
+}
+
+.table-view>div>div {
+    display: table-cell;
+    width: auto;
+    padding: .3em .5em;
+}
+
+.table-view .cell span {
+    display: inline;
+}
+
+.table-view .category>div {
+    text-align: center;
+}
+
+.grid-view-controller {
+    width: 100%;
+    height: 100%;
+}
+
+.grid-view {
+    display: grid;
+
+    width: 100%;
+    height: 100%;
+
+    grid-template-rows: 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
+}
+
+.spinner {
+    display: inline-block;
+    width: 144px;
+    height: 144px;
+}
+
+.spinner:after {
+    content: " ";
+    display: block;
+    width: 128px;
+    height: 128px;
+    margin: 8px;
+    border-radius: 50%;
+    animation: rotate 1.2s linear infinite;
+}
+
+.button-view.settings::before {
+    display: inline-block;
+    content: "\2699";
+    transform: translate(-50%, 20%) scale(2);
+    -webkit-transform: translate(-50%, 20%) scale(2);
+}
+
+.button-view.settings div {
+    border: none !important;
+}
+
+.button-view.expose::before {
+    content: "\2699";
+}
+
+.button-view.copy::before {
+    content: "\2398";
+}
+
+.button-view.add::before {
+    content: "\002B";
+}
+
+.button-view.expose,
+.button-view.copy,
+.button-view.add {
+    min-width: min-content;
+    max-width: min-content;
+}
+
+.button-view.expose::before,
+.button-view.copy::before,
+.button-view.add::before {
+    display: inline-block;
+    transform: scale(2) translate(0, -5%);
+    -webkit-transform: scale(2) translate(0, -5%);
+}
+
+.button-view.expose div:last-child,
+.button-view.copy div:last-child,
+.button-view.add div:last-child {
+    display: none !important;
+}
+
+.button-view.back::before {
+    display: inline-block;
+    content: "<";
+    transform: translate(-25%, 15%) scale(1, 2);
+    -webkit-transform: translate(-25%, 15%) scale(1, 2);
+}
+
+.accesses-view-controller .table-view-controller .expiration-label {
+    width: 9em;
+}
+
+.accesses-view-controller .table-view-controller .type-label {
+    width: 1px;
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@media (orientation: landscape) {
+    .menu-view-controller .menu-tab-bar {
+        display: none;
+    }
+}
+
+@media (orientation: portrait) {
+    .menu-view-controller .menu-menu-view {
+        display: none;
+    }
+}
