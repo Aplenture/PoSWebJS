@@ -1,7 +1,7 @@
 {
-    "name": "<my_app_name>",
+    "name": "poswebjs",
     "version": "0.1.0",
-    "description": "<description>",
+    "description": "Point of Sale Web App powered by Aplenture/PoSModuleJS API",
     "main": "client/index.js",
     "directories": {
         "test": "tests"
@@ -12,14 +12,14 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/Aplenture/<my_app_name>.git"
+        "url": "git+https://github.com/Aplenture/PoSWebJS.git"
     },
     "author": "Aplenture",
     "license": "ISC",
     "bugs": {
-        "url": "https://github.com/Aplenture/<my_app_name>/issues"
+        "url": "https://github.com/Aplenture/PoSWebJS/issues"
     },
-    "homepage": "https://github.com/Aplenture/<my_app_name>#readme",
+    "homepage": "https://github.com/Aplenture/PoSWebJS#readme",
     "dependencies": {
         "frontendjs": "github:Aplenture/FrontendJS"
     },

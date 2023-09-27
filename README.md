@@ -1,1 +1,1 @@
-# <my_app_name>
+# PoSWebJS

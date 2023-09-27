@@ -1,8 +1,8 @@
 /**
- * Aplenture/<my_app_name>
- * https://github.com/Aplenture/<my_app_name>
+ * Aplenture/PoSWebJS
+ * https://github.com/Aplenture/PoSWebJS
  * Copyright (c) 2023 Aplenture
- * License https://github.com/Aplenture/<my_app_name>/blob/main/LICENSE
+ * License https://github.com/Aplenture/PoSWebJS/blob/main/LICENSE
  */
 
 export * from "./indexViewController";
