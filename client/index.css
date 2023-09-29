@@ -53,7 +53,10 @@ canvas {
     height: calc(100% - 1em);
 
     padding: .5em;
+}
 
+.body-view-controller .content.view-controller,
+.menu-view-controller .content.view-controller {
     overflow: auto;
 }
 
@@ -408,6 +411,11 @@ canvas {
     border-radius: .3em;
 }
 
+.text-field-view input[type="color"] {
+    width: 100%;
+    height: 2.2em;
+}
+
 .dropbox-view>select {
     width: 100%;
 }
@@ -471,13 +479,14 @@ canvas {
     width: 100%;
     border-collapse: separate;
     border-spacing: .5em 0;
+    margin: 0 -.5em;
 }
 
 .table-view-controller>.title.label-view {
     width: calc(100% - 3em);
 
     padding: .3em 1em;
-    margin: 0 0 .5em .5em;
+    margin: 0 0 .5em 0;
 }
 
 .table-view>.header {
@@ -514,8 +523,10 @@ canvas {
     width: 100%;
     height: 100%;
 
-    grid-template-rows: 1fr 1fr;
-    grid-template-columns: 1fr 1fr;
+    grid-template-rows: none;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+
+    grid-auto-rows: 20vw;
 }
 
 .spinner {
@@ -543,6 +554,10 @@ canvas {
 
 .button-view.settings div {
     border: none !important;
+}
+
+.button-view.settings::after {
+    transform: translate(-50%, -50%) rotate(45deg);
 }
 
 .button-view.expose::before {

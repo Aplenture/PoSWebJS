@@ -116,6 +116,10 @@ body>.root {
     background-color: #50b7fc;
 }
 
+.negative {
+    color: #D40101;
+}
+
 .title-bar-view {
     border-bottom: 1px solid gray;
 }

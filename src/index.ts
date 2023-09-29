@@ -6,7 +6,7 @@
  */
 
 import * as FrontendJS from "frontendjs";
-import { RootViewController } from "./controllers";
+import { RootViewController } from "./controllers/rootViewController";
 
 (async function () {
     const config = await new FrontendJS.JSONRequest('/config.json')

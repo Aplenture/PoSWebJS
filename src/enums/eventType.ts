@@ -5,5 +5,7 @@
  * License https://github.com/Aplenture/PoSWebJS/blob/main/LICENSE
  */
 
-export * from "./indexViewController";
-export * from "./rootViewController";
+export enum EventType {
+    Increase = 1,
+    Decrease = -1
+}

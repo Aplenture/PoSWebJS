@@ -1,0 +1,141 @@
+/* .main-view-controller .stack-view-controller .view-controller {
+    width: 100%;
+    height: 100%;
+} */
+
+.main-view-controller.body-footer-bar {
+    border-top: 1px solid black;
+}
+
+.customers-grid-view-controller .grid-view,
+.products-grid-view-controller .grid-view {
+    grid-template-rows: none;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    grid-auto-rows: 15vw;
+    overflow: auto;
+    background-color: lightgray;
+}
+
+.create-customer-view-controller,
+.create-customer-view-controller .content.view-controller,
+.create-product-view-controller,
+.create-product-view-controller .content.view-controller {
+    background-color: transparent;
+}
+
+.cell .number-label,
+.cell .balance-label,
+.cell .price-label,
+.cell .sum-label,
+.cell .count-label {
+    width: 1px;
+    text-align: right;
+}
+
+.cell .date-label {
+    width: 1px;
+    text-align: left;
+}
+
+.table-view .header {
+    text-align: center;
+}
+
+.customers-grid-view-controller .grid-view .cell,
+.products-grid-view-controller .grid-view .cell {
+    background-color: white;
+    margin: 1px;
+}
+
+.customers-grid-view-controller .grid-view .cell .label-view,
+.products-grid-view-controller .grid-view .cell .label-view {
+    display: table;
+    width: 100%;
+}
+
+.customers-grid-view-controller .grid-view .cell .label-view span,
+.products-grid-view-controller .grid-view .cell .label-view span {
+    display: table-cell;
+    width: 100%;
+    text-align: center;
+    padding: .5em;
+}
+
+.customers-grid-view-controller .grid-view .cell .label-view,
+.customers-grid-view-controller .grid-view .cell .label-view span {
+    height: 100%;
+}
+
+.products-grid-view-controller .grid-view .cell .label-view,
+.products-grid-view-controller .grid-view .cell .label-view span {
+    height: 50%;
+}
+
+.products-grid-view-controller .grid-view .cell .label-view:first-child span {
+    vertical-align: bottom;
+}
+
+.products-grid-view-controller .grid-view .cell .label-view:last-child span {
+    vertical-align: top;
+}
+
+.products-grid-view-controller .grid-view .cell:last-child,
+.guests-grid-view-controller .grid-view .cell:last-child {
+    position: relative;
+    background-color: lightgray;
+}
+
+.products-grid-view-controller .grid-view .cell:last-child div,
+.guests-grid-view-controller .grid-view .cell:last-child div {
+    display: none;
+}
+
+.products-grid-view-controller .grid-view .cell:last-child::before,
+.guests-grid-view-controller .grid-view .cell:last-child::before,
+.products-grid-view-controller .grid-view .cell:last-child::after,
+.guests-grid-view-controller .grid-view .cell:last-child::after {
+    content: "";
+    position: absolute;
+    background: #fff;
+}
+
+.products-grid-view-controller .grid-view .cell:last-child::before,
+.guests-grid-view-controller .grid-view .cell:last-child::before {
+    top: 50%;
+    left: 50%;
+    width: 10vw;
+    height: 2vw;
+    transform: translate(-50%, -50%);
+}
+
+.products-grid-view-controller .grid-view .cell:last-child::after,
+.guests-grid-view-controller .grid-view .cell:last-child::after {
+    top: 50%;
+    left: 50%;
+    width: 2vw;
+    height: 10vw;
+    transform: translate(-50%, -50%);
+}
+
+.invoices-view-controller .table-view .cell:nth-last-child(2) {
+    visibility: hidden;
+    height: .5em;
+    padding: 0;
+    margin: 0;
+}
+
+.invoices-view-controller .table-view .cell:nth-last-child(2) div {
+    display: none;
+}
+
+.invoices-view-controller .table-view .cell:nth-last-child(3)>div {
+    border-bottom: 1px solid #0180D4;
+}
+
+.invoices-view-controller .table-view .cell:last-child>div {
+    border-top: 1px solid #0180D4;
+}
+
+.invoices-view-controller .table-view .cell:last-child>div:not(:last-child) {
+    visibility: hidden;
+}
