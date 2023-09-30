@@ -527,6 +527,8 @@ canvas {
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
 
     grid-auto-rows: 20vw;
+
+    overflow: auto;
 }
 
 .spinner {
