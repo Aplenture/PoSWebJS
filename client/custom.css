@@ -5,6 +5,14 @@
 
 .main-view-controller.body-footer-bar {
     border-top: 1px solid black;
+    justify-content: space-between;
+}
+
+.main-view-controller.body-footer-bar .balance-view {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }
 
 .customers-grid-view-controller .grid-view,
@@ -12,7 +20,6 @@
     grid-template-rows: none;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     grid-auto-rows: 15vw;
-    overflow: auto;
     background-color: lightgray;
 }
 

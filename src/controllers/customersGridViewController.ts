@@ -37,6 +37,12 @@ export class CustomersGridViewController extends FrontendJS.ViewController imple
     public get paymentMethods(): number { return this.editViewController.paymentMethods; }
     public set paymentMethods(value: number) { this.editViewController.paymentMethods = value; }
 
+    public get canScrollTop(): boolean { return this.gridViewController.canScrollTop }
+    public get canScrollBottom(): boolean { return this.gridViewController.canScrollBottom }
+
+    public get canScrollLeft(): boolean { return this.gridViewController.canScrollLeft }
+    public get canScrollRight(): boolean { return this.gridViewController.canScrollRight }
+
     public async load(): Promise<void> {
         this.customers = (await Customer.get({ paymentmethods: this.paymentMethods })).sort((a, b) => a.toString().localeCompare(b.toString()));
 
@@ -80,6 +86,14 @@ export class CustomersGridViewController extends FrontendJS.ViewController imple
             this.add();
         else
             this.onSelectedCustomer.emit(this, this.customers[index]);
+    }
+
+    public scrollHoriztonal(pages?: number) {
+        return this.gridViewController.scrollHoriztonal(pages);
+    }
+
+    public scrollVertical(pages?: number) {
+        return this.gridViewController.scrollVertical(pages);
     }
 }
 
