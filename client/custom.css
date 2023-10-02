@@ -1,8 +1,3 @@
-/* .main-view-controller .stack-view-controller .view-controller {
-    width: 100%;
-    height: 100%;
-} */
-
 .main-view-controller.body-footer-bar {
     border-top: 1px solid black;
     justify-content: space-between;
@@ -72,7 +67,7 @@
     display: table-cell;
     width: 100%;
     text-align: center;
-    padding: .5em;
+    padding: .5rem;
 }
 
 .customers-grid-view-controller .grid-view .cell .label-view,
@@ -133,7 +128,7 @@
 
 .invoices-view-controller .table-view .cell:nth-last-child(2) {
     visibility: hidden;
-    height: .5em;
+    height: .5rem;
     padding: 0;
     margin: 0;
 }
