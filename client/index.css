@@ -49,10 +49,10 @@ canvas {
 .menu-view-controller .relative.view-controller {
     position: relative;
 
-    width: calc(100% - 1rem);
-    height: calc(100% - 1rem);
+    width: calc(100% - 1em);
+    height: calc(100% - 1em);
 
-    padding: .5rem;
+    padding: .5em;
 }
 
 .body-view-controller .content.view-controller,
@@ -70,9 +70,9 @@ canvas {
     flex-direction: row;
     justify-content: flex-end;
 
-    width: calc(100% - 1rem) !important;
-    height: 2.3rem !important;
-    padding: .5rem;
+    width: calc(100% - 1em) !important;
+    height: 2.3em !important;
+    padding: .5em;
 }
 
 .tab-bar-view {
@@ -128,7 +128,7 @@ canvas {
 }
 
 .menu-view {
-    min-width: 10rem;
+    min-width: 8em;
     width: min-content;
 
     height: 100%;
@@ -136,7 +136,7 @@ canvas {
 
 .menu-view .item {
     width: 100%;
-    padding: 0.5rem;
+    padding: 0.5em;
 }
 
 .view {
@@ -155,14 +155,14 @@ canvas {
 
 .button-view {
     display: flex;
-    min-width: 6rem;
+    min-width: 6em;
     max-width: min-content;
-    height: 1.2rem;
-    font-size: 1.1rem;
-    padding: .5rem;
-    margin: .3rem;
+    height: 1.2em;
+    font-size: 1.1em;
+    padding: .5em;
+    margin: .3em;
     user-select: none;
-    border-radius: .3rem;
+    border-radius: .3em;
     text-align: center;
 }
 
@@ -194,20 +194,20 @@ canvas {
     min-width: min-content !important;
     max-width: min-content !important;
     height: min-content !important;
-    padding: .2rem;
-    margin: .1rem;
+    padding: .2em;
+    margin: .1em;
     border-radius: 0;
     text-align: center;
 }
 
 .title-bar-view .button-view .label-view {
-    width: calc(100% - .4rem);
-    border-radius: .3rem;
-    padding: .2rem;
+    width: calc(100% - .4em);
+    border-radius: .3em;
+    padding: .2em;
 }
 
 .title-bar-view .title.label-view {
-    font-size: 1.1rem;
+    font-size: 1.1em;
     font-weight: 700;
     text-transform: uppercase;
     text-align: center;
@@ -241,7 +241,7 @@ canvas {
     top: 50%;
     left: 50%;
 
-    min-width: 20rem;
+    min-width: 20em;
     max-width: 80vw;
     max-height: 80vh;
 
@@ -259,8 +259,8 @@ canvas {
 
 .notification-body-view-controller {
     height: min-content !important;
-    border-bottom-left-radius: .5rem;
-    border-bottom-right-radius: .5rem;
+    border-bottom-left-radius: .5em;
+    border-bottom-right-radius: .5em;
 }
 
 .notification-body-view-controller div {
@@ -269,7 +269,7 @@ canvas {
 
 .notification-view-controller .title-bar-view .title.label-view {
     height: min-content;
-    font-size: 1rem;
+    font-size: 1em;
     font-weight: normal;
     text-transform: none;
     text-align: left;
@@ -289,8 +289,8 @@ canvas {
 .notification-view-controller>div {
     position: absolute;
 
-    padding: .75rem;
-    border-radius: .5rem;
+    padding: .75em;
+    border-radius: .5em;
 }
 
 .popup-view-controller>div>div:not(.close-button-container) {
@@ -316,8 +316,8 @@ canvas {
 .popup-view-controller .close-button-container .view {
     position: absolute;
 
-    top: -.6rem;
-    right: -1.6rem;
+    top: -.6em;
+    right: -1.6em;
 
     transform: translate(-50%, -50%);
 
@@ -325,10 +325,10 @@ canvas {
     padding: 0;
     margin: 0;
 
-    width: 2rem;
-    height: 2rem;
+    width: 2em;
+    height: 2em;
 
-    border-width: .3rem;
+    border-width: .3em;
     border-style: solid;
 }
 
@@ -337,11 +337,11 @@ canvas {
     content: " ";
     position: absolute;
     display: block;
-    width: .3rem;
-    left: .85rem;
-    top: .3rem;
-    bottom: .3rem;
-    border-radius: .3rem;
+    width: .3em;
+    left: .85em;
+    top: .3em;
+    bottom: .3em;
+    border-radius: .3em;
     transform: translate(-50%, -50%);
 }
 
@@ -355,7 +355,7 @@ canvas {
 
 .titled-label-view {
     display: flex;
-    padding: .2rem;
+    padding: .2em;
 }
 
 .titled-label-view>div:first-child {
@@ -363,7 +363,7 @@ canvas {
 }
 
 .titled-label-view .button-view {
-    height: .7rem;
+    height: .7em;
 }
 
 .titled-label-view .button-view.expose::before,
@@ -375,7 +375,7 @@ canvas {
 
 .titled-label-view span {
     display: block;
-    padding: .2rem;
+    padding: .2em;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
@@ -395,7 +395,7 @@ canvas {
     display: block;
     font-weight: 700;
     text-transform: uppercase;
-    font-size: .9rem;
+    font-size: .9em;
     padding: 0;
     margin: 0;
 }
@@ -403,16 +403,16 @@ canvas {
 .text-field-view input,
 .switch-view input,
 .dropbox-view>select {
-    width: calc(100% - 1rem);
+    width: calc(100% - 1em);
     border: none;
-    font-size: 1rem;
-    padding: .5rem;
-    border-radius: .3rem;
+    font-size: 1em;
+    padding: .5em;
+    border-radius: .3em;
 }
 
 .text-field-view input[type="color"] {
     width: 100%;
-    height: 2.2rem;
+    height: 2.2em;
 }
 
 .dropbox-view>select {
@@ -425,21 +425,21 @@ canvas {
 }
 
 .switch-view {
-    padding: 0 0 .5rem 0;
+    padding: 0 0 .5em 0;
 }
 
 .switch-view span {
     display: inline-block;
-    padding: 1.1rem 0 0 0;
+    padding: 1.1em 0 0 0;
 }
 
 .switch-view label {
     float: right;
     position: relative;
     /* display: inline-block; */
-    width: 4rem;
-    height: 2.2rem;
-    margin: .2rem;
+    width: 4em;
+    height: 2.2em;
+    margin: .2em;
 }
 
 .switch-view input {
@@ -447,7 +447,7 @@ canvas {
 }
 
 .switch-view input:checked+span span {
-    transform: translate(1.8rem, 0);
+    transform: translate(1.8em, 0);
 }
 
 .switch-view>label>span {
@@ -458,18 +458,18 @@ canvas {
     right: 0;
     display: block;
     transition: all 250ms;
-    border-radius: 2.2rem;
+    border-radius: 2.2em;
 }
 
 .switch-view>label>span>span {
     position: absolute;
     content: "";
-    width: 1.7rem;
+    width: 1.7em;
     border-radius: 100%;
     display: block;
-    top: .25rem;
-    left: .25rem;
-    bottom: .25rem;
+    top: .25em;
+    left: .25em;
+    bottom: .25em;
     transition: all 250ms;
 }
 
@@ -477,19 +477,19 @@ canvas {
     display: table;
     width: 100%;
     border-collapse: separate;
-    border-spacing: .5rem 0;
-    margin: 0 -.5rem;
+    border-spacing: .5em 0;
+    margin: 0 -.5em;
 }
 
 .table-view-controller>.title.label-view {
-    width: calc(100% - 3rem);
+    width: calc(100% - 3em);
 
-    padding: .3rem 1rem;
-    margin: 0 0 .5rem 0;
+    padding: .3em 1em;
+    margin: 0 0 .5em 0;
 }
 
 .table-view>.header {
-    width: calc(100% - 1rem);
+    width: calc(100% - 1em);
     white-space: nowrap;
 }
 
@@ -500,7 +500,7 @@ canvas {
 .table-view>div>div {
     display: table-cell;
     width: auto;
-    padding: .3rem .5rem;
+    padding: .3em .5em;
 }
 
 .table-view .cell span {
@@ -602,7 +602,7 @@ canvas {
 }
 
 .accesses-view-controller .table-view-controller .expiration-label {
-    width: 9rem;
+    width: 9em;
 }
 
 .accesses-view-controller .table-view-controller .type-label {
@@ -631,20 +631,14 @@ canvas {
     }
 }
 
-@media (min-width: 320px) {
-    html {
+@media (max-width: 1023px) {
+    * {
         font-size: 16px;
     }
 }
 
-@media (min-width: 1080px) {
-    html {
-        font-size: 20px;
-    }
-}
-
-@media (min-width: 1920px) {
-    html {
+@media (min-width: 1024px) {
+    * {
         font-size: 26px;
     }
 }
