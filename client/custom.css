@@ -67,7 +67,7 @@
     display: table-cell;
     width: 100%;
     text-align: center;
-    padding: .5rem;
+    padding: .5em;
 }
 
 .customers-grid-view-controller .grid-view .cell .label-view,
@@ -128,7 +128,7 @@
 
 .invoices-view-controller .table-view .cell:nth-last-child(2) {
     visibility: hidden;
-    height: .5rem;
+    height: .5em;
     padding: 0;
     margin: 0;
 }
