@@ -37,8 +37,6 @@ export class MainViewController extends FrontendJS.BodyViewController {
 
     public readonly backButton = new FrontendJS.Button('back-button');
     public readonly payButton = new FrontendJS.Button('pay-button');
-    public readonly previousButton = new FrontendJS.Button('previous-button');
-    public readonly nextButton = new FrontendJS.Button('next-button');
 
     private _selectedProduct: Product;
     private _order: Order;
@@ -49,6 +47,7 @@ export class MainViewController extends FrontendJS.BodyViewController {
         const balanceView = new FrontendJS.View('balance-view');
 
         this.title = '#_title_main';
+        this.footerBar.isVisible = false;
 
         this.stackViewController.onPush.on(() => (this.stackViewController.currentViewController as FrontendJS.MenuViewController).selectedIndex = 0);
         this.stackViewController.onPush.on(() => this.titleBar.titleLabel.text = (this.stackViewController.currentViewController as FrontendJS.MenuViewController).selectedViewController.title);
@@ -90,12 +89,6 @@ export class MainViewController extends FrontendJS.BodyViewController {
         this.payButton.text = '#_title_pay';
         this.payButton.onClick.on(() => this.pay());
 
-        this.previousButton.text = '#_title_previous';
-        this.previousButton.onClick.on(() => this.previous());
-
-        this.nextButton.text = '#_title_next';
-        this.nextButton.onClick.on(() => this.next());
-
         this.balanceLabel.type = FrontendJS.LabelType.Balance;
 
         this.titleBar.leftView.appendChild(this.backButton);
@@ -104,9 +97,8 @@ export class MainViewController extends FrontendJS.BodyViewController {
         balanceView.appendChild(this.balanceLabel);
         balanceView.appendChild(this.payButton);
 
-        this.footerBar.appendChild(this.previousButton);
-        this.footerBar.appendChild(balanceView);
-        this.footerBar.appendChild(this.nextButton);
+        this.productsViewController.footerBar.appendChild(balanceView);
+        this.productsViewController.footerBar.appendChild(this.productsViewController.nextButton);
 
         this.appendChild(this.stackViewController);
 
@@ -123,10 +115,6 @@ export class MainViewController extends FrontendJS.BodyViewController {
         this.todayViewController.customer = value;
         this.monthViewController.customer = value;
         this.balanceLabel.isHidden = !value;
-        this.previousButton.isVisible = !value;
-        this.nextButton.isVisible = !value;
-        this.previousButton.isEnabled = false;
-        this.nextButton.isEnabled = true;
 
         if (value) {
             this.customerLabel.text = value.toString();
@@ -253,26 +241,6 @@ export class MainViewController extends FrontendJS.BodyViewController {
         await Order.close(this._order.id, PaymentMethod.Cash, amount);
 
         this.order = null;
-    }
-
-    private previous() {
-        if (this.customerMenuViewController.selectedViewController == this.membersViewController) {
-            this.previousButton.isDisabled = this.membersViewController.scrollVertical(-1);
-            this.nextButton.isEnabled = true;
-        } else {
-            this.previousButton.isDisabled = this.guestsViewController.scrollVertical(-1);
-            this.nextButton.isEnabled = true;
-        }
-    }
-    
-    private next() {
-        if (this.customerMenuViewController.selectedViewController == this.membersViewController) {
-            this.previousButton.isEnabled = true;
-            this.nextButton.isDisabled = this.membersViewController.scrollVertical();
-        } else {
-            this.previousButton.isEnabled = true;
-            this.nextButton.isDisabled = this.guestsViewController.scrollVertical();
-        }
     }
 
     private async updateOrder(): Promise<void> {

@@ -9,27 +9,22 @@ import * as CoreJS from "corejs";
 import * as FrontendJS from "frontendjs";
 import { Product } from "../models/product";
 import { ProductEditViewController } from "./productEditViewController";
+import { GridViewController } from "./gridViewController";
 
-export class ProductsGridViewController extends FrontendJS.ViewController implements FrontendJS.GridViewControllerDataSource {
+export class ProductsGridViewController extends GridViewController {
     public readonly onSelectedProduct = new CoreJS.Event<ProductsGridViewController, Product>('ProductsGridViewController.onSelectedProduct');
 
-    public readonly gridViewController = new FrontendJS.GridViewController();
     public readonly productViewController = new ProductEditViewController();
-    
+
     private products: readonly Product[] = [];
 
     constructor(...classes: string[]) {
         super(...classes, "products-grid-view-controller");
 
-        this.gridViewController.selectionMode = FrontendJS.TableSelectionMode.Clickable;
-        this.gridViewController.dataSource = this;
-        this.gridViewController.titleLabel.isHidden = true;
         this.gridViewController.onSelectedCell.on(cell => this.selectCell(cell.index));
 
         this.productViewController.onCreated.on(() => this.load());
         this.productViewController.onCreated.on(() => this.productViewController.removeFromParent());
-
-        this.appendChild(this.gridViewController);
     }
 
     public async load(): Promise<void> {

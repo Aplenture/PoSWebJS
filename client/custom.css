@@ -8,7 +8,14 @@
     justify-content: space-between;
 }
 
-.main-view-controller.body-footer-bar .balance-view {
+.grid-view-controller.body-footer-bar {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.grid-view-controller.body-footer-bar .balance-view {
     width: 100%;
     display: flex;
     flex-direction: row;
