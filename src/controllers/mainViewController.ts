@@ -204,6 +204,13 @@ export class MainViewController extends FrontendJS.BodyViewController {
             text: '#_notification_product_purchased',
             title: CoreJS.Localization.translate('#_title_product_purchased', { product: product.name })
         });
+
+        const continueShopping = await FrontendJS.Client.popupViewController.queryBoolean(CoreJS.Localization.translate("#_query_text_shopping_continue", { '$1': product.name }), "#_query_title_shopping_continue");
+
+        if (!continueShopping) {
+            this.purchaseViewController.removeFromParent();
+            this.stackViewController.popViewController();
+        }
     }
 
     public async undoPurchase(product: Product, customer: Customer): Promise<void> {
