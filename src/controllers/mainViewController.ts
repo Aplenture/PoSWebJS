@@ -184,7 +184,7 @@ export class MainViewController extends FrontendJS.BodyViewController {
 
         this.selectedProduct = product;
 
-        this.purchaseViewController.titleBar.titleLabel.text = CoreJS.Localization.translate('#_title_order_product', { product: product.name });
+        this.purchaseViewController.titleBar.titleLabel.text = CoreJS.Localization.translate('#_title_product_name', { '$1': product.name });
         this.purchaseViewController.priceLabel.text = CoreJS.formatCurrency(product.price);
         this.purchaseViewController.updatePurchaseCount(amount);
 
