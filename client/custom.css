@@ -91,7 +91,7 @@
 .products-grid-view-controller .grid-view .cell:last-child,
 .guests-grid-view-controller .grid-view .cell:last-child {
     position: relative;
-    background-color: lightgray;
+    background-color: gray;
 }
 
 .products-grid-view-controller .grid-view .cell:last-child div,
