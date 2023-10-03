@@ -5,7 +5,6 @@
  * License https://github.com/Aplenture/PoSWebJS/blob/main/LICENSE
  */
 
-import * as CoreJS from "corejs";
 import * as FrontendJS from "frontendjs";
 import { OrderState } from "../enums/orderState";
 import { PaymentMethod } from "../enums/paymentMethod";
@@ -19,8 +18,8 @@ const ROUTE_GET = "getOrders";
 interface GetOptions {
     readonly customer?: number;
     readonly start?: number;
+    readonly end?: number;
     readonly state?: OrderState;
-    readonly timeframe?: CoreJS.TimeFrame;
 }
 
 export class Order {

@@ -14,6 +14,7 @@ const ROUTE_GET = 'getFinances';
 interface GetOptions {
     readonly customer?: number;
     readonly start?: number;
+    readonly end?: number;
 }
 
 export class Finance {

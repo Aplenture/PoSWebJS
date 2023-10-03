@@ -79,10 +79,10 @@ export class MainViewController extends FrontendJS.BodyViewController {
         this.productsViewController.onSelectedProduct.on(product => this.selectProduct(product));
 
         this.todayViewController.title = '#_title_today';
-        this.todayViewController.timeFrame = CoreJS.TimeFrame.Day;
+        this.todayViewController.today = true;
 
         this.monthViewController.title = '#_title_month_this';
-        this.monthViewController.timeFrame = CoreJS.TimeFrame.Month;
+        this.monthViewController.today = false;
 
         this.purchaseViewController.buyButton.onClick.on(() => this.buy(this.selectedProduct, this.selectedCustomer));
         this.purchaseViewController.undoButton.onClick.on(() => this.undoPurchase(this.selectedProduct, this.selectedCustomer));

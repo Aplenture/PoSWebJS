@@ -16,7 +16,7 @@ export class FinanceViewController extends FrontendJS.ViewController implements 
     public readonly tableViewController = new FrontendJS.TableViewController();
 
     public customer: Customer;
-    public timeFrame: CoreJS.TimeFrame;
+    public today: boolean;
 
     private orders: readonly Order[] = [];
     private products: readonly Product[] = [];
@@ -36,7 +36,7 @@ export class FinanceViewController extends FrontendJS.ViewController implements 
         this.products = await Product.get();
         this.orders = await Order.get({
             customer: this.customer.id,
-            timeframe: this.timeFrame
+            start: this.today ? Number(CoreJS.calcDate()) : Number(CoreJS.calcDate({ monthDay: 1 }))
         });
 
         this.orderProducts = this.orders.map(order => order.products).flat();
@@ -54,7 +54,7 @@ export class FinanceViewController extends FrontendJS.ViewController implements 
     public createHeader?(sender: FrontendJS.TableViewController): FrontendJS.View {
         const cell = new Cell();
 
-        cell.dateLabel.isVisible = this.timeFrame != CoreJS.TimeFrame.Day;
+        cell.dateLabel.isHidden = this.today;
 
         return cell;
     }
@@ -62,7 +62,7 @@ export class FinanceViewController extends FrontendJS.ViewController implements 
     public createCell(sender: FrontendJS.TableViewController, category: number): FrontendJS.View {
         const cell = new Cell();
 
-        cell.dateLabel.isVisible = this.timeFrame != CoreJS.TimeFrame.Day;
+        cell.dateLabel.isHidden = this.today;
 
         return cell;
     }
