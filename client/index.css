@@ -631,9 +631,15 @@ canvas {
     }
 }
 
-@media (max-width: 1023px) {
+@media (min-width: 1px) {
     * {
         font-size: 16px;
+    }
+}
+
+@media (min-width: 768px) {
+    * {
+        font-size: 20px;
     }
 }
 
