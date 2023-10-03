@@ -19,6 +19,8 @@ import { Order } from "../models/order";
 import { OrderState } from "../enums/orderState";
 import { OrderProduct } from "../models/orderProduct";
 
+const KEY_RESET_DELAY = "resetDelay";
+
 export class MainViewController extends FrontendJS.BodyViewController {
     public static readonly route = 'main';
 
@@ -37,6 +39,8 @@ export class MainViewController extends FrontendJS.BodyViewController {
 
     public readonly backButton = new FrontendJS.Button('back-button');
     public readonly payButton = new FrontendJS.Button('pay-button');
+
+    private readonly _resetTimeout = new CoreJS.Timeout(FrontendJS.Client.config.get(KEY_RESET_DELAY));
 
     private _selectedProduct: Product;
     private _order: Order;
@@ -152,6 +156,16 @@ export class MainViewController extends FrontendJS.BodyViewController {
     }
 
     public async load(): Promise<void> {
+        FrontendJS.Client.config.add(new CoreJS.NumberParameter(KEY_RESET_DELAY, "delay until app goes automatically back to customer selection after last user interaction", CoreJS.Milliseconds.Minute), key => this._resetTimeout.delay = FrontendJS.Client.config.get(key));
+
+        FrontendJS.Client.onInteraction.on(() => this._resetTimeout.restart().then(async () => {
+            while (FrontendJS.Client.popupViewController.stackViewController.currentViewController)
+                await FrontendJS.Client.popupViewController.popViewController();
+
+            while (this.stackViewController.count)
+                await this.stackViewController.popViewController();
+        }), { listener: this });
+
         this.stackViewController.removeAllChildren();
         this.stackViewController.pushViewController(this.customerMenuViewController);
 
@@ -162,6 +176,10 @@ export class MainViewController extends FrontendJS.BodyViewController {
     }
 
     public async unload(): Promise<void> {
+        FrontendJS.Client.onInteraction.off({ listener: this });
+
+        this._resetTimeout.stop();
+
         await super.unload();
     }
 
@@ -205,11 +223,12 @@ export class MainViewController extends FrontendJS.BodyViewController {
             title: CoreJS.Localization.translate('#_title_product_purchased', { product: product.name })
         });
 
-        const continueShopping = await FrontendJS.Client.popupViewController.queryBoolean(CoreJS.Localization.translate("#_query_text_shopping_continue", { '$1': product.name }), "#_query_title_shopping_continue");
-
-        if (!continueShopping) {
+        // attention, undefined needs to be ignored too
+        if (false == await FrontendJS.Client.popupViewController.queryBoolean(CoreJS.Localization.translate("#_query_text_shopping_continue", { '$1': product.name }), "#_query_title_shopping_continue")) {
             this.purchaseViewController.removeFromParent();
-            this.stackViewController.popViewController();
+
+            if (this.stackViewController.count)
+                await this.stackViewController.popViewController();
         }
     }
 
