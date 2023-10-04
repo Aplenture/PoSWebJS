@@ -55,7 +55,7 @@ export class BalanceViewController extends FrontendJS.ViewController implements 
         const data = this.finances[row];
 
         cell.dateLabel.text = new Date(data.timestamp).toLocaleDateString();
-        cell.typeLabel.text = data.type;
+        cell.typeLabel.text = '#_balance_' + data.data;
         cell.valueLabel.text = CoreJS.formatCurrency(data.value);
     }
 }
