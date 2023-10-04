@@ -5,7 +5,7 @@
  * License https://github.com/Aplenture/PoSWebJS/blob/main/LICENSE
  */
 
-export enum EventType {
-    Increase = 1,
-    Decrease = -1
+export enum FinanceType {
+    Deposit = "#_finance_deposit",
+    Withdraw = "#_finance_withdraw"
 }

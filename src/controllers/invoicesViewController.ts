@@ -12,7 +12,7 @@ import { Order } from "../models/order";
 import { OrderProduct } from "../models/orderProduct";
 import { Product } from "../models/product";
 
-export class FinanceViewController extends FrontendJS.ViewController implements FrontendJS.TableViewControllerDataSource {
+export class InvoicesViewController extends FrontendJS.ViewController implements FrontendJS.TableViewControllerDataSource {
     public readonly tableViewController = new FrontendJS.TableViewController();
 
     public customer: Customer;
@@ -86,7 +86,7 @@ export class FinanceViewController extends FrontendJS.ViewController implements 
 
 class Cell extends FrontendJS.View {
     public readonly dateLabel = new FrontendJS.Label('date-label');
-    public readonly amountLabel = new FrontendJS.Label('count-label');
+    public readonly amountLabel = new FrontendJS.Label('amount-Label');
     public readonly productLabel = new FrontendJS.Label('product-label');
     public readonly priceLabel = new FrontendJS.Label('price-label');
     public readonly sumLabel = new FrontendJS.Label('sum-label');

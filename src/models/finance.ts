@@ -7,7 +7,7 @@
 
 import * as FrontendJS from "frontendjs";
 import { PaymentMethod } from "../enums/paymentMethod";
-import { EventType } from "../enums/eventType";
+import { FinanceType } from "../enums/financeType";
 
 const ROUTE_GET = 'getFinances';
 
@@ -23,7 +23,7 @@ export class Finance {
     constructor(
         public readonly id: number,
         public readonly timestamp: number,
-        public readonly type: EventType,
+        public readonly type: FinanceType,
         public readonly account: number,
         public readonly customer: number,
         public readonly paymentMethod: PaymentMethod,
@@ -48,7 +48,7 @@ export class Finance {
         return this._server.requestJSON(ROUTE_GET, options).then(data => data.map(data => new Finance(
             data.id,
             data.timestamp,
-            data.type,
+            Finance.parseEventTypeToFinanceType(data.type),
             data.account,
             data.customer,
             data.paymentMethod,
@@ -56,5 +56,14 @@ export class Finance {
             data.value,
             data.data
         )));
+    }
+
+    private static parseEventTypeToFinanceType(type: number): FinanceType {
+        switch (type) {
+            case 1: return FinanceType.Deposit;
+            case -1: return FinanceType.Withdraw;
+
+            default: throw new Error(`unhandled event type '${type}'`);
+        }
     }
 }

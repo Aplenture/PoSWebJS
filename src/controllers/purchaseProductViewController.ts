@@ -9,7 +9,7 @@ import * as FrontendJS from "frontendjs";
 
 export class PurchaseProductViewController extends FrontendJS.BodyViewController {
     public readonly priceLabel = new FrontendJS.TitledLabel('price-label');
-    public readonly countLabel = new FrontendJS.TitledLabel('count-label');
+    public readonly amountLabel = new FrontendJS.TitledLabel('amount-Label');
 
     public readonly buyButton = new FrontendJS.Button('buy-button');
     public readonly undoButton = new FrontendJS.Button('undo-button');
@@ -18,21 +18,21 @@ export class PurchaseProductViewController extends FrontendJS.BodyViewController
         super(...classes, 'purchase-product-view-controller');
 
         this.priceLabel.title = '#_title_price';
-        this.countLabel.title = '#_title_count_purchases';
+        this.amountLabel.title = '#_title_count_purchases';
         this.buyButton.text = '#_title_buy';
 
         this.undoButton.type = FrontendJS.ButtonType.Cancel;
         this.undoButton.text = '#_title_undo_purchase';
 
         this.contentView.appendChild(this.priceLabel);
-        this.contentView.appendChild(this.countLabel);
+        this.contentView.appendChild(this.amountLabel);
 
         this.footerBar.appendChild(this.undoButton);
         this.footerBar.appendChild(this.buyButton);
     }
 
     public updatePurchaseCount(value: number) {
-        this.countLabel.text = value.toString();
+        this.amountLabel.text = value.toString();
         this.undoButton.isDisabled = !value;
     }
 }

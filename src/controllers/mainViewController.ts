@@ -10,7 +10,7 @@ import * as FrontendJS from "frontendjs";
 import { CustomersGridViewController } from "./customersGridViewController";
 import { ProductsGridViewController } from "./productsGridViewController";
 import { PurchaseProductViewController } from "./purchaseProductViewController";
-import { FinanceViewController } from "./financeViewController";
+import { InvoicesViewController } from "./invoicesViewController";
 import { Product } from "../models/product";
 import { Customer } from "../models/customer";
 import { PaymentMethod } from "../enums/paymentMethod";
@@ -18,6 +18,7 @@ import { Balance } from "../models/balance";
 import { Order } from "../models/order";
 import { OrderState } from "../enums/orderState";
 import { OrderProduct } from "../models/orderProduct";
+import { BalanceViewController } from "./balanceViewController";
 
 const KEY_RESET_DELAY = "resetDelay";
 
@@ -31,8 +32,9 @@ export class MainViewController extends FrontendJS.BodyViewController {
     public readonly guestsViewController = new CustomersGridViewController('guests-grid-view-controller');
     public readonly productsViewController = new ProductsGridViewController();
     public readonly purchaseViewController = new PurchaseProductViewController();
-    public readonly todayViewController = new FinanceViewController('today-invoices-view-controller');
-    public readonly monthViewController = new FinanceViewController('month-invoices-view-controller');
+    public readonly todayViewController = new InvoicesViewController('today-invoices-view-controller');
+    public readonly monthViewController = new InvoicesViewController('month-invoices-view-controller');
+    public readonly balanceViewControlelr = new BalanceViewController();
 
     public readonly customerLabel = new FrontendJS.Label('customer-label');
     public readonly balanceLabel = new FrontendJS.Label('balance-label');
@@ -112,12 +114,14 @@ export class MainViewController extends FrontendJS.BodyViewController {
         this.productMenuViewController.appendChild(this.productsViewController, '#_title_buy');
         this.productMenuViewController.appendChild(this.todayViewController);
         this.productMenuViewController.appendChild(this.monthViewController, '#_title_month');
+        this.productMenuViewController.appendChild(this.balanceViewControlelr, '#_title_balance');
     }
 
     public get selectedCustomer(): Customer { return this.todayViewController.customer; }
     public set selectedCustomer(value: Customer) {
         this.todayViewController.customer = value;
         this.monthViewController.customer = value;
+        this.balanceViewControlelr.customer = value;
         this.balanceLabel.isHidden = !value;
 
         if (value) {

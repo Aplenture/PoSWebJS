@@ -42,14 +42,11 @@
 .cell .balance-label,
 .cell .price-label,
 .cell .sum-label,
-.cell .count-label {
-    width: 1px;
-    text-align: right;
-}
-
+.cell .amount-Label,
+.cell .value-label,
 .cell .date-label {
     width: 1px;
-    text-align: left;
+    text-align: right;
 }
 
 .table-view .header {
