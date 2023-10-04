@@ -1,3 +1,10 @@
+/**
+ * Aplenture/PoSWebJS
+ * https://github.com/Aplenture/PoSWebJS
+ * Copyright (c) 2023 Aplenture
+ * License https://github.com/Aplenture/PoSWebJS/blob/main/LICENSE
+ */
+
 .main-view-controller.body-footer-bar {
     border-top: 1px solid black;
     justify-content: space-between;

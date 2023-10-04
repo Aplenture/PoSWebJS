@@ -1,4 +1,6 @@
+const webpack = require('webpack');
 const path = require('path');
+const fs = require('fs');
 
 module.exports = {
     mode: 'production',
@@ -16,6 +18,9 @@ module.exports = {
     resolve: {
         extensions: ['.tsx', '.ts', '.js'],
     },
+    plugins: [
+        new webpack.BannerPlugin(fs.readFileSync('./LICENSE', 'utf8'))
+    ],
     output: {
         filename: 'index.js',
         path: path.resolve(__dirname, 'client'),
