@@ -16,6 +16,7 @@ export class BalanceViewController extends FrontendJS.ViewController implements 
     public customer: Customer;
 
     private finances: readonly Finance[] = [];
+    private sum = 0;
 
     constructor(...classes: string[]) {
         super(...classes, 'balance-view-controller');
@@ -27,16 +28,22 @@ export class BalanceViewController extends FrontendJS.ViewController implements 
     }
 
     public async load() {
+        const firstDayOfMonth = Number(CoreJS.calcDate({ monthDay: 1 }));
+
         this.finances = await Finance.get({
             customer: this.customer.id,
-            start: Number(CoreJS.calcDate())
+            start: firstDayOfMonth
         });
+
+        this.sum = this.finances
+            .map(data => data.value * data.type)
+            .reduce((a, b) => a + b, 0);
 
         await super.load();
     }
 
     public numberOfCells(sender: FrontendJS.TableViewController, category: number): number {
-        return this.finances.length;
+        return this.finances.length + 2;
     }
 
     public createHeader?(sender: FrontendJS.TableViewController): FrontendJS.View {
@@ -52,11 +59,15 @@ export class BalanceViewController extends FrontendJS.ViewController implements 
     }
 
     public updateCell(sender: FrontendJS.TableViewController, cell: Cell, row: number, category: number): void {
-        const data = this.finances[row];
+        if (row < this.finances.length) {
+            const data = this.finances[row];
 
-        cell.dateLabel.text = new Date(data.timestamp).toLocaleDateString();
-        cell.typeLabel.text = '#_balance_' + data.data;
-        cell.valueLabel.text = CoreJS.formatCurrency(data.value);
+            cell.dateLabel.text = new Date(data.timestamp).toLocaleDateString();
+            cell.typeLabel.text = '#_balance_' + data.data;
+            cell.valueLabel.text = CoreJS.formatCurrency(data.value * data.type);
+        } else if (row > this.finances.length) {
+            cell.valueLabel.text = CoreJS.formatCurrency(this.sum);
+        }
     }
 }
 
@@ -71,6 +82,8 @@ class Cell extends FrontendJS.View {
         this.dateLabel.text = '#_title_date';
         this.typeLabel.text = '#_title_type';
         this.valueLabel.text = '#_title_value';
+
+        this.valueLabel.type = FrontendJS.LabelType.Balance;
 
         this.appendChild(this.dateLabel);
         this.appendChild(this.typeLabel);

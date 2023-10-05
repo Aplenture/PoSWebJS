@@ -22,6 +22,8 @@
     "#_back": "Back",
     "#_balance_deposit": "Deposit",
     "#_balance_invoice": "Invoice",
+    "#_balance_previous_balance": "Previous Balance",
+    "#_balance_open_invoice": "Open Invoice",
     "#_balance_tip": "Tip",
     "#_balance_withdraw": "Withdraw",
     "#_cancel": "Cancel",

@@ -20,13 +20,10 @@ export class Finance {
     private static _server: FrontendJS.Server;
 
     constructor(
-        public readonly id: number,
         public readonly timestamp: number,
         public readonly type: number,
-        public readonly account: number,
         public readonly customer: number,
         public readonly paymentMethod: PaymentMethod,
-        public readonly order: number,
         public readonly value: number,
         public readonly data: string
     ) { }
@@ -45,13 +42,10 @@ export class Finance {
 
     public static get(options?: GetOptions): Promise<Finance[]> {
         return this._server.requestJSON(ROUTE_GET, options).then(data => data.map(data => new Finance(
-            data.id,
             data.timestamp,
             data.type,
-            data.account,
             data.customer,
             data.paymentMethod,
-            data.order,
             data.value,
             data.data
         )));

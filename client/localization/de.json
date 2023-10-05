@@ -22,6 +22,8 @@
     "#_back": "Zurück",
     "#_balance_deposit": "Einzahlung",
     "#_balance_invoice": "Bestellung",
+    "#_balance_open_invoice": "Offene Bestellung",
+    "#_balance_previous_balance": "Übertrag",
     "#_balance_tip": "Trinkgeld",
     "#_balance_withdraw": "Auszahlung",
     "#_cancel": "Abbrechen",

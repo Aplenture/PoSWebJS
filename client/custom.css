@@ -125,25 +125,30 @@
     height: 6vw;
 }
 
-.invoices-view-controller .table-view .cell:nth-last-child(2) {
+.invoices-view-controller .table-view .cell:nth-last-child(2),
+.balance-view-controller .table-view .cell:nth-last-child(2) {
     visibility: hidden;
     height: .5em;
     padding: 0;
     margin: 0;
 }
 
-.invoices-view-controller .table-view .cell:nth-last-child(2) div {
+.invoices-view-controller .table-view .cell:nth-last-child(2) div,
+.balance-view-controller .table-view .cell:nth-last-child(2) div {
     display: none;
 }
 
-.invoices-view-controller .table-view .cell:nth-last-child(3)>div {
+.invoices-view-controller .table-view .cell:nth-last-child(3)>div,
+.balance-view-controller .table-view .cell:nth-last-child(3)>div {
     border-bottom: 1px solid #0180D4;
 }
 
-.invoices-view-controller .table-view .cell:last-child>div {
+.invoices-view-controller .table-view .cell:last-child>div,
+.balance-view-controller .table-view .cell:last-child>div {
     border-top: 1px solid #0180D4;
 }
 
-.invoices-view-controller .table-view .cell:last-child>div:not(:last-child) {
+.invoices-view-controller .table-view .cell:last-child>div:not(:last-child),
+.balance-view-controller .table-view .cell:last-child>div:not(:last-child) {
     visibility: hidden;
 }
