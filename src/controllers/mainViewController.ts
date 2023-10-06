@@ -82,9 +82,11 @@ export class MainViewController extends FrontendJS.BodyViewController {
 
         this.todayViewController.title = '#_title_today';
         this.todayViewController.today = true;
+        this.todayViewController.onProductSelected.on(product => this.selectProduct(product));
 
         this.monthViewController.title = '#_title_month_this';
         this.monthViewController.today = false;
+        this.monthViewController.onProductSelected.on(product => this.selectProduct(product));
 
         this.purchaseViewController.buyButton.onClick.on(() => this.buy(this.selectedProduct, this.selectedCustomer));
         this.purchaseViewController.undoButton.onClick.on(() => this.undoPurchase(this.selectedProduct, this.selectedCustomer));
@@ -226,6 +228,12 @@ export class MainViewController extends FrontendJS.BodyViewController {
             title: CoreJS.Localization.translate('#_title_product_purchased', { product: product.name })
         });
 
+        if (this.productMenuViewController.selectedViewController == this.todayViewController)
+            this.productMenuViewController.selectedViewController.reload();
+
+        if (this.productMenuViewController.selectedViewController == this.monthViewController)
+            this.productMenuViewController.selectedViewController.reload();
+
         // attention, undefined needs to be ignored too
         if (false == await FrontendJS.Client.popupViewController.queryBoolean(CoreJS.Localization.translate("#_query_text_shopping_continue", { '$1': product.name }), "#_query_title_shopping_continue")) {
             this.purchaseViewController.removeFromParent();
@@ -252,6 +260,12 @@ export class MainViewController extends FrontendJS.BodyViewController {
             text: '#_notification_purchase_canceled',
             title: CoreJS.Localization.translate('#_title_product_canceled', { product: product.name })
         });
+
+        if (this.productMenuViewController.selectedViewController == this.todayViewController)
+            this.productMenuViewController.selectedViewController.reload();
+
+        if (this.productMenuViewController.selectedViewController == this.monthViewController)
+            this.productMenuViewController.selectedViewController.reload();
     }
 
     private async pay() {

@@ -13,6 +13,8 @@ import { OrderProduct } from "../models/orderProduct";
 import { Product } from "../models/product";
 
 export class InvoicesViewController extends FrontendJS.ViewController implements FrontendJS.TableViewControllerDataSource {
+    public readonly onProductSelected = new CoreJS.Event<InvoicesViewController, Product>('InvoicesViewController.onProductSelected');
+
     public readonly tableViewController = new FrontendJS.TableViewController();
 
     public customer: Customer;
@@ -28,6 +30,8 @@ export class InvoicesViewController extends FrontendJS.ViewController implements
 
         this.tableViewController.titleLabel.text = '#_title_invoices';
         this.tableViewController.dataSource = this;
+        this.tableViewController.selectionMode = FrontendJS.TableSelectionMode.Clickable;
+        this.tableViewController.onSelectedCell.on(cell => cell.index < this.orderProducts.length && this.onProductSelected.emit(this, this.products.find(product => product.id == this.orderProducts[cell.index].product)));
 
         this.appendChild(this.tableViewController);
     }
