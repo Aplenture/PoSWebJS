@@ -18,6 +18,12 @@ interface GetOptions {
     readonly paymentmethods?: number;
 }
 
+interface EditOptions {
+    readonly customer: number;
+    readonly firstname?: string;
+    readonly lastname?: string;
+}
+
 export class Customer {
     private static _server: FrontendJS.Server;
 
@@ -58,8 +64,8 @@ export class Customer {
         )));
     }
 
-    public static add(name: string, paymentmethods?: number): Promise<Customer> {
-        return this._server.requestJSON(ROUTE_ADD, { firstname: name, paymentmethods }).then(data => new Customer(
+    public static add(firstname: string, lastname: string, paymentmethods?: number): Promise<Customer> {
+        return this._server.requestJSON(ROUTE_ADD, { firstname, lastname, paymentmethods }).then(data => new Customer(
             data.id,
             data.account,
             data.created,
@@ -74,8 +80,8 @@ export class Customer {
         return this._server.requestBool(ROUTE_REMOVE, { customer });
     }
 
-    public static edit(customer: number, name: string): Promise<boolean> {
-        return this._server.requestBool(ROUTE_EDIT, { customer, firstname: name });
+    public static edit(options: EditOptions): Promise<boolean> {
+        return this._server.requestBool(ROUTE_EDIT, options);
     }
 
     public toString(): string {

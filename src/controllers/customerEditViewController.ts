@@ -13,7 +13,8 @@ export class CustomerEditViewController extends FrontendJS.BodyViewController {
     public readonly onCreated = new CoreJS.Event<CustomerEditViewController, Customer>('CustomerEditViewController.onCreated');
     public readonly onUpdated = new CoreJS.Event<CustomerEditViewController, Customer>('CustomerEditViewController.onUpdated');
 
-    public readonly nameTextField = new FrontendJS.TextField('name-text-field');
+    public readonly firstnameTextField = new FrontendJS.TextField('firstname-text-field');
+    public readonly lastnameTextField = new FrontendJS.TextField('lastname-text-field');
 
     public readonly createButton = new FrontendJS.Button('create-button');
     public readonly updateButton = new FrontendJS.Button('update-button');
@@ -25,8 +26,11 @@ export class CustomerEditViewController extends FrontendJS.BodyViewController {
     constructor(...classes: string[]) {
         super(...classes, 'create-customer-view-controller');
 
-        this.nameTextField.title = '#_title_name';
-        this.nameTextField.onEnterKey.on(() => this.onEnterKey());
+        this.firstnameTextField.title = '#_title_firstname';
+        this.firstnameTextField.onEnterKey.on(() => this.onEnterKey());
+
+        this.lastnameTextField.title = '#_title_lastname';
+        this.lastnameTextField.onEnterKey.on(() => this.onEnterKey());
 
         this.createButton.text = '#_title_create';
         this.createButton.onClick.on(() => this.create());
@@ -34,7 +38,8 @@ export class CustomerEditViewController extends FrontendJS.BodyViewController {
         this.updateButton.text = '#_title_update';
         this.updateButton.onClick.on(() => this.update());
 
-        this.contentView.appendChild(this.nameTextField);
+        this.contentView.appendChild(this.firstnameTextField);
+        this.contentView.appendChild(this.lastnameTextField);
 
         this.footerBar.appendChild(this.createButton);
         this.footerBar.appendChild(this.updateButton);
@@ -54,30 +59,38 @@ export class CustomerEditViewController extends FrontendJS.BodyViewController {
             : '#_title_create_customer';
 
         if (this.customer) {
-            this.nameTextField.value = this.customer.firstname;
+            this.firstnameTextField.value = this.customer.firstname;
+            this.lastnameTextField.value = this.customer.lastname;
         }
 
         await super.load();
     }
 
     public async unload(): Promise<void> {
-        this.nameTextField.value = '';
+        this.firstnameTextField.value = '';
+        this.lastnameTextField.value = '';
 
         await super.unload();
     }
 
     public focus() {
-        this.nameTextField.focus();
+        this.firstnameTextField.focus();
     }
 
     public async create(): Promise<Customer | void> {
-        const name = this.nameTextField.value;
+        const firstname = this.firstnameTextField.value;
 
-        if (!name)
-            return await FrontendJS.Client.popupViewController.pushMessage('#_error_missing_customer_name', '#_title_create_customer')
-                .then(() => this.nameTextField.focus());
+        if (!firstname)
+            return await FrontendJS.Client.popupViewController.pushMessage('#_error_missing_customer_firstname', '#_title_create_customer')
+                .then(() => this.firstnameTextField.focus());
 
-        this.customer = await Customer.add(name, this.paymentMethods);
+        const lastname = this.lastnameTextField.value;
+
+        if (!lastname)
+            return await FrontendJS.Client.popupViewController.pushMessage('#_error_missing_customer_lastname', '#_title_create_customer')
+                .then(() => this.lastnameTextField.focus());
+
+        this.customer = await Customer.add(firstname, lastname, this.paymentMethods);
 
         FrontendJS.Client.notificationViewController.pushNotification({ text: '#_notification_customer_created' });
 
@@ -87,7 +100,13 @@ export class CustomerEditViewController extends FrontendJS.BodyViewController {
     }
 
     public async update(): Promise<boolean> {
-        if (!await Customer.edit(this.customer.id, this.nameTextField.value))
+        const result = await Customer.edit({
+            customer: this.customer.id,
+            firstname: this.firstnameTextField.value,
+            lastname: this.lastnameTextField.value
+        });
+
+        if (!result)
             return false;
 
         FrontendJS.Client.notificationViewController.pushNotification({ text: '#_notification_customer_updated' });

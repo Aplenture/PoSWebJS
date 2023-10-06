@@ -61,7 +61,7 @@ export class CustomersGridViewController extends GridViewController {
 
         const customer = this.customers[index];
 
-        cell.nameLabel.text = customer.toString();
+        cell.nameLabel.text = `${customer.firstname}\n${customer.lastname}`;
     }
 
     public add(): Promise<void> {
