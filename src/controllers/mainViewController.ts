@@ -104,7 +104,7 @@ export class MainViewController extends FrontendJS.BodyViewController {
         balanceView.appendChild(this.payButton);
 
         this.productsViewController.footerBar.appendChild(balanceView);
-        this.productsViewController.footerBar.appendChild(this.productsViewController.nextButton);
+        this.productsViewController.footerBar.appendChild(this.productsViewController.downButton);
 
         this.appendChild(this.stackViewController);
 
