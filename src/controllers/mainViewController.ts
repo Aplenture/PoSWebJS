@@ -303,6 +303,11 @@ export class MainViewController extends FrontendJS.BodyViewController {
             return FrontendJS.Client.popupViewController.pushMessage('#_error_not_enough_payment', '#_error')
                 .then(() => this.pay());
 
+        const tip = amount - invoice;
+
+        if (!(await FrontendJS.Client.popupViewController.queryBoolean(CoreJS.Localization.translate('#_query_text_tip_correct', { '$1': CoreJS.formatCurrency(tip) }), CoreJS.Localization.translate('#_query_title_tip_correct', { '$1': CoreJS.formatCurrency(tip) }))))
+            return this.pay();
+
         await Order.close(this._order.id, PaymentMethod.Cash, amount);
 
         this.order = null;
