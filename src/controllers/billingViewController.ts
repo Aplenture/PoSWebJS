@@ -71,7 +71,7 @@ export class BillingViewController extends FrontendJS.BodyViewController impleme
             const data = this.finances[row];
 
             cell.dateLabel.text = new Date(data.timestamp).toLocaleDateString();
-            cell.typeLabel.text = '#_balance_' + data.data;
+            cell.typeLabel.text = '#_billing_' + data.data;
             cell.valueLabel.text = CoreJS.formatCurrency(data.value);
         } else if (row > this.finances.length) {
             cell.valueLabel.text = CoreJS.formatCurrency(this.sum);
