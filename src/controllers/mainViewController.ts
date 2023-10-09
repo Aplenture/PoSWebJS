@@ -118,7 +118,7 @@ export class MainViewController extends FrontendJS.BodyViewController {
 
         this.productMenuViewController.appendChild(this.productsViewController, '#_title_buy');
         this.productMenuViewController.appendChild(this.todayViewController);
-        this.productMenuViewController.appendChild(this.monthViewController, '#_title_month');
+        // this.productMenuViewController.appendChild(this.monthViewController, '#_title_month');
         this.productMenuViewController.appendChild(this.balanceViewControlelr, '#_title_balance');
     }
 
