@@ -12,6 +12,12 @@ const ROUTE_EDIT = 'editCustomer';
 const ROUTE_GET = 'getCustomers';
 const ROUTE_REMOVE = 'removeCustomer';
 
+interface AddOptions {
+    readonly firstname: string;
+    readonly lastname?: string;
+    readonly paymentmethods?: number;
+}
+
 interface GetOptions {
     readonly firstID?: number;
     readonly lastID?: number;
@@ -64,8 +70,8 @@ export class Customer {
         )));
     }
 
-    public static add(firstname: string, lastname: string, paymentmethods?: number): Promise<Customer> {
-        return this._server.requestJSON(ROUTE_ADD, { firstname, lastname, paymentmethods }).then(data => new Customer(
+    public static add(options: AddOptions): Promise<Customer> {
+        return this._server.requestJSON(ROUTE_ADD, options).then(data => new Customer(
             data.id,
             data.account,
             data.created,

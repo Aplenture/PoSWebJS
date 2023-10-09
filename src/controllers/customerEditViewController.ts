@@ -86,11 +86,15 @@ export class CustomerEditViewController extends FrontendJS.BodyViewController {
 
         const lastname = this.lastnameTextField.value;
 
-        if (!lastname)
-            return await FrontendJS.Client.popupViewController.pushMessage('#_error_missing_customer_lastname', '#_title_create_customer')
-                .then(() => this.lastnameTextField.focus());
+        // if (!lastname)
+        //     return await FrontendJS.Client.popupViewController.pushMessage('#_error_missing_customer_lastname', '#_title_create_customer')
+        //         .then(() => this.lastnameTextField.focus());
 
-        this.customer = await Customer.add(firstname, lastname, this.paymentMethods);
+        this.customer = await Customer.add({
+            firstname,
+            lastname,
+            paymentmethods: this.paymentMethods
+        });
 
         FrontendJS.Client.notificationViewController.pushNotification({ text: '#_notification_customer_created' });
 
