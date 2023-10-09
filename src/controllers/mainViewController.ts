@@ -292,7 +292,7 @@ export class MainViewController extends FrontendJS.BodyViewController {
         if (!this.selectedCustomer || (this.selectedCustomer.paymentMethods & PaymentMethod.Cash) == 0)
             throw new Error('selected customer is not a guest');
 
-        const amount = await FrontendJS.Client.popupViewController.queryCurrency('#_query_text_pay_invoice', CoreJS.Localization.translate('#_query_title_pay_invoice', { '$1': CoreJS.formatCurrency(this.balance) }));
+        const amount = await FrontendJS.Client.popupViewController.queryCurrency('#_query_text_pay_invoice', CoreJS.Localization.translate('#_query_title_pay_invoice', { '$1': CoreJS.formatCurrency(Math.abs(this.balance)) }));
 
         if (!amount)
             return;
