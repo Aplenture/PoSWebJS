@@ -83,9 +83,11 @@ export class MainViewController extends FrontendJS.BodyViewController {
         this.todayViewController.title = '#_title_today';
         this.todayViewController.today = true;
         this.todayViewController.onProductSelected.on(product => this.selectProduct(product));
+        this.todayViewController.payButton.onClick.on(() => this.pay());
 
         this.monthViewController.title = '#_title_month_this';
         this.monthViewController.today = false;
+        this.monthViewController.footerBar.isVisible = false;
         this.monthViewController.onProductSelected.on(product => this.selectProduct(product));
 
         this.purchaseViewController.buyButton.onClick.on(() => this.buy(this.selectedProduct, this.selectedCustomer));
@@ -95,6 +97,7 @@ export class MainViewController extends FrontendJS.BodyViewController {
         this.backButton.onClick.on(() => this.stackViewController.popViewController());
 
         this.payButton.text = '#_title_pay';
+        this.payButton.onClick.on(() => this.productMenuViewController.selectedViewController = this.todayViewController);
         this.payButton.onClick.on(() => this.pay());
 
         this.balanceLabel.type = FrontendJS.LabelType.Balance;
@@ -125,14 +128,17 @@ export class MainViewController extends FrontendJS.BodyViewController {
         this.monthViewController.customer = value;
         this.balanceViewControlelr.customer = value;
         this.balanceLabel.isHidden = !value;
+        this.todayViewController.footerBar.isVisible = value && (value.paymentMethods & PaymentMethod.Cash) != 0;
 
         if (value) {
             this.customerLabel.text = value.toString();
             this.payButton.isHidden = (value.paymentMethods & PaymentMethod.Cash) == 0;
+            this.todayViewController.payButton.isHidden = (value.paymentMethods & PaymentMethod.Cash) == 0;
         } else {
             this.customerLabel.text = '';
             this.balanceLabel.text = '';
             this.payButton.isHidden = true;
+            this.todayViewController.payButton.isHidden = true;
         }
 
         this.updateOrder();
@@ -158,6 +164,7 @@ export class MainViewController extends FrontendJS.BodyViewController {
     public set balance(value: number) {
         this.balanceLabel.text = CoreJS.formatCurrency(value);
         this.payButton.isDisabled = value >= 0;
+        this.todayViewController.payButton.isDisabled = value >= 0;
     }
 
     public async load(): Promise<void> {
@@ -174,10 +181,10 @@ export class MainViewController extends FrontendJS.BodyViewController {
         this.stackViewController.removeAllChildren();
         this.stackViewController.pushViewController(this.customerMenuViewController);
 
+        await super.load();
+
         this.selectedCustomer = null;
         this.selectedProduct = null;
-
-        await super.load();
     }
 
     public async unload(): Promise<void> {

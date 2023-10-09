@@ -12,10 +12,12 @@ import { Order } from "../models/order";
 import { OrderProduct } from "../models/orderProduct";
 import { Product } from "../models/product";
 
-export class InvoicesViewController extends FrontendJS.ViewController implements FrontendJS.TableViewControllerDataSource {
+export class InvoicesViewController extends FrontendJS.BodyViewController implements FrontendJS.TableViewControllerDataSource {
     public readonly onProductSelected = new CoreJS.Event<InvoicesViewController, Product>('InvoicesViewController.onProductSelected');
 
     public readonly tableViewController = new FrontendJS.TableViewController();
+
+    public readonly payButton = new FrontendJS.Button('pay-button');
 
     public customer: Customer;
     public today: boolean;
@@ -28,12 +30,18 @@ export class InvoicesViewController extends FrontendJS.ViewController implements
     constructor(...classes: string[]) {
         super(...classes, 'invoices-view-controller');
 
+        this.titleBar.isHidden = true;
+
         this.tableViewController.titleLabel.text = '#_title_invoices';
         this.tableViewController.dataSource = this;
         this.tableViewController.selectionMode = FrontendJS.TableSelectionMode.Clickable;
         this.tableViewController.onSelectedCell.on(cell => cell.index < this.orderProducts.length && this.onProductSelected.emit(this, this.products.find(product => product.id == this.orderProducts[cell.index].product)));
 
+        this.payButton.text = '#_title_pay';
+
         this.appendChild(this.tableViewController);
+
+        this.footerBar.appendChild(this.payButton);
     }
 
     public async load() {
