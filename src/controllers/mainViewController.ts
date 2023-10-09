@@ -129,6 +129,7 @@ export class MainViewController extends FrontendJS.BodyViewController {
         this.balanceViewControlelr.customer = value;
         this.balanceLabel.isHidden = !value;
         this.todayViewController.footerBar.isVisible = value && (value.paymentMethods & PaymentMethod.Cash) != 0;
+        this.productMenuViewController.showViewController(this.monthViewController, value && (value.paymentMethods & PaymentMethod.Balance) != 0);
 
         if (value) {
             this.customerLabel.text = value.toString();
