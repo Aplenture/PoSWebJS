@@ -51,7 +51,7 @@
     "#_error_missing_product_name": "Please type the name of the new product.",
     "#_error_missing_product_price": "Please type the price of the new product.",
     "#_error_no_access": "There is no access. You need to login.",
-    "#_order_not_enough_amount": "This is not enough money to pay the invoices.",
+    "#_error_not_enough_payment": "This is not enough money to pay the invoices.",
     "#_error_product_already_exist": "The product already exist.",
     "#_error_product_not_bought_lately": "You have not bought this product recently.",
     "#_expiration_date": "Expiration Date",
