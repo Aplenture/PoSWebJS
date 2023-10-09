@@ -311,6 +311,8 @@ export class MainViewController extends FrontendJS.BodyViewController {
         await Order.close(this._order.id, PaymentMethod.Cash, amount);
 
         this.order = null;
+
+        await this.billingViewController.reload();
     }
 
     private async updateOrder(): Promise<void> {
