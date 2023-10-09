@@ -91,7 +91,7 @@ class Cell extends FrontendJS.View {
         this.typeLabel.text = '#_title_type';
         this.valueLabel.text = '#_title_value';
 
-        this.appendChild(this.dateLabel);
+        // this.appendChild(this.dateLabel);
         this.appendChild(this.typeLabel);
         this.appendChild(this.valueLabel);
     }
