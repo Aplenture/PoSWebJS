@@ -44,6 +44,7 @@ export class BillingViewController extends FrontendJS.BodyViewController impleme
         });
 
         this.sum = this.finances
+            .filter(data => data.data == 'open_invoice')
             .map(data => data.value)
             .reduce((a, b) => a + b, 0);
 
