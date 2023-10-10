@@ -89,20 +89,28 @@
 }
 
 .products-grid-view-controller .grid-view .cell:last-child,
-.guests-grid-view-controller .grid-view .cell:last-child {
+.guests-grid-view-controller .grid-view .cell:last-child,
+.customer-guests-grid-view-controller .grid-view .cell:last-child,
+.main-guests-grid-view-controller .grid-view .cell:last-child {
     position: relative;
     background-color: gray;
 }
 
 .products-grid-view-controller .grid-view .cell:last-child div,
-.guests-grid-view-controller .grid-view .cell:last-child div {
+.guests-grid-view-controller .grid-view .cell:last-child div,
+.customer-guests-grid-view-controller .grid-view .cell:last-child div,
+.main-guests-grid-view-controller .grid-view .cell:last-child div {
     display: none;
 }
 
 .products-grid-view-controller .grid-view .cell:last-child::before,
 .guests-grid-view-controller .grid-view .cell:last-child::before,
+.customer-guests-grid-view-controller .grid-view .cell:last-child::before,
+.main-guests-grid-view-controller .grid-view .cell:last-child::before,
 .products-grid-view-controller .grid-view .cell:last-child::after,
-.guests-grid-view-controller .grid-view .cell:last-child::after {
+.guests-grid-view-controller .grid-view .cell:last-child::after,
+.customer-guests-grid-view-controller .grid-view .cell:last-child::after,
+.main-guests-grid-view-controller .grid-view .cell:last-child::after {
     content: "";
     position: absolute;
     background: #fff;
@@ -114,13 +122,17 @@
 }
 
 .products-grid-view-controller .grid-view .cell:last-child::before,
-.guests-grid-view-controller .grid-view .cell:last-child::before {
+.guests-grid-view-controller .grid-view .cell:last-child::before,
+.customer-guests-grid-view-controller .grid-view .cell:last-child::before,
+.main-guests-grid-view-controller .grid-view .cell:last-child::before {
     width: 6vw;
     height: 1.5vw;
 }
 
 .products-grid-view-controller .grid-view .cell:last-child::after,
-.guests-grid-view-controller .grid-view .cell:last-child::after {
+.guests-grid-view-controller .grid-view .cell:last-child::after,
+.customer-guests-grid-view-controller .grid-view .cell:last-child::after,
+.main-guests-grid-view-controller .grid-view .cell:last-child::after {
     width: 1.5vw;
     height: 6vw;
 }

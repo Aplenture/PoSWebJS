@@ -85,6 +85,8 @@ export class MainViewController extends FrontendJS.BodyViewController {
         this.openOrdersViewController.payButton.onClick.on(() => this.productMenuViewController.selectedViewController = this.billingViewController);
         this.openOrdersViewController.payButton.onClick.on(() => this.pay());
 
+        this.purchaseViewController.customerLabel.isVisible = false;
+        this.purchaseViewController.productLabel.isVisible = false;
         this.purchaseViewController.buyButton.onClick.on(() => this.buy(this.selectedProduct, this.selectedCustomer));
         this.purchaseViewController.undoButton.onClick.on(() => this.undoPurchase(this.selectedProduct, this.selectedCustomer));
 

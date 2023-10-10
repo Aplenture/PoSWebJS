@@ -55,6 +55,8 @@ export class OpenOrdersViewController extends FrontendJS.BodyViewController impl
             .map(data => data.invoice)
             .reduce((a, b) => a + b, 0);
 
+        this.payButton.isDisabled = !orders.length;
+
         await super.load();
     }
 

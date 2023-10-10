@@ -43,6 +43,8 @@ export class BillingViewController extends FrontendJS.BodyViewController impleme
             .map(data => data.value)
             .reduce((a, b) => a + b, 0);
 
+        this.payButton.isEnabled = this.sum > 0;
+
         await super.load();
     }
 
