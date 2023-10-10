@@ -174,6 +174,9 @@ export class MainViewController extends FrontendJS.BodyViewController {
 
     public get balance(): number { return this.balanceLabel.numberValue; }
     public set balance(value: number) {
+        if (this.selectedCustomer && (this.selectedCustomer.paymentMethods & PaymentMethod.Cash) != 0)
+            value = Math.abs(value);
+
         this.balanceLabel.text = CoreJS.formatCurrency(value);
         this.payButton.isDisabled = value >= 0;
         this.todayViewController.payButton.isDisabled = value >= 0;
