@@ -11,28 +11,27 @@ import { Customer } from "../models/customer";
 import { Order } from "../models/order";
 import { OrderProduct } from "../models/orderProduct";
 import { Product } from "../models/product";
+import { OrderState } from "../enums/orderState";
 
-export class InvoicesViewController extends FrontendJS.BodyViewController implements FrontendJS.TableViewControllerDataSource {
-    public readonly onProductSelected = new CoreJS.Event<InvoicesViewController, Product>('InvoicesViewController.onProductSelected');
+export class OpenOrdersViewController extends FrontendJS.BodyViewController implements FrontendJS.TableViewControllerDataSource {
+    public readonly onProductSelected = new CoreJS.Event<OpenOrdersViewController, Product>('OpenOrdersViewController.onProductSelected');
 
     public readonly tableViewController = new FrontendJS.TableViewController();
 
     public readonly payButton = new FrontendJS.Button('pay-button');
 
     public customer: Customer;
-    public today: boolean;
 
-    private orders: readonly Order[] = [];
     private products: readonly Product[] = [];
     private orderProducts: readonly OrderProduct[] = [];
     private sum = 0;
 
     constructor(...classes: string[]) {
-        super(...classes, 'invoices-view-controller');
+        super(...classes, 'open-orders-view-controller');
 
         this.titleBar.isHidden = true;
 
-        this.tableViewController.titleLabel.text = '#_title_invoices';
+        this.tableViewController.titleLabel.text = '#_title_open_orders';
         this.tableViewController.dataSource = this;
         this.tableViewController.selectionMode = FrontendJS.TableSelectionMode.Clickable;
         this.tableViewController.onSelectedCell.on(cell => cell.index < this.orderProducts.length && this.onProductSelected.emit(this, this.products.find(product => product.id == this.orderProducts[cell.index].product)));
@@ -45,14 +44,14 @@ export class InvoicesViewController extends FrontendJS.BodyViewController implem
     }
 
     public async load() {
-        this.products = await Product.get();
-        this.orders = await Order.get({
+        const orders = await Order.get({
             customer: this.customer.id,
-            start: this.today ? Number(CoreJS.calcDate()) : Number(CoreJS.calcDate({ monthDay: 1 }))
+            state: OrderState.Open
         });
 
-        this.orderProducts = this.orders.map(order => order.products).flat();
-        this.sum = this.orders
+        this.products = await Product.get();
+        this.orderProducts = orders.map(order => order.products).flat();
+        this.sum = orders
             .map(data => data.invoice)
             .reduce((a, b) => a + b, 0);
 
@@ -66,15 +65,11 @@ export class InvoicesViewController extends FrontendJS.BodyViewController implem
     public createHeader?(sender: FrontendJS.TableViewController): FrontendJS.View {
         const cell = new Cell();
 
-        cell.dateLabel.isHidden = this.today;
-
         return cell;
     }
 
     public createCell(sender: FrontendJS.TableViewController, category: number): FrontendJS.View {
         const cell = new Cell();
-
-        cell.dateLabel.isHidden = this.today;
 
         return cell;
     }
@@ -83,9 +78,7 @@ export class InvoicesViewController extends FrontendJS.BodyViewController implem
         if (row < this.orderProducts.length) {
             const orderProduct = this.orderProducts[row];
             const product = this.products.find(product => product.id == orderProduct.product);
-            const order = this.orders.find(order => order.id == orderProduct.order);
 
-            cell.dateLabel.text = new Date(order.updated).toLocaleDateString();
             cell.amountLabel.text = orderProduct.amount.toString();
             cell.productLabel.text = product.name;
             cell.priceLabel.text = CoreJS.formatCurrency(orderProduct.price);
@@ -97,7 +90,6 @@ export class InvoicesViewController extends FrontendJS.BodyViewController implem
 }
 
 class Cell extends FrontendJS.View {
-    public readonly dateLabel = new FrontendJS.Label('date-label');
     public readonly amountLabel = new FrontendJS.Label('amount-Label');
     public readonly productLabel = new FrontendJS.Label('product-label');
     public readonly priceLabel = new FrontendJS.Label('price-label');
@@ -106,13 +98,11 @@ class Cell extends FrontendJS.View {
     constructor(...classes: string[]) {
         super(...classes);
 
-        this.dateLabel.text = '#_title_date';
         this.amountLabel.text = '#_title_amount';
         this.productLabel.text = '#_title_product';
         this.priceLabel.text = '#_title_price';
         this.sumLabel.text = '#_title_sum';
 
-        this.appendChild(this.dateLabel);
         this.appendChild(this.productLabel);
         this.appendChild(this.priceLabel);
         this.appendChild(this.amountLabel);
