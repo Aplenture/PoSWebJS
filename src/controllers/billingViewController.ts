@@ -36,12 +36,7 @@ export class BillingViewController extends FrontendJS.BodyViewController impleme
     }
 
     public async load() {
-        const yesterday = Number(CoreJS.reduceDate({ days: 1 }));
-
-        this.finances = await Finance.get({
-            customer: this.customer.id,
-            start: yesterday
-        });
+        this.finances = await Finance.get({ customer: this.customer.id });
 
         this.sum = this.finances
             .filter(data => data.data == 'open_invoice')
