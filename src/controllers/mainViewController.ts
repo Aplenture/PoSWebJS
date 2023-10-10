@@ -167,9 +167,9 @@ export class MainViewController extends FrontendJS.BodyViewController {
             value = Math.abs(value);
 
         this.balanceLabel.text = CoreJS.formatCurrency(value);
-        this.payButton.isDisabled = value >= 0;
-        this.openOrdersViewController.payButton.isDisabled = value >= 0;
-        this.billingViewController.payButton.isDisabled = value >= 0;
+        this.payButton.isEnabled = value >= 0;
+        this.openOrdersViewController.payButton.isEnabled = value >= 0;
+        this.billingViewController.payButton.isEnabled = value >= 0;
     }
 
     public async load(): Promise<void> {
