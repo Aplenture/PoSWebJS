@@ -79,9 +79,22 @@ export class MainViewController extends FrontendJS.BodyViewController {
         this.guestsViewController.onSelectedCustomer.on(customer => this.selectCustomer(customer));
 
         this.productsViewController.title = '#_title_select_product';
-        this.productsViewController.onSelectedProduct.on(product => this.selectProduct(product));
+        this.productsViewController.onSelectedProduct.on(product => this.selectedProduct = product);
+        this.productsViewController.onSelectedProduct.on(async product => {
+            if (!await this.buy(product, this.selectedCustomer))
+                return;
 
-        this.openOrdersViewController.onProductSelected.on(product => this.selectProduct(product));
+            // attention, undefined needs to be ignored too
+            const done = true === await FrontendJS.Client.popupViewController.queryBoolean(CoreJS.Localization.translate("#_query_text_shopping_done", { '$1': product.name }), "#_query_title_shopping_done", FrontendJS.QueryBooleanType.DoneContinue);
+
+            if (done) {
+                this.purchaseViewController.removeFromParent();
+                await this.reset();
+            }
+        });
+
+        this.openOrdersViewController.onProductSelected.on(product => this.selectedProduct = product);
+        this.openOrdersViewController.onProductSelected.on(product => this.displayPurchase(product));
         this.openOrdersViewController.payButton.onClick.on(() => this.productMenuViewController.selectedViewController = this.billingViewController);
         this.openOrdersViewController.payButton.onClick.on(() => this.pay());
 
@@ -177,13 +190,7 @@ export class MainViewController extends FrontendJS.BodyViewController {
     public async load(): Promise<void> {
         FrontendJS.Client.config.add(new CoreJS.NumberParameter(KEY_RESET_DELAY, "delay until app goes automatically back to customer selection after last user interaction", CoreJS.Milliseconds.Minute), key => this._resetTimeout.delay = FrontendJS.Client.config.get(key));
 
-        FrontendJS.Client.onInteraction.on(() => this._resetTimeout.restart().then(async () => {
-            while (FrontendJS.Client.popupViewController.stackViewController.currentViewController)
-                await FrontendJS.Client.popupViewController.popViewController();
-
-            while (this.stackViewController.count)
-                await this.stackViewController.popViewController();
-        }), { listener: this });
+        FrontendJS.Client.onInteraction.on(() => this._resetTimeout.restart().then(() => this.reset()), { listener: this });
 
         this.stackViewController.removeAllChildren();
         this.stackViewController.pushViewController(this.customerMenuViewController);
@@ -206,20 +213,26 @@ export class MainViewController extends FrontendJS.BodyViewController {
         super.focus();
     }
 
+    public async reset() {
+        while (FrontendJS.Client.popupViewController.stackViewController.currentViewController)
+            await FrontendJS.Client.popupViewController.popViewController();
+
+        while (this.stackViewController.count)
+            await this.stackViewController.popViewController();
+    }
+
     public async selectCustomer(customer: Customer): Promise<void> {
         this.selectedCustomer = customer;
 
         this.stackViewController.pushViewController(this.productMenuViewController);
     }
 
-    public async selectProduct(product: Product): Promise<void> {
+    public async displayPurchase(product: Product): Promise<void> {
         const orderProduct = this._order
             ? this._order.products.find(tmp => tmp.product == product.id)
             : null;
 
         const amount = orderProduct && orderProduct.amount || 0;
-
-        this.selectedProduct = product;
 
         this.purchaseViewController.titleBar.titleLabel.text = CoreJS.Localization.translate('#_title_product_name', { '$1': product.name });
         this.purchaseViewController.priceLabel.text = CoreJS.formatCurrency(product.price);
@@ -228,7 +241,7 @@ export class MainViewController extends FrontendJS.BodyViewController {
         FrontendJS.Client.popupViewController.pushViewController(this.purchaseViewController);
     }
 
-    public async buy(product: Product, customer: Customer): Promise<void> {
+    public async buy(product: Product, customer: Customer): Promise<boolean> {
         if (!this._order)
             this._order = await Order.create(customer.id, customer.paymentMethods);
 
@@ -245,17 +258,11 @@ export class MainViewController extends FrontendJS.BodyViewController {
         if (this.productMenuViewController.selectedViewController == this.openOrdersViewController)
             this.productMenuViewController.selectedViewController.reload();
 
-        // attention, undefined needs to be ignored too
-        if (false == await FrontendJS.Client.popupViewController.queryBoolean(CoreJS.Localization.translate("#_query_text_shopping_continue", { '$1': product.name }), "#_query_title_shopping_continue")) {
-            this.purchaseViewController.removeFromParent();
-
-            if (this.stackViewController.count)
-                await this.stackViewController.popViewController();
-        }
+        return true;
     }
 
     public async undoPurchase(product: Product, customer: Customer): Promise<void> {
-        if (!await FrontendJS.Client.popupViewController.queryBoolean('#_query_text_undo_purchase', CoreJS.Localization.translate('#_title_undo_product', { product: product.name })))
+        if (!await FrontendJS.Client.popupViewController.queryBoolean(CoreJS.Localization.translate('#_query_text_undo_purchase', { '$1': product.name }), CoreJS.Localization.translate('#_title_undo_product', { '$1': product.name })))
             return;
 
         const orderProduct = await OrderProduct.update(this.order.id, product.id, {

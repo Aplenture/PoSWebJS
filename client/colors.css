@@ -118,6 +118,18 @@ body>.root {
     background-color: #D40101;
 }
 
+.button-view.done {
+    background-color: #03a734;
+}
+
+.button-view.done:hover {
+    background-color: #00de43;
+}
+
+.button-view.done:active {
+    background-color: #03a734;
+}
+
 .selected {
     color: black;
     background-color: #50b7fc;
@@ -167,7 +179,7 @@ body>.root {
 
 .title-bar-view .button-view.delete .label-view,
 .title-bar-view .button-view.cancel .label-view {
-    border: 1px solid rgb(212, 1, 1);
+    border: 1px solid #D40101;
 }
 
 .title-bar-view .button-view.delete,
@@ -185,6 +197,25 @@ body>.root {
 .title-bar-view .button-view.delete:active,
 .title-bar-view .button-view.cancel:active {
     color: #D40101;
+    background-color: transparent !important;
+}
+
+.title-bar-view .button-view.done .label-view {
+    border: 1px solid #03a734;
+}
+
+.title-bar-view .button-view.done {
+    color: #03a734;
+    background-color: transparent !important;
+}
+
+.title-bar-view .button-view.done:hover {
+    color: #00de43;
+    background-color: transparent !important;
+}
+
+.title-bar-view .button-view.done:active {
+    color: #03a734;
     background-color: transparent !important;
 }
 
