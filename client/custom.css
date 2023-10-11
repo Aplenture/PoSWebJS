@@ -28,7 +28,12 @@
     grid-template-rows: none;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     grid-auto-rows: 9vw;
-    background-color: lightgray;
+    background-color: #AAA;
+}
+
+.grid-view-controller .cell.no_open_order {
+    color: #EEE;
+    background-color: #4A4948 !important;
 }
 
 .create-customer-view-controller,
@@ -93,7 +98,7 @@
 .customer-guests-grid-view-controller .grid-view .cell:last-child,
 .main-guests-grid-view-controller .grid-view .cell:last-child {
     position: relative;
-    background-color: gray;
+    background-color: #009a2e;
 }
 
 .products-grid-view-controller .grid-view .cell:last-child div,
@@ -113,7 +118,7 @@
 .main-guests-grid-view-controller .grid-view .cell:last-child::after {
     content: "";
     position: absolute;
-    background: #fff;
+    background: #c7ffd8;
 
     top: 50%;
     left: 50%;

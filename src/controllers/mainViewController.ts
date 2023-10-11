@@ -46,7 +46,7 @@ export class MainViewController extends FrontendJS.BodyViewController {
     private readonly _resetTimeout = new CoreJS.Timeout(FrontendJS.Client.config.get(KEY_RESET_DELAY));
 
     private _selectedProduct: Product;
-    private _order: Order;
+    private _customerOrder: Order;
 
     constructor(public readonly account: FrontendJS.Account.Account, ...classes: string[]) {
         super(...classes, "main-view-controller");
@@ -134,6 +134,8 @@ export class MainViewController extends FrontendJS.BodyViewController {
         this.productMenuViewController.appendChild(this.billingViewController, '#_title_billing');
     }
 
+    public get currentCustomersViewController(): CustomersGridViewController { return this.customerMenuViewController.selectedViewController as any; }
+
     public get selectedCustomer(): Customer { return this.openOrdersViewController.customer; }
     public set selectedCustomer(value: Customer) {
         this.openOrdersViewController.customer = value;
@@ -163,14 +165,14 @@ export class MainViewController extends FrontendJS.BodyViewController {
     public get selectedProduct(): Product { return this._selectedProduct; }
     public set selectedProduct(value: Product) { this._selectedProduct = value; }
 
-    public get order(): Order { return this._order; }
-    public set order(value: Order) {
-        this._order = value;
+    public get customerOrder(): Order { return this._customerOrder; }
+    public set customerOrder(value: Order) {
+        this._customerOrder = value;
 
         if (this.selectedCustomer)
             Balance.get(this.selectedCustomer.id).then(value => this.balance = value
                 // reduce balance by invoice of open order
-                - (this._order && this._order.invoice || 0)
+                - (this._customerOrder && this._customerOrder.invoice || 0)
             );
         else
             this.balance = 0;
@@ -228,8 +230,8 @@ export class MainViewController extends FrontendJS.BodyViewController {
     }
 
     public async displayPurchase(product: Product): Promise<void> {
-        const orderProduct = this._order
-            ? this._order.products.find(tmp => tmp.product == product.id)
+        const orderProduct = this._customerOrder
+            ? this._customerOrder.products.find(tmp => tmp.product == product.id)
             : null;
 
         const amount = orderProduct && orderProduct.amount || 0;
@@ -242,12 +244,14 @@ export class MainViewController extends FrontendJS.BodyViewController {
     }
 
     public async buy(product: Product, customer: Customer): Promise<boolean> {
-        if (!this._order)
-            this._order = await Order.create(customer.id, customer.paymentMethods);
+        if (!this._customerOrder)
+            this._customerOrder = await Order.create(customer.id, customer.paymentMethods);
 
-        const orderProduct = await OrderProduct.order(this._order.id, product.id);
-        await this.updateOrder();
+        const orderProduct = await OrderProduct.order(this._customerOrder.id, product.id);
 
+        await this.currentCustomersViewController.reload();
+
+        this.updateOrder();
         this.purchaseViewController.updatePurchaseCount(orderProduct.amount);
 
         FrontendJS.Client.notificationViewController.pushNotification({
@@ -265,13 +269,14 @@ export class MainViewController extends FrontendJS.BodyViewController {
         if (!await FrontendJS.Client.popupViewController.queryBoolean(CoreJS.Localization.translate('#_query_text_undo_purchase', { '$1': product.name }), CoreJS.Localization.translate('#_title_undo_product', { '$1': product.name })))
             return;
 
-        const orderProduct = await OrderProduct.update(this.order.id, product.id, {
+        const orderProduct = await OrderProduct.update(this.customerOrder.id, product.id, {
             // reduce amount by one
-            amount: - 1 + this.order.products.find(tmp => tmp.product == product.id && tmp.order == this.order.id).amount
+            amount: - 1 + this.customerOrder.products.find(tmp => tmp.product == product.id && tmp.order == this.customerOrder.id).amount
         });
 
-        await this.updateOrder();
+        await this.currentCustomersViewController.reload();
 
+        this.updateOrder();
         this.purchaseViewController.updatePurchaseCount(orderProduct.amount);
 
         FrontendJS.Client.notificationViewController.pushNotification({
@@ -303,19 +308,17 @@ export class MainViewController extends FrontendJS.BodyViewController {
         if (!(await FrontendJS.Client.popupViewController.queryBoolean(CoreJS.Localization.translate('#_query_text_tip_correct', { '$1': CoreJS.formatCurrency(tip) }), CoreJS.Localization.translate('#_query_title_tip_correct', { '$1': CoreJS.formatCurrency(tip) }))))
             return this.pay();
 
-        await Order.close(this._order.id, PaymentMethod.Cash, amount);
+        await Order.close(this._customerOrder.id, PaymentMethod.Cash, amount);
 
-        this.order = null;
+        this.customerOrder = null;
 
         await this.billingViewController.reload();
     }
 
-    private async updateOrder(): Promise<void> {
+    private updateOrder(): Promise<void> {
         if (!this.selectedCustomer)
-            return this.order = null;
+            return this.customerOrder = null;
 
-        const openOrders = await Order.get({ customer: this.selectedCustomer.id, state: OrderState.Open });
-
-        this.order = openOrders[0] ?? null;
+        this.customerOrder = this.currentCustomersViewController.openOrders.find(order => order.customer == this.selectedCustomer.id);
     }
 }

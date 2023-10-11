@@ -10,6 +10,8 @@ import * as FrontendJS from "frontendjs";
 import { Customer } from "../models/customer";
 import { CustomerEditViewController } from "./customerEditViewController";
 import { GridViewController } from "./gridViewController";
+import { Order } from "../models/order";
+import { OrderState } from "../enums/orderState";
 
 export class CustomersGridViewController extends GridViewController {
     public readonly onSelectedCustomer = new CoreJS.Event<CustomersGridViewController, Customer>('CustomersGridViewController.onSelectedCustomer');
@@ -18,7 +20,8 @@ export class CustomersGridViewController extends GridViewController {
 
     public isAddAllowed = false;
 
-    private customers: readonly Customer[] = [];
+    private _openOrders: readonly Order[] = [];
+    private _customers: readonly Customer[] = [];
 
     constructor(...classes: string[]) {
         super(...classes, "customers-grid-view-controller");
@@ -29,11 +32,30 @@ export class CustomersGridViewController extends GridViewController {
         this.editViewController.onCreated.on(() => this.editViewController.removeFromParent());
     }
 
+    public get openOrders(): readonly Order[] { return this._openOrders; }
+
     public get paymentMethods(): number { return this.editViewController.paymentMethods; }
     public set paymentMethods(value: number) { this.editViewController.paymentMethods = value; }
 
     public async load(): Promise<void> {
-        this.customers = (await Customer.get({ paymentmethods: this.paymentMethods })).sort((a, b) => a.toString().localeCompare(b.toString()));
+        this._openOrders = await Order.get({ state: OrderState.Open });
+
+        const allCustomers = await Customer.get({ paymentmethods: this.paymentMethods });
+
+        const openCustomers = this._openOrders
+            .map(order => allCustomers.find(customer => customer.id == order.customer))
+            // undefined missing customer
+            .filter(customer => customer)
+            // sort by name asc
+            .sort((a, b) => a.toString().localeCompare(b.toString()));
+            
+        const closedCustomers = allCustomers
+            // filter all customers wich are not included in open customers
+            .filter(customer => !openCustomers.includes(customer))
+            // sort by name asc
+            .sort((a, b) => a.toString().localeCompare(b.toString()));
+
+        this._customers = openCustomers.concat(closedCustomers);
 
         await super.load();
     }
@@ -47,7 +69,7 @@ export class CustomersGridViewController extends GridViewController {
     }
 
     public numberOfCells(sender: FrontendJS.GridViewController): number {
-        return this.customers.length
+        return this._customers.length
             + (this.isAddAllowed ? 1 : 0);
     }
 
@@ -56,12 +78,18 @@ export class CustomersGridViewController extends GridViewController {
     }
 
     public updateCell(sender: FrontendJS.GridViewController, cell: Cell, index: number): void {
-        if (index == this.customers.length)
+        if (index == this._customers.length)
             return;
 
-        const customer = this.customers[index];
+        const customer = this._customers[index];
+        const order = this._openOrders.find(order => order.customer == customer.id);
 
         cell.nameLabel.text = `${customer.firstname}\n${customer.lastname}`;
+
+        if (order)
+            cell.removeClass('no_open_order');
+        else
+            cell.addClass('no_open_order');
     }
 
     public add(): Promise<void> {
@@ -71,10 +99,10 @@ export class CustomersGridViewController extends GridViewController {
     }
 
     public select(index: number) {
-        if (index == this.customers.length)
+        if (index == this._customers.length)
             this.add();
         else
-            this.onSelectedCustomer.emit(this, this.customers[index]);
+            this.onSelectedCustomer.emit(this, this._customers[index]);
     }
 }
 
