@@ -11,7 +11,7 @@ export class PurchaseProductViewController extends FrontendJS.BodyViewController
     public readonly customerLabel = new FrontendJS.TitledLabel('customer-label');
     public readonly productLabel = new FrontendJS.TitledLabel('product-label');
     public readonly priceLabel = new FrontendJS.TitledLabel('price-label');
-    public readonly amountLabel = new FrontendJS.TitledLabel('amount-Label');
+    public readonly amountLabel = new FrontendJS.TitledLabel('amount-label');
 
     public readonly buyButton = new FrontendJS.Button('buy-button');
     public readonly undoButton = new FrontendJS.Button('undo-button');
