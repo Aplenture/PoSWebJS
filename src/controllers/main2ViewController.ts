@@ -138,7 +138,11 @@ export class MainViewController extends FrontendJS.BodyViewController {
         });
 
         this.backButton.type = FrontendJS.ButtonType.Back;
-        this.backButton.onClick.on(() => this.stackViewController.count && this.stackViewController.popViewController());
+        this.backButton.onClick.on(async () => {
+            this.backButton.isEnabled = false;
+            await this.stackViewController.popViewController();
+            this.backButton.isEnabled = true;
+        });
 
         this.guestsBillingViewController.payButton.onClick.on(() => this.pay());
 

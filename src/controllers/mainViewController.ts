@@ -104,7 +104,11 @@ export class MainViewController extends FrontendJS.BodyViewController {
         this.purchaseViewController.undoButton.onClick.on(() => this.undoPurchase(this.selectedProduct, this.selectedCustomer));
 
         this.backButton.type = FrontendJS.ButtonType.Back;
-        this.backButton.onClick.on(() => this.stackViewController.popViewController());
+        this.backButton.onClick.on(async () => {
+            this.backButton.isEnabled = false;
+            await this.stackViewController.popViewController();
+            this.backButton.isEnabled = true;
+        });
 
         this.payButton.text = '#_title_pay';
         this.payButton.onClick.on(() => this.productMenuViewController.selectedViewController = this.billingViewController);
