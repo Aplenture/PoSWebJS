@@ -142,7 +142,7 @@
     height: 6vw;
 }
 
-.open-orders-view-controller .table-view .cell:nth-last-child(2),
+.orders-view-controller .table-view .cell:nth-last-child(2),
 .balance-view-controller .table-view .cell:nth-last-child(2),
 .billing-view-controller .table-view .cell:nth-last-child(2) {
     visibility: hidden;
@@ -151,25 +151,25 @@
     margin: 0;
 }
 
-.open-orders-view-controller .table-view .cell:nth-last-child(2) div,
+.orders-view-controller .table-view .cell:nth-last-child(2) div,
 .balance-view-controller .table-view .cell:nth-last-child(2) div,
 .billing-view-controller .table-view .cell:nth-last-child(2) div {
     display: none;
 }
 
-.open-orders-view-controller .table-view .cell:nth-last-child(3)>div,
+.orders-view-controller .table-view .cell:nth-last-child(3)>div,
 .balance-view-controller .table-view .cell:nth-last-child(3)>div,
 .billing-view-controller .table-view .cell:nth-last-child(3)>div {
     border-bottom: 1px solid #0180D4;
 }
 
-.open-orders-view-controller .table-view .cell:last-child>div,
+.orders-view-controller .table-view .cell:last-child>div,
 .balance-view-controller .table-view .cell:last-child>div,
 .billing-view-controller .table-view .cell:last-child>div {
     border-top: 1px solid #0180D4;
 }
 
-.open-orders-view-controller .table-view .cell:last-child>div:not(:last-child),
+.orders-view-controller .table-view .cell:last-child>div:not(:last-child),
 .balance-view-controller .table-view .cell:last-child>div:not(:last-child),
 .billing-view-controller .table-view .cell:last-child>div:not(:last-child) {
     visibility: hidden;

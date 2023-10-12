@@ -10,7 +10,7 @@ import * as FrontendJS from "frontendjs";
 import { CustomersGridViewController } from "./customersGridViewController";
 import { ProductsGridViewController } from "./productsGridViewController";
 import { PurchaseProductViewController } from "./purchaseProductViewController";
-import { OpenOrdersViewController } from "./openOrdersViewController";
+import { OrdersViewController } from "./ordersViewController";
 import { Product } from "../models/product";
 import { Customer } from "../models/customer";
 import { PaymentMethod } from "../enums/paymentMethod";
@@ -33,7 +33,8 @@ export class MainViewController extends FrontendJS.BodyViewController {
     public readonly guestsViewController = new CustomersGridViewController('guests-grid-view-controller');
     public readonly productsViewController = new ProductsGridViewController();
     public readonly purchaseViewController = new PurchaseProductViewController();
-    public readonly openOrdersViewController = new OpenOrdersViewController();
+    public readonly openOrdersViewController = new OrdersViewController('open-orders-view-controller');
+    public readonly monthOrdersViewController = new OrdersViewController('month-orders-view-controller');
     public readonly balanceViewControlelr = new BalanceViewController();
     public readonly billingViewController = new BillingViewController();
 
@@ -93,10 +94,18 @@ export class MainViewController extends FrontendJS.BodyViewController {
             }
         });
 
+        this.openOrdersViewController.state = OrderState.Open;
+        this.openOrdersViewController.tableViewController.titleLabel.text = '#_title_open_order';
         this.openOrdersViewController.onProductSelected.on(product => this.selectedProduct = product);
         this.openOrdersViewController.onProductSelected.on(product => this.displayPurchase(product));
         this.openOrdersViewController.payButton.onClick.on(() => this.productMenuViewController.selectedViewController = this.billingViewController);
         this.openOrdersViewController.payButton.onClick.on(() => this.pay());
+        
+        this.monthOrdersViewController.tableViewController.titleLabel.text = '#_title_month';
+        this.monthOrdersViewController.onProductSelected.on(product => this.selectedProduct = product);
+        this.monthOrdersViewController.onProductSelected.on(product => this.displayPurchase(product));
+        this.monthOrdersViewController.payButton.onClick.on(() => this.productMenuViewController.selectedViewController = this.billingViewController);
+        this.monthOrdersViewController.payButton.onClick.on(() => this.pay());
 
         this.purchaseViewController.customerLabel.isVisible = false;
         this.purchaseViewController.productLabel.isVisible = false;
@@ -134,6 +143,7 @@ export class MainViewController extends FrontendJS.BodyViewController {
 
         this.productMenuViewController.appendChild(this.productsViewController, '#_title_buy');
         this.productMenuViewController.appendChild(this.openOrdersViewController, '#_title_order');
+        this.productMenuViewController.appendChild(this.monthOrdersViewController, '#_title_month');
         this.productMenuViewController.appendChild(this.balanceViewControlelr, '#_title_balance');
         this.productMenuViewController.appendChild(this.billingViewController, '#_title_billing');
     }
@@ -143,10 +153,13 @@ export class MainViewController extends FrontendJS.BodyViewController {
     public get selectedCustomer(): Customer { return this.openOrdersViewController.customer; }
     public set selectedCustomer(value: Customer) {
         this.openOrdersViewController.customer = value;
+        this.monthOrdersViewController.customer = value;
+        this.monthOrdersViewController.date = CoreJS.calcDate({ monthDay: 1 });
         this.balanceViewControlelr.customer = value;
         this.billingViewController.customer = value;
         this.balanceLabel.isHidden = !value;
         this.openOrdersViewController.footerBar.isVisible = value && (value.paymentMethods & PaymentMethod.Cash) != 0;
+        this.monthOrdersViewController.footerBar.isVisible = value && (value.paymentMethods & PaymentMethod.Cash) != 0;
         this.productMenuViewController.showViewController(this.balanceViewControlelr, value && (value.paymentMethods & PaymentMethod.Balance) != 0);
         this.productMenuViewController.showViewController(this.billingViewController, value && (value.paymentMethods & PaymentMethod.Cash) != 0);
 
@@ -154,12 +167,14 @@ export class MainViewController extends FrontendJS.BodyViewController {
             this.customerLabel.text = value.toString();
             this.payButton.isHidden = (value.paymentMethods & PaymentMethod.Cash) == 0;
             this.openOrdersViewController.payButton.isHidden = (value.paymentMethods & PaymentMethod.Cash) == 0;
+            this.monthOrdersViewController.payButton.isHidden = (value.paymentMethods & PaymentMethod.Cash) == 0;
             this.billingViewController.payButton.isHidden = (value.paymentMethods & PaymentMethod.Cash) == 0;
         } else {
             this.customerLabel.text = '';
             this.balanceLabel.text = '';
             this.payButton.isHidden = true;
-            this.openOrdersViewController.payButton.isHidden = true;
+            // this.openOrdersViewController.payButton.isHidden = true;
+            // this.openOrdersViewController.payButton.isHidden = true;
             this.billingViewController.payButton.isHidden = true;
         }
 
@@ -190,6 +205,7 @@ export class MainViewController extends FrontendJS.BodyViewController {
         this.balanceLabel.text = CoreJS.formatCurrency(value);
         this.payButton.isEnabled = value >= 0;
         this.openOrdersViewController.payButton.isEnabled = value >= 0;
+        this.monthOrdersViewController.payButton.isEnabled = value >= 0;
         this.billingViewController.payButton.isEnabled = value >= 0;
     }
 
@@ -266,6 +282,9 @@ export class MainViewController extends FrontendJS.BodyViewController {
         if (this.productMenuViewController.selectedViewController == this.openOrdersViewController)
             this.productMenuViewController.selectedViewController.reload();
 
+        if (this.productMenuViewController.selectedViewController == this.monthOrdersViewController)
+            this.productMenuViewController.selectedViewController.reload();
+
         return true;
     }
 
@@ -289,6 +308,9 @@ export class MainViewController extends FrontendJS.BodyViewController {
         });
 
         if (this.productMenuViewController.selectedViewController == this.openOrdersViewController)
+            this.productMenuViewController.selectedViewController.reload();
+
+        if (this.productMenuViewController.selectedViewController == this.monthOrdersViewController)
             this.productMenuViewController.selectedViewController.reload();
     }
 

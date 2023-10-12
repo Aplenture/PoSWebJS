@@ -10,7 +10,7 @@ import * as FrontendJS from "frontendjs";
 import { CustomersGridViewController } from "./customersGridViewController";
 import { ProductsGridViewController } from "./productsGridViewController";
 import { PurchaseProductViewController } from "./purchaseProductViewController";
-import { OpenOrdersViewController } from "./openOrdersViewController";
+import { OrdersViewController } from "./ordersViewController";
 import { Product } from "../models/product";
 import { Customer } from "../models/customer";
 import { PaymentMethod } from "../enums/paymentMethod";
@@ -39,8 +39,8 @@ export class MainViewController extends FrontendJS.BodyViewController {
     public readonly mainPurchaseViewController = new PurchaseProductViewController('main-purchase-product-view-controller');
     public readonly membersOpenOrdersPurchaseViewController = new PurchaseProductViewController('members-open-orders-purchase-product-view-controller');
     public readonly guestsOpenOrdersPurchaseViewController = new PurchaseProductViewController('guests-open-orders-purchase-product-view-controller');
-    public readonly membersOpenOrdersViewController = new OpenOrdersViewController('members-open-orders-view-controller');
-    public readonly guestsOpenOrdersViewController = new OpenOrdersViewController('guests-open-orders-view-controller');
+    public readonly membersOpenOrdersViewController = new OrdersViewController('members-open-orders-view-controller');
+    public readonly guestsOpenOrdersViewController = new OrdersViewController('guests-open-orders-view-controller');
     public readonly membersBalanceViewControlelr = new BalanceViewController();
     public readonly guestsBillingViewController = new BillingViewController();
 
