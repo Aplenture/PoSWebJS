@@ -59,6 +59,8 @@ export class OrdersViewController extends FrontendJS.BodyViewController implemen
             start: this.date && Number(this.date)
         });
 
+        const openOrders = orders.filter(order => order.state == OrderState.Open);
+
         const orderProducts = orders
             .map(order => order.products)
             .flat();
@@ -83,7 +85,7 @@ export class OrdersViewController extends FrontendJS.BodyViewController implemen
             .map(data => data.invoice)
             .reduce((a, b) => a + b, 0);
 
-        this.payButton.isDisabled = !orders.length;
+        this.payButton.isDisabled = !openOrders.length;
 
         await super.load();
     }
