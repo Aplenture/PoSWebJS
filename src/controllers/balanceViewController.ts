@@ -29,11 +29,14 @@ export class BalanceViewController extends FrontendJS.ViewController implements 
 
     public async load() {
         const firstDayOfMonth = Number(CoreJS.calcDate({ monthDay: 1 }));
-
-        this.finances = await Finance.get({
+        const finances = await Finance.get({
             customer: this.customer.id,
             start: firstDayOfMonth
         });
+
+        this.finances = finances
+            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+            .sort((a, b) => a.timestamp - b.timestamp);
 
         this.sum = this.finances
             .map(data => data.value * data.type)

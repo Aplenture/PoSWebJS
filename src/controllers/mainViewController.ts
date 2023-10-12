@@ -47,7 +47,6 @@ export class MainViewController extends FrontendJS.BodyViewController {
     private readonly _resetTimeout = new CoreJS.Timeout(FrontendJS.Client.config.get(KEY_RESET_DELAY));
 
     private _selectedProduct: Product;
-    private _customerOrder: Order;
 
     constructor(public readonly account: FrontendJS.Account.Account, ...classes: string[]) {
         super(...classes, "main-view-controller");
@@ -100,12 +99,16 @@ export class MainViewController extends FrontendJS.BodyViewController {
         this.openOrdersViewController.onProductSelected.on(product => this.displayPurchase(product));
         this.openOrdersViewController.payButton.onClick.on(() => this.productMenuViewController.selectedViewController = this.billingViewController);
         this.openOrdersViewController.payButton.onClick.on(() => this.pay());
-        
+        this.openOrdersViewController.correctButton.onClick.on(() => this.productMenuViewController.selectedViewController = this.billingViewController);
+        this.openOrdersViewController.correctButton.onClick.on(() => this.correctPayment().then(result => result && this.pay()));
+
         this.monthOrdersViewController.tableViewController.titleLabel.text = '#_title_month';
         this.monthOrdersViewController.onProductSelected.on(product => this.selectedProduct = product);
         this.monthOrdersViewController.onProductSelected.on(product => this.displayPurchase(product));
         this.monthOrdersViewController.payButton.onClick.on(() => this.productMenuViewController.selectedViewController = this.billingViewController);
         this.monthOrdersViewController.payButton.onClick.on(() => this.pay());
+        this.monthOrdersViewController.correctButton.onClick.on(() => this.productMenuViewController.selectedViewController = this.billingViewController);
+        this.monthOrdersViewController.correctButton.onClick.on(() => this.correctPayment().then(result => result && this.pay()));
 
         this.purchaseViewController.customerLabel.isVisible = false;
         this.purchaseViewController.productLabel.isVisible = false;
@@ -124,6 +127,7 @@ export class MainViewController extends FrontendJS.BodyViewController {
         this.payButton.onClick.on(() => this.pay());
 
         this.billingViewController.payButton.onClick.on(() => this.pay());
+        this.billingViewController.correctButton.onClick.on(() => this.correctPayment().then(result => result && this.pay()));
 
         this.balanceLabel.type = FrontendJS.LabelType.Balance;
 
@@ -177,25 +181,13 @@ export class MainViewController extends FrontendJS.BodyViewController {
             // this.openOrdersViewController.payButton.isHidden = true;
             this.billingViewController.payButton.isHidden = true;
         }
-
-        this.updateOrder();
     }
 
     public get selectedProduct(): Product { return this._selectedProduct; }
     public set selectedProduct(value: Product) { this._selectedProduct = value; }
 
-    public get customerOrder(): Order { return this._customerOrder; }
-    public set customerOrder(value: Order) {
-        this._customerOrder = value;
-
-        if (this.selectedCustomer)
-            Balance.get(this.selectedCustomer.id).then(value => this.balance = value
-                // reduce balance by invoice of open order
-                - (this._customerOrder && this._customerOrder.invoice || 0)
-            );
-        else
-            this.balance = 0;
-    }
+    public get openCustomerOrder(): Order { return this.openOrdersViewController.openOrders[0]; }
+    public get closedCustomerOrder(): Order { return this.openOrdersViewController.closedOrders[this.openOrdersViewController.closedOrders.length - 1]; }
 
     public get balance(): number { return this.balanceLabel.numberValue; }
     public set balance(value: number) {
@@ -219,7 +211,7 @@ export class MainViewController extends FrontendJS.BodyViewController {
 
         await super.load();
 
-        this.selectedCustomer = null;
+        this.selectCustomer(null);
         this.selectedProduct = null;
     }
 
@@ -246,12 +238,15 @@ export class MainViewController extends FrontendJS.BodyViewController {
     public async selectCustomer(customer: Customer): Promise<void> {
         this.selectedCustomer = customer;
 
-        this.stackViewController.pushViewController(this.productMenuViewController);
+        if (customer) await this.openOrdersViewController.load();
+        await this.updateBalance();
+        if (customer) await this.stackViewController.pushViewController(this.productMenuViewController);
     }
 
     public async displayPurchase(product: Product): Promise<void> {
-        const orderProduct = this._customerOrder
-            ? this._customerOrder.products.find(tmp => tmp.product == product.id)
+        const openOrder = this.openCustomerOrder;
+        const orderProduct = openOrder
+            ? openOrder.products.find(tmp => tmp.product == product.id)
             : null;
 
         const amount = orderProduct && orderProduct.amount || 0;
@@ -264,14 +259,14 @@ export class MainViewController extends FrontendJS.BodyViewController {
     }
 
     public async buy(product: Product, customer: Customer): Promise<boolean> {
-        if (!this._customerOrder)
-            this._customerOrder = await Order.create(customer.id, customer.paymentMethods);
+        const openOrder = this.openCustomerOrder
+            || await Order.create(customer.id, customer.paymentMethods);
 
-        const orderProduct = await OrderProduct.order(this._customerOrder.id, product.id);
+        const orderProduct = await OrderProduct.order(openOrder.id, product.id);
 
         await this.currentCustomersViewController.reload();
 
-        this.updateOrder();
+        this.updateBalance();
         this.purchaseViewController.updatePurchaseCount(orderProduct.amount);
 
         FrontendJS.Client.notificationViewController.pushNotification({
@@ -292,14 +287,14 @@ export class MainViewController extends FrontendJS.BodyViewController {
         if (!await FrontendJS.Client.popupViewController.queryBoolean(CoreJS.Localization.translate('#_query_text_undo_purchase', { '$1': product.name }), CoreJS.Localization.translate('#_title_undo_product', { '$1': product.name })))
             return;
 
-        const orderProduct = await OrderProduct.update(this.customerOrder.id, product.id, {
+        const orderProduct = await OrderProduct.update(this.openCustomerOrder.id, product.id, {
             // reduce amount by one
-            amount: - 1 + this.customerOrder.products.find(tmp => tmp.product == product.id && tmp.order == this.customerOrder.id).amount
+            amount: - 1 + this.openCustomerOrder.products.find(tmp => tmp.product == product.id && tmp.order == this.openCustomerOrder.id).amount
         });
 
         await this.currentCustomersViewController.reload();
 
-        this.updateOrder();
+        this.updateBalance();
         this.purchaseViewController.updatePurchaseCount(orderProduct.amount);
 
         FrontendJS.Client.notificationViewController.pushNotification({
@@ -314,16 +309,23 @@ export class MainViewController extends FrontendJS.BodyViewController {
             this.productMenuViewController.selectedViewController.reload();
     }
 
-    private async pay() {
+    private async pay(): Promise<boolean> {
         if (!this.selectedCustomer || (this.selectedCustomer.paymentMethods & PaymentMethod.Cash) == 0)
             throw new Error('selected customer is not a guest');
+
+        const openOrder = this.openCustomerOrder;
+
+        console.log(this.openOrdersViewController, this.openOrdersViewController.openOrders);
+
+        if (!openOrder)
+            throw new Error('there is no open order from selected customer');
 
         const invoice = Math.abs(this.balance);
 
         const amount = await FrontendJS.Client.popupViewController.queryCurrency('#_query_text_pay_invoice', CoreJS.Localization.translate('#_query_title_pay_invoice', { '$1': CoreJS.formatCurrency(invoice) }));
 
         if (!amount)
-            return;
+            return false;
 
         if (amount < invoice)
             return FrontendJS.Client.popupViewController.pushMessage('#_error_not_enough_payment', '#_error')
@@ -334,17 +336,50 @@ export class MainViewController extends FrontendJS.BodyViewController {
         if (!(await FrontendJS.Client.popupViewController.queryBoolean(CoreJS.Localization.translate('#_query_text_tip_correct', { '$1': CoreJS.formatCurrency(tip) }), CoreJS.Localization.translate('#_query_title_tip_correct', { '$1': CoreJS.formatCurrency(tip) }))))
             return this.pay();
 
-        await Order.close(this._customerOrder.id, PaymentMethod.Cash, amount);
+        await Order.close(openOrder.id, PaymentMethod.Cash, amount);
 
-        this.customerOrder = null;
+        await this.currentCustomersViewController.reload();
+        await this.openOrdersViewController.reload();
+
+        this.updateBalance();
 
         await this.billingViewController.reload();
+
+        return true;
     }
 
-    private updateOrder(): Promise<void> {
-        if (!this.selectedCustomer)
-            return this.customerOrder = null;
+    private async correctPayment(): Promise<boolean> {
+        if (!this.selectedCustomer || (this.selectedCustomer.paymentMethods & PaymentMethod.Cash) == 0)
+            throw new Error('selected customer is not a guest');
 
-        this.customerOrder = this.currentCustomersViewController.openOrders.find(order => order.customer == this.selectedCustomer.id);
+        const closedOrder = this.closedCustomerOrder;
+
+        if (!closedOrder)
+            throw new Error('there is no closed order from selected customer');
+
+        if (!(await FrontendJS.Client.popupViewController.queryBoolean('#_query_text_payment_correct', '#_query_title_payment_correct')))
+            return false;
+
+        await Order.reopen(closedOrder.id);
+
+        await this.currentCustomersViewController.reload();
+        await this.openOrdersViewController.reload();
+
+        this.updateBalance();
+
+        await this.billingViewController.reload();
+
+        return true;
+    }
+
+    private async updateBalance(): Promise<any> {
+        if (!this.selectedCustomer)
+            return this.balance = 0;
+
+        const openOrder = this.openCustomerOrder;
+
+        this.balance = await Balance.get(this.selectedCustomer.id)
+            // reduce balance by open order invoice
+            - (openOrder && openOrder.invoice || 0);
     }
 }

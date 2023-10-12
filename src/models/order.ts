@@ -12,6 +12,7 @@ import { OrderProduct } from "./orderProduct";
 
 const ROUTE_CREATE = "createOrder";
 const ROUTE_CLOSE = "closeOrder";
+const ROUTE_REOPEN = "reopenOrder";
 const ROUTE_DELETE = "deleteOrder";
 const ROUTE_GET = "getOrders";
 
@@ -41,6 +42,7 @@ export class Order {
     public static async prepare(preparer: FrontendJS.ServerPreparer): Promise<void> {
         preparer.addRoute(ROUTE_CREATE);
         preparer.addRoute(ROUTE_CLOSE);
+        preparer.addRoute(ROUTE_REOPEN);
         preparer.addRoute(ROUTE_DELETE);
         preparer.addRoute(ROUTE_GET);
     }
@@ -67,6 +69,18 @@ export class Order {
 
     public static close(order: number, paymentmethod: PaymentMethod, amount: number): Promise<Order> {
         return this._server.requestJSON(ROUTE_CLOSE, { order, paymentmethod, amount }).then(data => new Order(
+            data.id,
+            data.account,
+            data.updated,
+            data.state,
+            data.customer,
+            data.paymentMethod,
+            data.tip
+        ));
+    }
+
+    public static reopen(order: number): Promise<Order> {
+        return this._server.requestJSON(ROUTE_REOPEN, { order }).then(data => new Order(
             data.id,
             data.account,
             data.updated,

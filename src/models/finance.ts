@@ -23,6 +23,7 @@ export class Finance {
         public readonly timestamp: number,
         public readonly type: number,
         public readonly customer: number,
+        public readonly order: number,
         public readonly paymentMethod: PaymentMethod,
         public readonly value: number,
         public readonly data: string
@@ -45,6 +46,7 @@ export class Finance {
             data.timestamp,
             data.type,
             data.customer,
+            data.order,
             data.paymentMethod,
             data.value,
             data.data

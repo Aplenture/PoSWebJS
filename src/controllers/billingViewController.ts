@@ -14,6 +14,7 @@ export class BillingViewController extends FrontendJS.BodyViewController impleme
     public readonly tableViewController = new FrontendJS.TableViewController();
 
     public readonly payButton = new FrontendJS.Button('pay-button');
+    public readonly correctButton = new FrontendJS.Button('correct-button');
 
     public customer: Customer;
 
@@ -29,9 +30,11 @@ export class BillingViewController extends FrontendJS.BodyViewController impleme
         this.tableViewController.dataSource = this;
 
         this.payButton.text = '#_title_pay';
+        this.correctButton.text = '#_title_pay_correct';
 
         this.appendChild(this.tableViewController);
 
+        this.footerBar.appendChild(this.correctButton);
         this.footerBar.appendChild(this.payButton);
     }
 
@@ -44,6 +47,7 @@ export class BillingViewController extends FrontendJS.BodyViewController impleme
             .reduce((a, b) => a + b, 0);
 
         this.payButton.isEnabled = this.sum > 0;
+        this.correctButton.isEnabled = this.finances.some(data => data.data == 'invoice');
 
         await super.load();
     }
@@ -68,9 +72,9 @@ export class BillingViewController extends FrontendJS.BodyViewController impleme
         if (row < this.finances.length) {
             const data = this.finances[row];
 
-            cell.dateLabel.text = new Date(data.timestamp).toLocaleDateString();
+            cell.dateLabel.text = new Date(data.timestamp).toLocaleString();
             cell.typeLabel.text = '#_billing_' + data.data;
-            cell.valueLabel.text = CoreJS.formatCurrency(data.value);
+            cell.valueLabel.text = CoreJS.formatCurrency(data.value * data.type * -1);
         } else if (row > this.finances.length) {
             cell.valueLabel.text = CoreJS.formatCurrency(this.sum);
         }
@@ -87,9 +91,11 @@ class Cell extends FrontendJS.View {
 
         this.dateLabel.text = '#_title_date';
         this.typeLabel.text = '#_title_type';
+
+        this.valueLabel.type = FrontendJS.LabelType.Balance;
         this.valueLabel.text = '#_title_value';
 
-        // this.appendChild(this.dateLabel);
+        this.appendChild(this.dateLabel);
         this.appendChild(this.typeLabel);
         this.appendChild(this.valueLabel);
     }

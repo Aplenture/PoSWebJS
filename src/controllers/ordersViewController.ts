@@ -26,13 +26,16 @@ export class OrdersViewController extends FrontendJS.BodyViewController implemen
     public readonly tableViewController = new FrontendJS.TableViewController();
 
     public readonly payButton = new FrontendJS.Button('pay-button');
+    public readonly correctButton = new FrontendJS.Button('correct-button');
 
     public customer: Customer;
     public state: OrderState;
     public date: Date;
 
-    private data: readonly Data[] = [];
-    private sum = 0;
+    private _openOrders: readonly Order[] = [];
+    private _closedOrders: readonly Order[] = [];
+    private _data: readonly Data[] = [];
+    private _sum = 0;
 
     constructor(...classes: string[]) {
         super(...classes, 'orders-view-controller');
@@ -42,30 +45,39 @@ export class OrdersViewController extends FrontendJS.BodyViewController implemen
         this.tableViewController.titleLabel.text = '#_title_orders';
         this.tableViewController.dataSource = this;
         this.tableViewController.selectionMode = FrontendJS.TableSelectionMode.Clickable;
-        this.tableViewController.onSelectedCell.on(cell => cell.index < this.data.length && this.onProductSelected.emit(this, this.data[cell.index].product));
+        this.tableViewController.onSelectedCell.on(cell => cell.index < this._data.length && this.onProductSelected.emit(this, this._data[cell.index].product));
 
         this.payButton.text = '#_title_pay';
+        this.correctButton.text = '#_title_pay_correct';
 
         this.appendChild(this.tableViewController);
 
+        this.footerBar.appendChild(this.correctButton);
         this.footerBar.appendChild(this.payButton);
     }
 
+    public get openOrders(): readonly Order[] { return this._openOrders; }
+    public get closedOrders(): readonly Order[] { return this._closedOrders; }
+
     public async load() {
         const products = await Product.get();
-        const orders = await Order.get({
+        const allOrders = await Order.get({
             customer: this.customer.id,
-            state: this.state,
             start: this.date && Number(this.date)
         });
 
-        const openOrders = orders.filter(order => order.state == OrderState.Open);
+        const stateOrders = this.state
+            ? allOrders.filter(order => order.state == this.state)
+            : allOrders;
 
-        const orderProducts = orders
+        this._openOrders = allOrders.filter(order => order.state == OrderState.Open);
+        this._closedOrders = allOrders.filter(order => order.state == OrderState.Closed);
+
+        const orderProducts = stateOrders
             .map(order => order.products)
             .flat();
 
-        this.data = orderProducts
+        this._data = orderProducts
             .filter((data, index, array) => index == array.findIndex(tmp => tmp.product == data.product && tmp.price == data.price))
             .map(data => {
                 const product = products.find(product => product.id == data.product);
@@ -81,17 +93,18 @@ export class OrdersViewController extends FrontendJS.BodyViewController implemen
                 }
             });
 
-        this.sum = orders
+        this._sum = stateOrders
             .map(data => data.invoice)
             .reduce((a, b) => a + b, 0);
 
-        this.payButton.isDisabled = !openOrders.length;
+        this.payButton.isDisabled = !this.openOrders.length;
+        this.correctButton.isDisabled = !this.closedOrders.length;
 
         await super.load();
     }
 
     public numberOfCells(sender: FrontendJS.TableViewController, category: number): number {
-        return this.data.length + 2;
+        return this._data.length + 2;
     }
 
     public createHeader?(sender: FrontendJS.TableViewController): FrontendJS.View {
@@ -107,15 +120,15 @@ export class OrdersViewController extends FrontendJS.BodyViewController implemen
     }
 
     public updateCell(sender: FrontendJS.TableViewController, cell: Cell, row: number, category: number): void {
-        if (row < this.data.length) {
-            const product = this.data[row];
+        if (row < this._data.length) {
+            const product = this._data[row];
 
             cell.amountLabel.text = product.amount.toString();
             cell.productLabel.text = product.name;
             cell.priceLabel.text = CoreJS.formatCurrency(product.price);
             cell.sumLabel.text = CoreJS.formatCurrency(product.sum);
-        } else if (row > this.data.length) {
-            cell.sumLabel.text = CoreJS.formatCurrency(this.sum);
+        } else if (row > this._data.length) {
+            cell.sumLabel.text = CoreJS.formatCurrency(this._sum);
         }
     }
 }
