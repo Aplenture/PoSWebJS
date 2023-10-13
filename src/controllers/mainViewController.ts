@@ -315,8 +315,6 @@ export class MainViewController extends FrontendJS.BodyViewController {
 
         const openOrder = this.openCustomerOrder;
 
-        console.log(this.openOrdersViewController, this.openOrdersViewController.openOrders);
-
         if (!openOrder)
             throw new Error('there is no open order from selected customer');
 
