@@ -262,7 +262,15 @@ export class MainViewController extends FrontendJS.BodyViewController {
         const openOrder = this.openCustomerOrder
             || await Order.create(customer.id, customer.paymentMethods);
 
-        const orderProduct = await OrderProduct.order(openOrder.id, product.id);
+        const amount = await FrontendJS.Client.popupViewController.queryNumber(CoreJS.Localization.translate('#_query_text_order_amount', { '$1': product.name }), '#_query_title_order_amount', {
+            default: 1,
+            min: 1
+        });
+
+        if (!amount)
+            return false;
+
+        const orderProduct = await OrderProduct.order(openOrder.id, product.id, { amount });
 
         await this.currentCustomersViewController.reload();
 
@@ -283,7 +291,7 @@ export class MainViewController extends FrontendJS.BodyViewController {
         return true;
     }
 
-    public async undoPurchase(product: Product, customer: Customer): Promise<void> {
+    public async undoPurchase(product: Product, customer: Customer): Promise<boolean> {
         if (!await FrontendJS.Client.popupViewController.queryBoolean(CoreJS.Localization.translate('#_query_text_undo_purchase', { '$1': product.name }), CoreJS.Localization.translate('#_title_undo_product', { '$1': product.name })))
             return;
 
@@ -297,7 +305,16 @@ export class MainViewController extends FrontendJS.BodyViewController {
         if (!currentOrderProduct)
             throw new Error(`the order does not contain this product`);
 
-        const amount = currentOrderProduct.amount - 1;
+        const decrease = await FrontendJS.Client.popupViewController.queryNumber(CoreJS.Localization.translate('#_query_text_undo_purchase_amount', { '$1': product.name }), '#_query_title_undo_purchase_amount', {
+            default: 1,
+            min: 1,
+            max: currentOrderProduct.amount
+        });
+
+        if (!decrease)
+            return false;
+
+        const amount = currentOrderProduct.amount - decrease;
         const orderWillBeEmpty = openOrder.products.length == 1 && amount == 0;
 
         if (orderWillBeEmpty)
@@ -320,6 +337,8 @@ export class MainViewController extends FrontendJS.BodyViewController {
 
         if (this.productMenuViewController.selectedViewController == this.monthOrdersViewController)
             this.productMenuViewController.selectedViewController.reload();
+
+        return true;
     }
 
     private async pay(): Promise<boolean> {
