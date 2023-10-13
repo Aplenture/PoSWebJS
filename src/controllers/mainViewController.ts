@@ -259,9 +259,6 @@ export class MainViewController extends FrontendJS.BodyViewController {
     }
 
     public async buy(product: Product, customer: Customer): Promise<boolean> {
-        const openOrder = this.openCustomerOrder
-            || await Order.create(customer.id, customer.paymentMethods);
-
         const amount = await FrontendJS.Client.popupViewController.queryNumber(CoreJS.Localization.translate('#_query_text_order_amount', { '$1': product.name }), '#_query_title_order_amount', {
             default: 1,
             min: 1
@@ -269,6 +266,9 @@ export class MainViewController extends FrontendJS.BodyViewController {
 
         if (!amount)
             return false;
+
+        const openOrder = this.openCustomerOrder
+            || await Order.create(customer.id, customer.paymentMethods);
 
         const orderProduct = await OrderProduct.order(openOrder.id, product.id, { amount });
 
