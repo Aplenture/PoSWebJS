@@ -273,7 +273,7 @@ export class MainViewController extends FrontendJS.BodyViewController {
         if (!this._order)
             this._order = await Order.create(customer.id, customer.paymentMethods);
 
-        const amount = await FrontendJS.Client.popupViewController.queryNumber(CoreJS.Localization.translate('#_query_text_order_amount', { '$1': product.name }), '#_query_title_order_amount', 1);
+        const amount = await FrontendJS.Client.popupViewController.queryNumber(CoreJS.Localization.translate('#_query_text_order_amount', { '$1': product.name }), '#_query_title_order_amount', { default: 1 });
 
         if (!amount)
             return false;
@@ -300,7 +300,7 @@ export class MainViewController extends FrontendJS.BodyViewController {
         if (!await FrontendJS.Client.popupViewController.queryBoolean('#_query_text_undo_purchase', CoreJS.Localization.translate('#_title_undo_product', { product: product.name })))
             return false;
 
-        const amount = await FrontendJS.Client.popupViewController.queryNumber(CoreJS.Localization.translate('#_query_text_undo_purchase_amount', { '$1': product.name }), '#_query_title_undo_purchase_amount', 1);
+        const amount = await FrontendJS.Client.popupViewController.queryNumber(CoreJS.Localization.translate('#_query_text_undo_purchase_amount', { '$1': product.name }), '#_query_title_undo_purchase_amount', { default: 1 });
 
         if (!amount)
             return false;
