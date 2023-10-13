@@ -72,7 +72,8 @@ export class BillingViewController extends FrontendJS.BodyViewController impleme
         if (row < this.finances.length) {
             const data = this.finances[row];
 
-            cell.dateLabel.text = new Date(data.timestamp).toLocaleString();
+            cell.dateLabel.text = new Date(data.timestamp).toLocaleTimeString();
+            cell.orderLabel.text = data.order.toString();
             cell.typeLabel.text = '#_billing_' + data.data;
             cell.valueLabel.text = CoreJS.formatCurrency(data.value * data.type * -1);
         } else if (row > this.finances.length) {
@@ -83,19 +84,22 @@ export class BillingViewController extends FrontendJS.BodyViewController impleme
 
 class Cell extends FrontendJS.View {
     public readonly dateLabel = new FrontendJS.Label('date-label');
+    public readonly orderLabel = new FrontendJS.Label('order-label');
     public readonly typeLabel = new FrontendJS.Label('type-label');
     public readonly valueLabel = new FrontendJS.Label('value-label');
 
     constructor(...classes: string[]) {
         super(...classes);
 
-        this.dateLabel.text = '#_title_date';
+        this.dateLabel.text = '#_title_time';
+        this.orderLabel.text = '#_title_order';
         this.typeLabel.text = '#_title_type';
 
         this.valueLabel.type = FrontendJS.LabelType.Balance;
         this.valueLabel.text = '#_title_value';
 
-        this.appendChild(this.dateLabel);
+        // this.appendChild(this.dateLabel);
+        this.appendChild(this.orderLabel);
         this.appendChild(this.typeLabel);
         this.appendChild(this.valueLabel);
     }

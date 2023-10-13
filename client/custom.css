@@ -49,7 +49,8 @@
 .cell .sum-label,
 .cell .amount-label,
 .cell .value-label,
-.cell .date-label {
+.cell .date-label,
+.cell .order-label {
     width: 1px;
     text-align: right;
 }
