@@ -287,15 +287,28 @@ export class MainViewController extends FrontendJS.BodyViewController {
         if (!await FrontendJS.Client.popupViewController.queryBoolean(CoreJS.Localization.translate('#_query_text_undo_purchase', { '$1': product.name }), CoreJS.Localization.translate('#_title_undo_product', { '$1': product.name })))
             return;
 
-        const orderProduct = await OrderProduct.update(this.openCustomerOrder.id, product.id, {
-            // reduce amount by one
-            amount: - 1 + this.openCustomerOrder.products.find(tmp => tmp.product == product.id && tmp.order == this.openCustomerOrder.id).amount
-        });
+        const openOrder = this.openCustomerOrder;
+
+        if (!openOrder)
+            throw new Error('there is no open order from selected customer');
+
+        const currentOrderProduct = openOrder.products.find(tmp => tmp.product == product.id && tmp.order == openOrder.id);
+
+        if (!currentOrderProduct)
+            throw new Error(`the order does not contain this product`);
+
+        const amount = currentOrderProduct.amount - 1;
+        const orderWillBeEmpty = openOrder.products.length == 1 && amount == 0;
+
+        if (orderWillBeEmpty)
+            await Order.delete(openOrder.id);
+        else
+            await OrderProduct.update(openOrder.id, product.id, { amount });
 
         await this.currentCustomersViewController.reload();
 
         this.updateBalance();
-        this.purchaseViewController.updatePurchaseCount(orderProduct.amount);
+        this.purchaseViewController.updatePurchaseCount(amount);
 
         FrontendJS.Client.notificationViewController.pushNotification({
             text: '#_notification_purchase_canceled',
