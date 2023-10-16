@@ -145,7 +145,8 @@
 
 .orders-view-controller .table-view .cell:nth-last-child(2),
 .balance-view-controller .table-view .cell:nth-last-child(2),
-.billing-view-controller .table-view .cell:nth-last-child(2) {
+.billing-view-controller .table-view .cell:nth-last-child(2),
+.turnover-view-controller .table-view .cell:nth-last-child(2) {
     visibility: hidden;
     height: .5em;
     padding: 0;
@@ -154,24 +155,28 @@
 
 .orders-view-controller .table-view .cell:nth-last-child(2) div,
 .balance-view-controller .table-view .cell:nth-last-child(2) div,
-.billing-view-controller .table-view .cell:nth-last-child(2) div {
+.billing-view-controller .table-view .cell:nth-last-child(2) div,
+.turnover-view-controller .table-view .cell:nth-last-child(2) div {
     display: none;
 }
 
 .orders-view-controller .table-view .cell:nth-last-child(3)>div,
 .balance-view-controller .table-view .cell:nth-last-child(3)>div,
-.billing-view-controller .table-view .cell:nth-last-child(3)>div {
+.billing-view-controller .table-view .cell:nth-last-child(3)>div,
+.turnover-view-controller .table-view .cell:nth-last-child(3)>div {
     border-bottom: 1px solid #0180D4;
 }
 
 .orders-view-controller .table-view .cell:last-child>div,
 .balance-view-controller .table-view .cell:last-child>div,
-.billing-view-controller .table-view .cell:last-child>div {
+.billing-view-controller .table-view .cell:last-child>div,
+.turnover-view-controller .table-view .cell:last-child>div {
     border-top: 1px solid #0180D4;
 }
 
 .orders-view-controller .table-view .cell:last-child>div:not(:last-child),
 .balance-view-controller .table-view .cell:last-child>div:not(:last-child),
-.billing-view-controller .table-view .cell:last-child>div:not(:last-child) {
+.billing-view-controller .table-view .cell:last-child>div:not(:last-child),
+.turnover-view-controller .table-view .cell:last-child>div:not(:last-child) {
     visibility: hidden;
 }
