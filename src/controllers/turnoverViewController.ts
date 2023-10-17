@@ -117,7 +117,8 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
 
     public download() {
         const firstDayOfMonth = CoreJS.calcDate({ monthDay: 1 });
-        const formatDate = CoreJS.formatDate(firstDayOfMonth).slice(0, -3);
+        const selectedDate = CoreJS.reduceDate({ date: firstDayOfMonth, months: this.monthDropbox.selectedIndex });
+        const formatDate = CoreJS.formatDate(selectedDate).slice(0, -3);
         const filename = `${CoreJS.Localization.translate('#_title_turnover')}-${formatDate}`;
         const parser = new CoreJS.CSVParser(filename);
 
