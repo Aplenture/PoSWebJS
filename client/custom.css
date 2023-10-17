@@ -36,6 +36,10 @@
     background-color: #4A4948 !important;
 }
 
+.turnover-view-controller.body-title-bar {
+    border: 0px;
+}
+
 .create-customer-view-controller,
 .create-customer-view-controller .content.view-controller,
 .create-product-view-controller,
@@ -55,7 +59,14 @@
     text-align: right;
 }
 
-.table-view .header {
+.table-view .header .number-label,
+.table-view .header .balance-label,
+.table-view .header .price-label,
+.table-view .header .sum-label,
+.table-view .header .amount-label,
+.table-view .header .value-label,
+.table-view .header .date-label,
+.table-view .header .order-label {
     text-align: center;
 }
 

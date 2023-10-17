@@ -16,8 +16,11 @@ interface Data {
     readonly customer?: number;
 }
 
-export class TurnoverViewController extends FrontendJS.ViewController implements FrontendJS.TableViewControllerDataSource {
+export class TurnoverViewController extends FrontendJS.BodyViewController implements FrontendJS.TableViewControllerDataSource {
     public readonly tableViewController = new FrontendJS.TableViewController();
+
+    public readonly monthDropbox = new FrontendJS.Dropbox('month-dropbox-view');
+    public readonly downloadButton = new FrontendJS.Button('download-button-view');
 
     private customers: readonly Customer[] = [];
     private finances: readonly Data[] = [];
@@ -27,17 +30,38 @@ export class TurnoverViewController extends FrontendJS.ViewController implements
         super(...classes, 'turnover-view-controller');
 
         this.title = '#_title_turnover';
+        this.titleBar.titleLabel.isHidden = true;
 
         this.tableViewController.titleLabel.text = '#_title_turnover';
         this.tableViewController.dataSource = this;
+
+        this.monthDropbox.onSelected.on(() => this.reload());
+
+        this.downloadButton.type = FrontendJS.ButtonType.Download;
+        this.downloadButton.onClick.on(() => this.download());
+
+        this.titleBar.leftView.appendChild(this.monthDropbox);
+        this.titleBar.rightView.appendChild(this.downloadButton);
 
         this.appendChild(this.tableViewController);
     }
 
     public async load() {
-        const firstDayOfMonth = Number(CoreJS.calcDate({ monthDay: 1 }));
+        const firstDayOfMonth = CoreJS.calcDate({ monthDay: 1 });
+        const selectedMonth = this.monthDropbox.selectedIndex;
+
+        this.monthDropbox.options = Array.from(Array(12).keys()).map(index => {
+            const date = CoreJS.reduceDate({ date: firstDayOfMonth, months: index });
+
+            return date.toLocaleString(CoreJS.Localization.language, {
+                month: 'long',
+                year: 'numeric'
+            });
+        });
+        this.monthDropbox.selectedIndex = selectedMonth;
+
         const finances: Data[] = await Finance.get({
-            start: firstDayOfMonth
+            start: Number(CoreJS.reduceDate({ date: firstDayOfMonth, months: selectedMonth }))
         });
 
         this.customers = (await Customer.get({ paymentmethods: PaymentMethod.Balance }))
@@ -51,7 +75,7 @@ export class TurnoverViewController extends FrontendJS.ViewController implements
             .filter(data => !this.customers.some(customer => customer.id == data.customer))
             .reduce((a, b) => ({
                 value: Math.abs(a.value) + Math.abs(b.value)
-            }));
+            }), { value: 0 });
 
         this.finances = customerFinances
             .concat(additionalFinances);
@@ -89,6 +113,30 @@ export class TurnoverViewController extends FrontendJS.ViewController implements
         } else if (row > this.finances.length) {
             cell.valueLabel.text = CoreJS.formatCurrency(this.sum);
         }
+    }
+
+    public download() {
+        const firstDayOfMonth = CoreJS.calcDate({ monthDay: 1 });
+        const formatDate = CoreJS.formatDate(firstDayOfMonth).slice(0, -3);
+        const filename = `${CoreJS.Localization.translate('#_title_turnover')}-${formatDate}`;
+        const parser = new CoreJS.CSVParser(filename);
+
+        parser.add([
+            CoreJS.Localization.translate('#_title_customer'),
+            CoreJS.Localization.translate('#_title_sum')
+        ]);
+
+        this.finances.forEach(finance => parser.add([
+            this.customers.find(customer => customer.id == finance.customer) || CoreJS.Localization.translate('#_unknown_customer'),
+            CoreJS.formatCurrency(Math.abs(finance.value))
+        ]));
+
+        parser.add([
+            '',
+            CoreJS.formatCurrency(this.sum)
+        ]);
+
+        FrontendJS.download(parser);
     }
 }
 
