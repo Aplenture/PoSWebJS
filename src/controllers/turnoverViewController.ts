@@ -10,10 +10,14 @@ import * as FrontendJS from "frontendjs";
 import { Customer } from "../models/customer";
 import { Finance } from "../models/finance";
 import { PaymentMethod } from "../enums/paymentMethod";
+import { BalanceEvent } from "../enums/balanceEvent";
+import { Balance } from "../models/balance";
 
 interface Data {
-    readonly value: number;
-    readonly customer?: number;
+    readonly customer: string;
+    readonly turnover: number;
+    readonly deposit: number;
+    readonly balance: number;
 }
 
 export class TurnoverViewController extends FrontendJS.BodyViewController implements FrontendJS.TableViewControllerDataSource {
@@ -22,9 +26,7 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
     public readonly monthDropbox = new FrontendJS.Dropbox('month-dropbox-view');
     public readonly downloadButton = new FrontendJS.Button('download-button-view');
 
-    private customers: readonly Customer[] = [];
-    private finances: readonly Data[] = [];
-    private sum = 0;
+    private data: Data[] = [];
 
     constructor(...classes: string[]) {
         super(...classes, 'turnover-view-controller');
@@ -49,6 +51,13 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
     public async load() {
         const firstDayOfMonth = CoreJS.calcDate({ monthDay: 1 });
         const selectedMonth = this.monthDropbox.selectedIndex;
+        const start = Number(CoreJS.reduceDate({ date: firstDayOfMonth, months: selectedMonth }));
+        const sum = {
+            customer: '',
+            turnover: 0,
+            deposit: 0,
+            balance: 0
+        };
 
         this.monthDropbox.options = Array.from(Array(12).keys()).map(index => {
             const date = CoreJS.reduceDate({ date: firstDayOfMonth, months: index });
@@ -60,35 +69,71 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
         });
         this.monthDropbox.selectedIndex = selectedMonth;
 
-        const finances: Data[] = await Finance.get({
-            start: Number(CoreJS.reduceDate({ date: firstDayOfMonth, months: selectedMonth }))
+        let customers: Customer[];
+        let balances: Balance[];
+        let transfer: Balance[];
+        let turnovers: Finance[];
+        let deposits: Finance[];
+
+        await Promise.all([
+            Customer.get({ paymentmethods: PaymentMethod.Balance }).then(result => customers = result.sort((a, b) => a.toString().localeCompare(b.toString()))),
+            Balance.getAll(start).then(result => balances = result),
+            Balance.getAll(start - 1).then(result => transfer = result),
+            Finance.get({
+                data: [BalanceEvent.Invoice, BalanceEvent.Tip, BalanceEvent.UndoInvoice, BalanceEvent.UndoTip],
+                start
+            }).then(result => turnovers = result),
+            Finance.get({
+                data: [BalanceEvent.Deposit],
+                start
+            }).then(result => deposits = result)
+        ]);
+
+        this.data = customers.map(customer => {
+            const turnover = turnovers.find(data => data.customer == customer.id);
+            const deposit = deposits.find(data => data.customer == customer.id);
+            const balance = balances.find(data => data.customer == customer.id);
+
+            return {
+                customer: customer.toString(),
+                turnover: Math.abs(turnover && turnover.value || 0),
+                deposit: Math.abs(deposit && deposit.value || 0),
+                balance: balance && balance.value || 0
+            };
         });
 
-        this.customers = (await Customer.get({ paymentmethods: PaymentMethod.Balance }))
-            .sort((a, b) => a.toString().localeCompare(b.toString()));
+        // add guests and former members
+        this.data.push({
+            customer: CoreJS.Localization.translate('#_unknown_customer'),
+            balance: balances
+                .filter(data => !customers.some(customer => customer.id == data.customer))
+                .map(data => data.value)
+                .reduce((a, b) => Math.abs(a) + Math.abs(b), 0),
+            turnover: turnovers
+                .filter(data => !customers.some(customer => customer.id == data.customer))
+                .map(data => data.value)
+                .reduce((a, b) => Math.abs(a) + Math.abs(b), 0),
+            deposit: deposits
+                .filter(data => !customers.some(customer => customer.id == data.customer))
+                .map(data => data.value)
+                .reduce((a, b) => Math.abs(a) + Math.abs(b), 0)
+        });
 
-        const customerFinances: Data[] = this.customers
-            .map(customer => finances.find(data => data.customer == customer.id))
-            .filter(data => !!data);
+        // sum all values
+        this.data.forEach(data => {
+            sum.turnover += data.turnover;
+            sum.deposit += data.deposit;
+            sum.balance += data.balance;
+        });
 
-        const additionalFinances: Data = finances
-            .filter(data => !this.customers.some(customer => customer.id == data.customer))
-            .reduce((a, b) => ({
-                value: Math.abs(a.value) + Math.abs(b.value)
-            }), { value: 0 });
-
-        this.finances = customerFinances
-            .concat(additionalFinances);
-
-        this.sum = this.finances
-            .map(data => Math.abs(data.value))
-            .reduce((a, b) => a + b, 0);
+        // add sum
+        this.data.push(sum);
 
         await super.load();
     }
 
     public numberOfCells(sender: FrontendJS.TableViewController, category: number): number {
-        return this.finances.length + 2;
+        return this.data.length + 1;
     }
 
     public createHeader?(sender: FrontendJS.TableViewController): FrontendJS.View {
@@ -104,15 +149,22 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
     }
 
     public updateCell(sender: FrontendJS.TableViewController, cell: Cell, row: number, category: number): void {
-        if (row < this.finances.length) {
-            const data = this.finances[row];
-            const customer = this.customers.find(customer => customer.id == data.customer);
+        // skip penultimate line to delimit the sum (last line)
+        const index = row < this.data.length - 1
+            ? row
+            : row < this.data.length
+                ? -1
+                : row - 1;
 
-            cell.customerLabel.text = customer && customer.toString() || '#_unknown_customer';
-            cell.valueLabel.text = CoreJS.formatCurrency(Math.abs(data.value));
-        } else if (row > this.finances.length) {
-            cell.valueLabel.text = CoreJS.formatCurrency(this.sum);
-        }
+        const data = this.data[index];
+
+        if (!data)
+            return;
+
+        cell.customerLabel.text = data.customer;
+        cell.turnoverLabel.text = data.turnover && CoreJS.formatCurrency(data.turnover) || '';
+        cell.depositLabel.text = data.deposit && CoreJS.formatCurrency(data.deposit) || '';
+        cell.balanceLabel.text = data.balance && CoreJS.formatCurrency(data.balance) || '';
     }
 
     public download() {
@@ -124,18 +176,17 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
 
         parser.add([
             CoreJS.Localization.translate('#_title_customer'),
-            CoreJS.Localization.translate('#_title_sum')
+            CoreJS.Localization.translate('#_title_turnover'),
+            CoreJS.Localization.translate('#_title_deposited'),
+            CoreJS.Localization.translate('#_title_balance')
         ]);
 
-        this.finances.forEach(finance => parser.add([
-            this.customers.find(customer => customer.id == finance.customer) || CoreJS.Localization.translate('#_unknown_customer'),
-            CoreJS.formatCurrency(Math.abs(finance.value))
+        parser.add(...this.data.map(data => [
+            data.customer,
+            CoreJS.formatCurrency(data.turnover),
+            CoreJS.formatCurrency(data.deposit),
+            CoreJS.formatCurrency(data.balance)
         ]));
-
-        parser.add([
-            '',
-            CoreJS.formatCurrency(this.sum)
-        ]);
 
         FrontendJS.download(parser);
     }
@@ -143,17 +194,25 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
 
 class Cell extends FrontendJS.View {
     public readonly customerLabel = new FrontendJS.Label('customer-label');
-    public readonly valueLabel = new FrontendJS.Label('value-label');
+    public readonly turnoverLabel = new FrontendJS.Label('turnover-label');
+    public readonly depositLabel = new FrontendJS.Label('deposit-label');
+    public readonly balanceLabel = new FrontendJS.Label('balance-label');
 
     constructor(...classes: string[]) {
         super(...classes);
 
         this.customerLabel.text = '#_title_customer';
-        this.valueLabel.text = '#_title_value';
+        this.turnoverLabel.text = '#_title_turnover';
+        this.depositLabel.text = '#_title_deposited';
+        this.balanceLabel.text = '#_title_balance';
 
-        this.valueLabel.type = FrontendJS.LabelType.Balance;
+        this.turnoverLabel.type = FrontendJS.LabelType.Balance;
+        this.depositLabel.type = FrontendJS.LabelType.Balance;
+        this.balanceLabel.type = FrontendJS.LabelType.Balance;
 
         this.appendChild(this.customerLabel);
-        this.appendChild(this.valueLabel);
+        this.appendChild(this.turnoverLabel);
+        this.appendChild(this.depositLabel);
+        this.appendChild(this.balanceLabel);
     }
 }

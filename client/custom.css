@@ -187,7 +187,10 @@
 
 .orders-view-controller .table-view .cell:last-child>div:not(:last-child),
 .balance-view-controller .table-view .cell:last-child>div:not(:last-child),
-.billing-view-controller .table-view .cell:last-child>div:not(:last-child),
-.turnover-view-controller .table-view .cell:last-child>div:not(:last-child) {
+.billing-view-controller .table-view .cell:last-child>div:not(:last-child) {
+    visibility: hidden;
+}
+
+.turnover-view-controller .table-view .cell:last-child>.customer-label {
     visibility: hidden;
 }
