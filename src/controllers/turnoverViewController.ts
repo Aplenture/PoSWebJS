@@ -12,12 +12,14 @@ import { Finance } from "../models/finance";
 import { PaymentMethod } from "../enums/paymentMethod";
 import { BalanceEvent } from "../enums/balanceEvent";
 import { Balance } from "../models/balance";
+import { BalanceResolution } from "../enums/balanceResolution";
 
 interface Data {
     readonly customer: string;
     readonly turnover: number;
     readonly deposit: number;
     readonly balance: number;
+    readonly transfer: number;
 }
 
 export class TurnoverViewController extends FrontendJS.BodyViewController implements FrontendJS.TableViewControllerDataSource {
@@ -51,12 +53,15 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
     public async load() {
         const firstDayOfMonth = CoreJS.calcDate({ monthDay: 1 });
         const selectedMonth = this.monthDropbox.selectedIndex;
+        const previous = Number(CoreJS.reduceDate({ date: firstDayOfMonth, months: selectedMonth + 1 }));
         const start = Number(CoreJS.reduceDate({ date: firstDayOfMonth, months: selectedMonth }));
+        const end = Number(CoreJS.reduceDate({ date: firstDayOfMonth, months: selectedMonth - 1 }));
         const sum = {
             customer: '',
             turnover: 0,
             deposit: 0,
-            balance: 0
+            balance: 0,
+            transfer: 0
         };
 
         this.monthDropbox.options = Array.from(Array(12).keys()).map(index => {
@@ -71,14 +76,14 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
 
         let customers: Customer[];
         let balances: Balance[];
-        let transfer: Balance[];
+        let transfers: Balance[];
         let turnovers: Finance[];
         let deposits: Finance[];
 
         await Promise.all([
             Customer.get({ paymentmethods: PaymentMethod.Balance }).then(result => customers = result.sort((a, b) => a.toString().localeCompare(b.toString()))),
-            Balance.getAll(start).then(result => balances = result),
-            Balance.getAll(start - 1).then(result => transfer = result),
+            Balance.getAll({ start, end: end - 1, resolution: BalanceResolution.Month }).then(result => balances = result),
+            Balance.getAll({ start: previous, end: start - 1, resolution: BalanceResolution.Month }).then(result => transfers = result),
             Finance.get({
                 data: [BalanceEvent.Invoice, BalanceEvent.Tip, BalanceEvent.UndoInvoice, BalanceEvent.UndoTip],
                 start
@@ -93,12 +98,14 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
             const turnover = turnovers.find(data => data.customer == customer.id);
             const deposit = deposits.find(data => data.customer == customer.id);
             const balance = balances.find(data => data.customer == customer.id);
+            const transfer = transfers.find(data => data.customer == customer.id);
 
             return {
                 customer: customer.toString(),
                 turnover: Math.abs(turnover && turnover.value || 0),
                 deposit: Math.abs(deposit && deposit.value || 0),
-                balance: balance && balance.value || 0
+                balance: balance && balance.value || 0,
+                transfer: transfer && transfer.value || 0
             };
         });
 
@@ -116,6 +123,10 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
             deposit: deposits
                 .filter(data => !customers.some(customer => customer.id == data.customer))
                 .map(data => data.value)
+                .reduce((a, b) => Math.abs(a) + Math.abs(b), 0),
+            transfer: transfers
+                .filter(data => !customers.some(customer => customer.id == data.customer))
+                .map(data => data.value)
                 .reduce((a, b) => Math.abs(a) + Math.abs(b), 0)
         });
 
@@ -124,6 +135,7 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
             sum.turnover += data.turnover;
             sum.deposit += data.deposit;
             sum.balance += data.balance;
+            sum.transfer += data.transfer;
         });
 
         // add sum
@@ -165,6 +177,7 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
         cell.turnoverLabel.text = data.turnover && CoreJS.formatCurrency(data.turnover) || '';
         cell.depositLabel.text = data.deposit && CoreJS.formatCurrency(data.deposit) || '';
         cell.balanceLabel.text = data.balance && CoreJS.formatCurrency(data.balance) || '';
+        cell.transferLabel.text = data.transfer && CoreJS.formatCurrency(data.transfer) || '';
     }
 
     public download() {
@@ -178,14 +191,16 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
             CoreJS.Localization.translate('#_title_customer'),
             CoreJS.Localization.translate('#_title_turnover'),
             CoreJS.Localization.translate('#_title_deposited'),
-            CoreJS.Localization.translate('#_title_balance')
+            CoreJS.Localization.translate('#_title_balance'),
+            CoreJS.Localization.translate('#_title_transfer')
         ]);
 
         parser.add(...this.data.map(data => [
             data.customer,
             CoreJS.formatCurrency(data.turnover),
             CoreJS.formatCurrency(data.deposit),
-            CoreJS.formatCurrency(data.balance)
+            CoreJS.formatCurrency(data.balance),
+            CoreJS.formatCurrency(data.transfer)
         ]));
 
         FrontendJS.download(parser);
@@ -197,6 +212,7 @@ class Cell extends FrontendJS.View {
     public readonly turnoverLabel = new FrontendJS.Label('turnover-label');
     public readonly depositLabel = new FrontendJS.Label('deposit-label');
     public readonly balanceLabel = new FrontendJS.Label('balance-label');
+    public readonly transferLabel = new FrontendJS.Label('transfer-label');
 
     constructor(...classes: string[]) {
         super(...classes);
@@ -205,14 +221,17 @@ class Cell extends FrontendJS.View {
         this.turnoverLabel.text = '#_title_turnover';
         this.depositLabel.text = '#_title_deposited';
         this.balanceLabel.text = '#_title_balance';
+        this.transferLabel.text = '#_title_transfer';
 
         this.turnoverLabel.type = FrontendJS.LabelType.Balance;
         this.depositLabel.type = FrontendJS.LabelType.Balance;
         this.balanceLabel.type = FrontendJS.LabelType.Balance;
+        this.transferLabel.type = FrontendJS.LabelType.Balance;
 
         this.appendChild(this.customerLabel);
         this.appendChild(this.turnoverLabel);
         this.appendChild(this.depositLabel);
         this.appendChild(this.balanceLabel);
+        this.appendChild(this.transferLabel);
     }
 }

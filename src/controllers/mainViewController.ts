@@ -408,7 +408,7 @@ export class MainViewController extends FrontendJS.BodyViewController {
 
         const openOrder = this.openCustomerOrder;
 
-        this.balance = await Balance.get(this.selectedCustomer.id)
+        this.balance = await Balance.get({ customer: this.selectedCustomer.id })
             // reduce balance by open order invoice
             - (openOrder && openOrder.invoice || 0);
     }
