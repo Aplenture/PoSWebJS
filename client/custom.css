@@ -54,7 +54,11 @@
 .cell .amount-label,
 .cell .value-label,
 .cell .date-label,
-.cell .order-label {
+.cell .order-label,
+.cell .transfer-label,
+.cell .deposit-label,
+.cell .turnover-label,
+.cell .bonus-label {
     width: 1px;
     text-align: right;
 }
