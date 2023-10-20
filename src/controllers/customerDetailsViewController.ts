@@ -42,7 +42,7 @@ export class CustomerDetailsViewController extends FrontendJS.BodyViewController
         if (this.customer.paymentMethods & PaymentMethod.Balance) {
             const openOrders = await Order.get({ customer: this.customer.id, state: OrderState.Open });
 
-            const balance = await Balance.get({ customer: this.customer.id })
+            const balance = await Balance.get(this.customer.id)
                 - (openOrders[0] && openOrders[0].invoice || 0);
 
             this.depositButton.isVisible = true;

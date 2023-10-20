@@ -12,19 +12,6 @@ const ROUTE_DEPOSIT = 'depositBalance';
 const ROUTE_WITHDRAW = 'withdrawBalance';
 const ROUTE_GET = 'getBalance';
 
-interface GetOptions {
-    readonly customer: number;
-    readonly start?: number;
-    readonly end?: number;
-    readonly resolution?: number;
-}
-
-interface GetAllOptions {
-    readonly start?: number;
-    readonly end?: number;
-    readonly resolution?: number;
-}
-
 export class Balance {
     private static _server: FrontendJS.Server;
 
@@ -70,12 +57,12 @@ export class Balance {
         ));
     }
 
-    public static get(options: GetOptions): Promise<number> {
-        return this._server.requestNumber(ROUTE_GET, options);
+    public static get(customer: number, time?: number): Promise<number> {
+        return this._server.requestNumber(ROUTE_GET, { customer, time });
     }
 
-    public static getAll(options: GetAllOptions = {}): Promise<Balance[]> {
-        return this._server.requestJSON(ROUTE_GET, options).then(data => data.map(data => new Balance(
+    public static getAll(time?: number): Promise<Balance[]> {
+        return this._server.requestJSON(ROUTE_GET, { time }).then(data => data.map(data => new Balance(
             data.timestamp,
             data.account,
             data.customer,

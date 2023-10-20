@@ -182,7 +182,7 @@ export class MainViewController extends FrontendJS.BodyViewController {
         this._order = value;
 
         if (this.selectedCustomer)
-            Balance.get({ customer: this.selectedCustomer.id }).then(value => this._balance = value
+            Balance.get(this.selectedCustomer.id).then(value => this._balance = value
                 // reduce balance by invoice of open order
                 - (this._order && this._order.invoice || 0)
             );
