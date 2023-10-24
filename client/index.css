@@ -5,7 +5,7 @@
  * License https://github.com/Aplenture/PoSWebJS/blob/main/LICENSE
  */
 
- * {
+* {
     margin: 0;
     padding: 0;
     cursor: inherit;
@@ -94,6 +94,14 @@ canvas {
 
     padding: 0;
     margin: 0;
+}
+
+.bar-view .dropbox-view {
+    width: max-content;
+}
+
+.bar-view .dropbox-view>span {
+    display: none;
 }
 
 .bar-view .label-view {
@@ -381,7 +389,8 @@ canvas {
 .titled-label-view .button-view.expose::before,
 .titled-label-view .button-view.copy::before,
 .titled-label-view .button-view.add::before,
-.titled-label-view .button-view.remove::before {
+.titled-label-view .button-view.remove::before,
+.titled-label-view .button-view.download::before {
     transform: scale(2) translate(0, -50%);
     -webkit-transform: scale(2) translate(0, -50%);
 }
@@ -590,10 +599,15 @@ canvas {
     content: "\2012";
 }
 
+.button-view.download::before {
+    content: "\f019";
+}
+
 .button-view.expose,
 .button-view.copy,
 .button-view.add,
-.button-view.remove {
+.button-view.remove,
+.button-view.download {
     min-width: min-content;
     max-width: min-content;
 }
@@ -601,7 +615,8 @@ canvas {
 .button-view.expose::before,
 .button-view.copy::before,
 .button-view.add::before,
-.button-view.remove::before {
+.button-view.remove::before,
+.button-view.download::before {
     display: inline-block;
     transform: scale(2) translate(0, -5%);
     -webkit-transform: scale(2) translate(0, -5%);
@@ -610,7 +625,8 @@ canvas {
 .button-view.expose div:last-child,
 .button-view.copy div:last-child,
 .button-view.add div:last-child,
-.button-view.remove div:last-child {
+.button-view.remove div:last-child,
+.button-view.download div:last-child {
     display: none !important;
 }
 

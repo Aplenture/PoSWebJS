@@ -14,6 +14,7 @@ interface GetOptions {
     readonly customer?: number;
     readonly start?: number;
     readonly end?: number;
+    readonly data?: readonly string[];
 }
 
 export class Finance {

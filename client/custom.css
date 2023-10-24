@@ -36,6 +36,10 @@
     background-color: #4A4948 !important;
 }
 
+.turnover-view-controller.body-title-bar {
+    border: 0px;
+}
+
 .create-customer-view-controller,
 .create-customer-view-controller .content.view-controller,
 .create-product-view-controller,
@@ -50,12 +54,23 @@
 .cell .amount-label,
 .cell .value-label,
 .cell .date-label,
-.cell .order-label {
+.cell .order-label,
+.cell .transfer-label,
+.cell .deposit-label,
+.cell .turnover-label,
+.cell .bonus-label {
     width: 1px;
     text-align: right;
 }
 
-.table-view .header {
+.table-view .header .number-label,
+.table-view .header .balance-label,
+.table-view .header .price-label,
+.table-view .header .sum-label,
+.table-view .header .amount-label,
+.table-view .header .value-label,
+.table-view .header .date-label,
+.table-view .header .order-label {
     text-align: center;
 }
 
@@ -145,7 +160,8 @@
 
 .orders-view-controller .table-view .cell:nth-last-child(2),
 .balance-view-controller .table-view .cell:nth-last-child(2),
-.billing-view-controller .table-view .cell:nth-last-child(2) {
+.billing-view-controller .table-view .cell:nth-last-child(2),
+.turnover-view-controller .table-view .cell:nth-last-child(2) {
     visibility: hidden;
     height: .5em;
     padding: 0;
@@ -154,24 +170,31 @@
 
 .orders-view-controller .table-view .cell:nth-last-child(2) div,
 .balance-view-controller .table-view .cell:nth-last-child(2) div,
-.billing-view-controller .table-view .cell:nth-last-child(2) div {
+.billing-view-controller .table-view .cell:nth-last-child(2) div,
+.turnover-view-controller .table-view .cell:nth-last-child(2) div {
     display: none;
 }
 
 .orders-view-controller .table-view .cell:nth-last-child(3)>div,
 .balance-view-controller .table-view .cell:nth-last-child(3)>div,
-.billing-view-controller .table-view .cell:nth-last-child(3)>div {
+.billing-view-controller .table-view .cell:nth-last-child(3)>div,
+.turnover-view-controller .table-view .cell:nth-last-child(3)>div {
     border-bottom: 1px solid #0180D4;
 }
 
 .orders-view-controller .table-view .cell:last-child>div,
 .balance-view-controller .table-view .cell:last-child>div,
-.billing-view-controller .table-view .cell:last-child>div {
+.billing-view-controller .table-view .cell:last-child>div,
+.turnover-view-controller .table-view .cell:last-child>div {
     border-top: 1px solid #0180D4;
 }
 
 .orders-view-controller .table-view .cell:last-child>div:not(:last-child),
 .balance-view-controller .table-view .cell:last-child>div:not(:last-child),
 .billing-view-controller .table-view .cell:last-child>div:not(:last-child) {
+    visibility: hidden;
+}
+
+.turnover-view-controller .table-view .cell:last-child>.customer-label {
     visibility: hidden;
 }

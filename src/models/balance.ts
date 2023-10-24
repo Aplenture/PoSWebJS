@@ -57,12 +57,12 @@ export class Balance {
         ));
     }
 
-    public static get(customer: number, start?: number): Promise<number> {
-        return this._server.requestNumber(ROUTE_GET, { customer, start });
+    public static get(customer: number, time?: number): Promise<number> {
+        return this._server.requestNumber(ROUTE_GET, { customer, time });
     }
 
-    public static getAll(start?: number): Promise<Balance[]> {
-        return this._server.requestJSON(ROUTE_GET, { start }).then(data => data.map(data => new Balance(
+    public static getAll(time?: number): Promise<Balance[]> {
+        return this._server.requestJSON(ROUTE_GET, { time }).then(data => data.map(data => new Balance(
             data.timestamp,
             data.account,
             data.customer,

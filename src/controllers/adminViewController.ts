@@ -9,6 +9,7 @@ import * as FrontendJS from "frontendjs";
 import { CustomersTableViewController } from "./customersTableViewController";
 import { ProductsTableViewController } from "./productsTableViewController";
 import { PaymentMethod } from "../enums/paymentMethod";
+import { TurnoverViewController } from "./turnoverViewController";
 
 export class AdminViewController extends FrontendJS.BodyViewController {
     public static readonly route = 'admin';
@@ -18,6 +19,7 @@ export class AdminViewController extends FrontendJS.BodyViewController {
     public readonly membersTableViewController = new CustomersTableViewController();
     public readonly guestsTableViewController = new CustomersTableViewController();
     public readonly productsTableViewController = new ProductsTableViewController();
+    public readonly turnoverViewContoller = new TurnoverViewController();
 
     constructor(...classes: string[]) {
         super(...classes, 'admin-view-controller');
@@ -41,5 +43,6 @@ export class AdminViewController extends FrontendJS.BodyViewController {
         this.menuViewController.appendChild(this.membersTableViewController);
         this.menuViewController.appendChild(this.guestsTableViewController);
         this.menuViewController.appendChild(this.productsTableViewController);
+        this.menuViewController.appendChild(this.turnoverViewContoller);
     }
 } 
