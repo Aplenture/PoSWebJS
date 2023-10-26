@@ -113,7 +113,7 @@ export class MainViewController extends FrontendJS.BodyViewController {
         this.purchaseViewController.customerLabel.isVisible = false;
         this.purchaseViewController.productLabel.isVisible = false;
         this.purchaseViewController.buyButton.onClick.on(() => this.buy(this.selectedProduct, this.selectedCustomer));
-        this.purchaseViewController.undoButton.onClick.on(() => this.undoPurchase(this.selectedProduct, this.selectedCustomer));
+        this.purchaseViewController.undoButton.onClick.on(() => this.undoPurchase(this.selectedProduct));
 
         this.backButton.type = FrontendJS.ButtonType.Back;
         this.backButton.onClick.on(async () => {
@@ -267,12 +267,16 @@ export class MainViewController extends FrontendJS.BodyViewController {
         if (!amount)
             return false;
 
-        const openOrder = this.openCustomerOrder
-            || await Order.create(customer.id, customer.paymentMethods);
+        const orderProduct = await OrderProduct.order({
+            customer: customer.id,
+            product: product.id,
+            amount
+        });
 
-        const orderProduct = await OrderProduct.order(openOrder.id, product.id, { amount });
-
-        await this.currentCustomersViewController.reload();
+        await Promise.all([
+            this.currentCustomersViewController.reload(),
+            this.openOrdersViewController.reload()
+        ]);
 
         this.updateBalance();
         this.purchaseViewController.updatePurchaseCount(orderProduct.amount);
@@ -291,7 +295,7 @@ export class MainViewController extends FrontendJS.BodyViewController {
         return true;
     }
 
-    public async undoPurchase(product: Product, customer: Customer): Promise<boolean> {
+    public async undoPurchase(product: Product): Promise<boolean> {
         if (!await FrontendJS.Client.popupViewController.queryBoolean(CoreJS.Localization.translate('#_query_text_undo_purchase', { '$1': product.name }), CoreJS.Localization.translate('#_title_undo_product', { '$1': product.name })))
             return;
 
@@ -315,14 +319,17 @@ export class MainViewController extends FrontendJS.BodyViewController {
             return false;
 
         const amount = currentOrderProduct.amount - decrease;
-        const orderWillBeEmpty = openOrder.products.length == 1 && amount == 0;
 
-        if (orderWillBeEmpty)
-            await Order.delete(openOrder.id);
-        else
-            await OrderProduct.update(openOrder.id, product.id, { amount });
+        await OrderProduct.update({
+            customer: this.selectedCustomer.id,
+            product: product.id,
+            amount
+        });
 
-        await this.currentCustomersViewController.reload();
+        await Promise.all([
+            this.currentCustomersViewController.reload(),
+            this.openOrdersViewController.reload()
+        ]);
 
         this.updateBalance();
         this.purchaseViewController.updatePurchaseCount(amount);
@@ -368,12 +375,13 @@ export class MainViewController extends FrontendJS.BodyViewController {
 
         await Order.close(openOrder.id, PaymentMethod.Cash, amount);
 
-        await this.currentCustomersViewController.reload();
-        await this.openOrdersViewController.reload();
+        await Promise.all([
+            this.currentCustomersViewController.reload(),
+            this.openOrdersViewController.reload(),
+            this.billingViewController.reload()
+        ]);
 
         this.updateBalance();
-
-        await this.billingViewController.reload();
 
         return true;
     }
@@ -392,12 +400,13 @@ export class MainViewController extends FrontendJS.BodyViewController {
 
         await Order.reopen(closedOrder.id);
 
-        await this.currentCustomersViewController.reload();
-        await this.openOrdersViewController.reload();
+        await Promise.all([
+            this.currentCustomersViewController.reload(),
+            this.openOrdersViewController.reload(),
+            this.billingViewController.reload()
+        ]);
 
         this.updateBalance();
-
-        await this.billingViewController.reload();
 
         return true;
     }
