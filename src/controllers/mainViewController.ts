@@ -154,6 +154,9 @@ export class MainViewController extends FrontendJS.BodyViewController {
 
     public get currentCustomersViewController(): CustomersGridViewController { return this.customerMenuViewController.selectedViewController as any; }
 
+    public get canPayWithBalance(): boolean { return (this.selectedCustomer.paymentMethods & PaymentMethod.Balance) > 0; }
+    public get canPayWithCash(): boolean { return (this.selectedCustomer.paymentMethods & PaymentMethod.Cash) > 0; }
+
     public get selectedCustomer(): Customer { return this.openOrdersViewController.customer; }
     public set selectedCustomer(value: Customer) {
         this.openOrdersViewController.customer = value;
@@ -162,17 +165,17 @@ export class MainViewController extends FrontendJS.BodyViewController {
         this.balanceViewControlelr.customer = value;
         this.billingViewController.customer = value;
         this.balanceLabel.isHidden = !value;
-        this.openOrdersViewController.footerBar.isVisible = value && (value.paymentMethods & PaymentMethod.Cash) != 0;
-        this.monthOrdersViewController.footerBar.isVisible = value && (value.paymentMethods & PaymentMethod.Cash) != 0;
-        this.productMenuViewController.showViewController(this.balanceViewControlelr, value && (value.paymentMethods & PaymentMethod.Balance) != 0);
-        this.productMenuViewController.showViewController(this.billingViewController, value && (value.paymentMethods & PaymentMethod.Cash) != 0);
+        this.openOrdersViewController.footerBar.isVisible = value && this.canPayWithCash;
+        this.monthOrdersViewController.footerBar.isVisible = value && this.canPayWithCash;
+        this.productMenuViewController.showViewController(this.balanceViewControlelr, value && this.canPayWithBalance);
+        this.productMenuViewController.showViewController(this.billingViewController, value && this.canPayWithCash);
 
         if (value) {
             this.customerLabel.text = value.toString();
-            this.payButton.isHidden = (value.paymentMethods & PaymentMethod.Cash) == 0;
-            this.openOrdersViewController.payButton.isHidden = (value.paymentMethods & PaymentMethod.Cash) == 0;
-            this.monthOrdersViewController.payButton.isHidden = (value.paymentMethods & PaymentMethod.Cash) == 0;
-            this.billingViewController.payButton.isHidden = (value.paymentMethods & PaymentMethod.Cash) == 0;
+            this.payButton.isVisible = this.canPayWithCash;
+            this.openOrdersViewController.payButton.isVisible = this.canPayWithCash;
+            this.monthOrdersViewController.payButton.isVisible = this.canPayWithCash;
+            this.billingViewController.payButton.isVisible = this.canPayWithCash;
         } else {
             this.customerLabel.text = '';
             this.balanceLabel.text = '';
@@ -191,7 +194,7 @@ export class MainViewController extends FrontendJS.BodyViewController {
 
     public get balance(): number { return this.balanceLabel.numberValue; }
     public set balance(value: number) {
-        if (this.selectedCustomer && (this.selectedCustomer.paymentMethods & PaymentMethod.Cash) != 0)
+        if (this.selectedCustomer && this.canPayWithCash)
             value = Math.abs(value);
 
         this.balanceLabel.text = CoreJS.formatCurrency(value);
@@ -349,7 +352,7 @@ export class MainViewController extends FrontendJS.BodyViewController {
     }
 
     private async pay(): Promise<boolean> {
-        if (!this.selectedCustomer || (this.selectedCustomer.paymentMethods & PaymentMethod.Cash) == 0)
+        if (!this.selectedCustomer || !this.canPayWithCash)
             throw new Error('selected customer is not a guest');
 
         const openOrder = this.openCustomerOrder;
@@ -387,7 +390,7 @@ export class MainViewController extends FrontendJS.BodyViewController {
     }
 
     private async correctPayment(): Promise<boolean> {
-        if (!this.selectedCustomer || (this.selectedCustomer.paymentMethods & PaymentMethod.Cash) == 0)
+        if (!this.selectedCustomer || !this.canPayWithCash)
             throw new Error('selected customer is not a guest');
 
         const closedOrder = this.closedCustomerOrder;
