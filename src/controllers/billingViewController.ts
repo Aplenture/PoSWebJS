@@ -41,13 +41,16 @@ export class BillingViewController extends FrontendJS.BodyViewController impleme
     public async load() {
         this.finances = await Finance.get({ customer: this.customer.id });
 
+        const filteredClosedInvoices = this.finances
+            .filter(data => data.data == 'invoice' && this.finances.every(tmp => tmp.order != data.order || tmp.data != 'open_invoice'));
+
         this.sum = this.finances
             .filter(data => data.data == 'open_invoice')
             .map(data => data.value)
             .reduce((a, b) => a + b, 0);
 
         this.payButton.isEnabled = this.sum > 0;
-        this.correctButton.isEnabled = this.finances.some(data => data.data == 'invoice');
+        this.correctButton.isEnabled = !!filteredClosedInvoices.length;
 
         await super.load();
     }
