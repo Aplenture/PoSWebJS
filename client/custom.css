@@ -57,6 +57,7 @@
 .cell .order-label,
 .cell .transfer-label,
 .cell .deposit-label,
+.cell .withdraw-label,
 .cell .turnover-label,
 .cell .bonus-label {
     width: 1px;

@@ -16,6 +16,7 @@ import { OrderState } from "../enums/orderState";
 export class CustomerDetailsViewController extends FrontendJS.BodyViewController {
     public readonly balanceLabel = new FrontendJS.TitledLabel('balance-text-field');
 
+    public readonly withdrawButton = new FrontendJS.Button('withdraw-button');
     public readonly depositButton = new FrontendJS.Button('deposit-button');
     public readonly editButton = new FrontendJS.Button('edit-button');
 
@@ -24,6 +25,7 @@ export class CustomerDetailsViewController extends FrontendJS.BodyViewController
     constructor(...classes: string[]) {
         super(...classes, 'create-customer-view-controller');
 
+        this.withdrawButton.text = '#_title_withdraw';
         this.depositButton.text = '#_title_deposit';
         this.editButton.text = '#_title_edit';
 
@@ -32,6 +34,7 @@ export class CustomerDetailsViewController extends FrontendJS.BodyViewController
 
         this.contentView.appendChild(this.balanceLabel);
 
+        this.footerBar.appendChild(this.withdrawButton);
         this.footerBar.appendChild(this.depositButton);
         this.footerBar.appendChild(this.editButton);
     }
@@ -45,10 +48,12 @@ export class CustomerDetailsViewController extends FrontendJS.BodyViewController
             const balance = await Balance.get(this.customer.id)
                 - (openOrders[0] && openOrders[0].invoice || 0);
 
+            this.withdrawButton.isVisible = true;
             this.depositButton.isVisible = true;
             this.balanceLabel.isVisible = true;
             this.balanceLabel.text = CoreJS.formatCurrency(balance);
         } else {
+            this.withdrawButton.isVisible = false;
             this.depositButton.isVisible = false;
             this.balanceLabel.isVisible = false;
             this.balanceLabel.text = "";

@@ -45,6 +45,7 @@ export class CustomersTableViewController extends FrontendJS.ViewController impl
 
         this.detailViewController.editButton.onClick.on(() => this.edit(this.detailViewController.customer));
         this.detailViewController.depositButton.onClick.on(() => this.deposit(this.detailViewController.customer));
+        this.detailViewController.withdrawButton.onClick.on(() => this.withdraw(this.detailViewController.customer));
 
         this.appendChild(this.tableViewController);
     }
@@ -139,6 +140,32 @@ export class CustomersTableViewController extends FrontendJS.ViewController impl
             this.balances[balanceIndex].value = balance.value;
 
         FrontendJS.Client.notificationViewController.pushNotification({ text: '#_notification_deposit_balance' });
+
+        this.tableViewController.render();
+
+        return result;
+    }
+
+    public async withdraw(customer: Customer): Promise<number> {
+        const max = await Balance.get(customer.id);
+
+        const result = await FrontendJS.Client.popupViewController.queryCurrency('#_query_text_withdraw', '#_query_title_withdraw', {
+            default: max,
+            max
+        });
+
+        if (!result)
+            return null;
+
+        const balance = await Balance.withdraw(customer.id, result);
+        const balanceIndex = this.balances.findIndex(data => data.customer == balance.customer);
+
+        if (-1 == balanceIndex)
+            this.balances.push(balance);
+        else
+            this.balances[balanceIndex].value = balance.value;
+
+        FrontendJS.Client.notificationViewController.pushNotification({ text: '#_notification_withdraw_balance' });
 
         this.tableViewController.render();
 

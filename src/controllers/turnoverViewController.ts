@@ -12,12 +12,12 @@ import { Finance } from "../models/finance";
 import { PaymentMethod } from "../enums/paymentMethod";
 import { BalanceEvent } from "../enums/balanceEvent";
 import { Balance } from "../models/balance";
-import { BalanceResolution } from "../enums/balanceResolution";
 
 interface Data {
     readonly customer: string;
     readonly turnover: number;
     readonly deposit: number;
+    readonly withdraw: number;
     readonly balance: number;
     readonly transfer: number;
     readonly bonus: number;
@@ -59,6 +59,7 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
             customer: '',
             turnover: 0,
             deposit: 0,
+            withdraw: 0,
             balance: 0,
             transfer: 0,
             bonus: 0
@@ -79,6 +80,7 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
         let transfers: Balance[];
         let turnovers: Finance[];
         let deposits: Finance[];
+        let withdraws: Finance[];
         let bonuses: any[] = [];
 
         await Promise.all([
@@ -92,12 +94,17 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
             Finance.get({
                 data: [BalanceEvent.Deposit],
                 start
-            }).then(result => deposits = result)
+            }).then(result => deposits = result),
+            Finance.get({
+                data: [BalanceEvent.Withdraw],
+                start
+            }).then(result => withdraws = result)
         ]);
 
         this.data = customers.map(customer => {
             const turnover = turnovers.find(data => data.customer == customer.id);
             const deposit = deposits.find(data => data.customer == customer.id);
+            const withdraw = withdraws.find(data => data.customer == customer.id);
             const balance = balances.find(data => data.customer == customer.id);
             const transfer = transfers.find(data => data.customer == customer.id);
             const bonus = bonuses.find(data => data.customer == customer.id);
@@ -106,6 +113,7 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
                 customer: customer.toString(),
                 turnover: Math.abs(turnover && turnover.value || 0),
                 deposit: Math.abs(deposit && deposit.value || 0),
+                withdraw: Math.abs(withdraw && withdraw.value || 0),
                 balance: balance && balance.value || 0,
                 transfer: transfer && transfer.value || 0,
                 bonus: bonus && bonus.value || 0
@@ -127,6 +135,10 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
                 .filter(data => !customers.some(customer => customer.id == data.customer))
                 .map(data => data.value)
                 .reduce((a, b) => Math.abs(a) + Math.abs(b), 0),
+            withdraw: withdraws
+                .filter(data => !customers.some(customer => customer.id == data.customer))
+                .map(data => data.value)
+                .reduce((a, b) => Math.abs(a) + Math.abs(b), 0),
             transfer: transfers
                 .filter(data => !customers.some(customer => customer.id == data.customer))
                 .map(data => data.value)
@@ -141,6 +153,7 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
         this.data.forEach(data => {
             sum.turnover += data.turnover;
             sum.deposit += data.deposit;
+            sum.withdraw += data.withdraw;
             sum.balance += data.balance;
             sum.transfer += data.transfer;
             sum.bonus += data.bonus;
@@ -184,6 +197,7 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
         cell.customerLabel.text = data.customer;
         cell.turnoverLabel.text = data.turnover && CoreJS.formatCurrency(data.turnover) || '';
         cell.depositLabel.text = data.deposit && CoreJS.formatCurrency(data.deposit) || '';
+        cell.withdrawLabel.text = data.withdraw && CoreJS.formatCurrency(data.withdraw) || '';
         cell.balanceLabel.text = data.balance && CoreJS.formatCurrency(data.balance) || '';
         cell.transferLabel.text = data.transfer && CoreJS.formatCurrency(data.transfer) || '';
         cell.bonusLabel.text = data.bonus && CoreJS.formatCurrency(data.bonus) || '';
@@ -200,6 +214,7 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
             CoreJS.Localization.translate('#_title_customer'),
             CoreJS.Localization.translate('#_title_transfer'),
             CoreJS.Localization.translate('#_title_deposited'),
+            CoreJS.Localization.translate('#_title_withdrawn'),
             CoreJS.Localization.translate('#_title_turnover'),
             CoreJS.Localization.translate('#_title_balance'),
             CoreJS.Localization.translate('#_title_bonus')
@@ -209,6 +224,7 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
             data.customer,
             CoreJS.formatCurrency(data.transfer),
             CoreJS.formatCurrency(data.deposit),
+            CoreJS.formatCurrency(data.withdraw),
             CoreJS.formatCurrency(data.turnover),
             CoreJS.formatCurrency(data.balance),
             CoreJS.formatCurrency(data.bonus)
@@ -222,6 +238,7 @@ class Cell extends FrontendJS.View {
     public readonly customerLabel = new FrontendJS.Label('customer-label');
     public readonly turnoverLabel = new FrontendJS.Label('turnover-label');
     public readonly depositLabel = new FrontendJS.Label('deposit-label');
+    public readonly withdrawLabel = new FrontendJS.Label('withdraw-label');
     public readonly balanceLabel = new FrontendJS.Label('balance-label');
     public readonly transferLabel = new FrontendJS.Label('transfer-label');
     public readonly bonusLabel = new FrontendJS.Label('bonus-label');
@@ -232,12 +249,14 @@ class Cell extends FrontendJS.View {
         this.customerLabel.text = '#_title_customer';
         this.turnoverLabel.text = '#_title_turnover';
         this.depositLabel.text = '#_title_deposited';
+        this.withdrawLabel.text = '#_title_withdrawn';
         this.balanceLabel.text = '#_title_balance';
         this.transferLabel.text = '#_title_transfer';
         this.bonusLabel.text = '#_title_bonus';
 
         this.turnoverLabel.type = FrontendJS.LabelType.Balance;
         this.depositLabel.type = FrontendJS.LabelType.Balance;
+        this.withdrawLabel.type = FrontendJS.LabelType.Balance;
         this.balanceLabel.type = FrontendJS.LabelType.Balance;
         this.transferLabel.type = FrontendJS.LabelType.Balance;
         this.bonusLabel.type = FrontendJS.LabelType.Balance;
@@ -245,6 +264,7 @@ class Cell extends FrontendJS.View {
         this.appendChild(this.customerLabel);
         this.appendChild(this.transferLabel);
         this.appendChild(this.depositLabel);
+        this.appendChild(this.withdrawLabel);
         this.appendChild(this.turnoverLabel);
         this.appendChild(this.balanceLabel);
         this.appendChild(this.bonusLabel);
