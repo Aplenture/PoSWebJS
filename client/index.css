@@ -684,3 +684,7 @@ canvas {
         font-size: 26px;
     }
 }
+
+@media (pointer:none), (pointer:coarse) {
+    /* custom css for "touch targets" */
+}

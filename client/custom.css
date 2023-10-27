@@ -199,3 +199,9 @@
 .turnover-view-controller .table-view .cell:last-child>.customer-label {
     visibility: hidden;
 }
+
+@media (pointer:none), (pointer:coarse) {
+    .popup-view-controller>div {
+        top: 30%;
+    }
+}

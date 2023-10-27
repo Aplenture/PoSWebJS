@@ -28,6 +28,7 @@ export class CustomersGridViewController extends GridViewController {
 
         this.gridViewController.onSelectedCell.on(cell => this.select(cell.index));
 
+        this.editViewController.lastnameTextField.isHidden = true;
         this.editViewController.onCreated.on(() => this.load());
         this.editViewController.onCreated.on(() => this.editViewController.removeFromParent());
     }
