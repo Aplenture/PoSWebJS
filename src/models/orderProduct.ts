@@ -12,6 +12,8 @@ const ROUTE_ORDER = "orderProduct";
 const ROUTE_UPDATE = "updateOrder";
 
 interface OrderOptions {
+    readonly customer: number;
+    readonly product: number;
     readonly amount?: number;
     readonly discount?: number;
 }
@@ -46,8 +48,8 @@ export class OrderProduct {
         return this._server.requestBool(ROUTE_CANCEL, { order, product });
     }
 
-    public static order(order: number, product: number, options?: OrderOptions): Promise<OrderProduct> {
-        return this._server.requestJSON(ROUTE_ORDER, Object.assign({ order, product }, options)).then(data => new OrderProduct(
+    public static order(options: OrderOptions): Promise<OrderProduct> {
+        return this._server.requestJSON(ROUTE_ORDER, options).then(data => new OrderProduct(
             data.order,
             data.product,
             data.price,
@@ -55,12 +57,7 @@ export class OrderProduct {
         ));
     }
 
-    public static update(order: number, product: number, options?: OrderOptions): Promise<OrderProduct> {
-        return this._server.requestJSON(ROUTE_UPDATE, Object.assign({ order, product }, options)).then(data => new OrderProduct(
-            data.order,
-            data.product,
-            data.price,
-            data.amount
-        ));
+    public static update(options: OrderOptions): Promise<boolean> {
+        return this._server.requestBool(ROUTE_UPDATE, options);
     }
 }
