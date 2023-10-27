@@ -46,9 +46,11 @@ export class CustomersGridViewController extends GridViewController {
             .map(order => allCustomers.find(customer => customer.id == order.customer))
             // undefined missing customer
             .filter(customer => customer)
+            // filter duplicates
+            .filter((customer, index, array) => index == array.indexOf(customer))
             // sort by name asc
             .sort((a, b) => a.toString().localeCompare(b.toString()));
-            
+
         const closedCustomers = allCustomers
             // filter all customers wich are not included in open customers
             .filter(customer => !openCustomers.includes(customer))
