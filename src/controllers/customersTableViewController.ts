@@ -14,11 +14,14 @@ import { Balance } from "../models/balance";
 import { PaymentMethod } from "../enums/paymentMethod";
 import { Order } from "../models/order";
 import { OrderState } from "../enums/orderState";
+import { DepostiViewController } from "./depositViewController";
 
 export class CustomersTableViewController extends FrontendJS.ViewController implements FrontendJS.TableViewControllerDataSource {
     public readonly tableViewController = new FrontendJS.TableViewController();
     public readonly editViewController = new CustomerEditViewController();
     public readonly detailViewController = new CustomerDetailsViewController();
+    public readonly depositViewController = new DepostiViewController();
+    public readonly withdrawViewController = new DepostiViewController('withdraw-view-controller');
 
     public readonly addButton = new FrontendJS.Button('add-button');
 
@@ -33,6 +36,8 @@ export class CustomersTableViewController extends FrontendJS.ViewController impl
         this.tableViewController.selectionMode = FrontendJS.TableSelectionMode.Clickable;
         this.tableViewController.onSelectedCell.on(cell => this.select(this.customers[cell.index]));
 
+        this.withdrawViewController.titleBar.titleLabel.text = '#_query_title_withdraw';
+
         this.addButton.type = FrontendJS.ButtonType.Add;
         this.addButton.onClick.on(() => this.add());
 
@@ -44,8 +49,15 @@ export class CustomersTableViewController extends FrontendJS.ViewController impl
         this.editViewController.onCreated.on(() => this.editViewController.removeFromParent());
 
         this.detailViewController.editButton.onClick.on(() => this.edit(this.detailViewController.customer));
-        this.detailViewController.depositButton.onClick.on(() => this.deposit(this.detailViewController.customer));
-        this.detailViewController.withdrawButton.onClick.on(() => this.withdraw(this.detailViewController.customer));
+        this.detailViewController.depositButton.onClick.on(() => FrontendJS.Client.popupViewController.pushViewController(this.depositViewController));
+        this.detailViewController.withdrawButton.onClick.on(() => FrontendJS.Client.popupViewController.pushViewController(this.withdrawViewController));
+        this.detailViewController.withdrawButton.onClick.on(async () => this.withdrawViewController.max = await Balance.get(this.detailViewController.customer.id));
+
+        this.depositViewController.okButton.onClick.on(() => this.deposit(this.detailViewController.customer, this.depositViewController.amountTextField.numberValue, this.depositViewController.dateTextField.dateValue));
+        this.depositViewController.okButton.onClick.on(() => this.depositViewController.removeFromParent());
+
+        this.withdrawViewController.okButton.onClick.on(() => this.withdraw(this.detailViewController.customer, this.withdrawViewController.amountTextField.numberValue, this.withdrawViewController.dateTextField.dateValue));
+        this.withdrawViewController.okButton.onClick.on(() => this.withdrawViewController.removeFromParent());
 
         this.appendChild(this.tableViewController);
     }
@@ -125,13 +137,11 @@ export class CustomersTableViewController extends FrontendJS.ViewController impl
         return FrontendJS.Client.popupViewController.pushViewController(this.editViewController);
     }
 
-    public async deposit(customer: Customer): Promise<number> {
-        const result = await FrontendJS.Client.popupViewController.queryCurrency('#_query_text_deposit', '#_query_title_deposit');
-
-        if (!result)
+    public async deposit(customer: Customer, value: number, date?: Date): Promise<number> {
+        if (!value)
             return null;
 
-        const balance = await Balance.deposit(customer.id, result);
+        const balance = await Balance.deposit(customer.id, value, date);
         const balanceIndex = this.balances.findIndex(data => data.customer == balance.customer);
 
         if (-1 == balanceIndex)
@@ -143,21 +153,14 @@ export class CustomersTableViewController extends FrontendJS.ViewController impl
 
         this.tableViewController.render();
 
-        return result;
+        return value;
     }
 
-    public async withdraw(customer: Customer): Promise<number> {
-        const max = await Balance.get(customer.id);
-
-        const result = await FrontendJS.Client.popupViewController.queryCurrency('#_query_text_withdraw', '#_query_title_withdraw', {
-            default: max,
-            max
-        });
-
-        if (!result)
+    public async withdraw(customer: Customer, value: number, date?: Date): Promise<number> {
+        if (!value)
             return null;
 
-        const balance = await Balance.withdraw(customer.id, result);
+        const balance = await Balance.withdraw(customer.id, value, date);
         const balanceIndex = this.balances.findIndex(data => data.customer == balance.customer);
 
         if (-1 == balanceIndex)
@@ -169,7 +172,7 @@ export class CustomersTableViewController extends FrontendJS.ViewController impl
 
         this.tableViewController.render();
 
-        return result;
+        return value;
     }
 }
 

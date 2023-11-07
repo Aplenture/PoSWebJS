@@ -37,8 +37,8 @@ export class Balance {
     public static async unload() { }
     public static async start() { }
 
-    public static deposit(customer: number, value: number): Promise<Balance> {
-        return this._server.requestJSON(ROUTE_DEPOSIT, { customer, value }).then(data => new Balance(
+    public static deposit(customer: number, value: number, date?: Date): Promise<Balance> {
+        return this._server.requestJSON(ROUTE_DEPOSIT, { customer, value, date }).then(data => new Balance(
             data.timestamp,
             data.account,
             data.customer,
@@ -47,8 +47,8 @@ export class Balance {
         ));
     }
 
-    public static withdraw(customer: number, value: number): Promise<Balance> {
-        return this._server.requestJSON(ROUTE_WITHDRAW, { customer, value }).then(data => new Balance(
+    public static withdraw(customer: number, value: number, date?: Date): Promise<Balance> {
+        return this._server.requestJSON(ROUTE_WITHDRAW, { customer, value, date }).then(data => new Balance(
             data.timestamp,
             data.account,
             data.customer,
