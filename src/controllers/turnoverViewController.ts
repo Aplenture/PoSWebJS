@@ -55,6 +55,7 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
         const firstDayOfMonth = CoreJS.calcDate({ monthDay: 1 });
         const selectedMonth = this.monthDropbox.selectedIndex;
         const start = Number(CoreJS.reduceDate({ date: firstDayOfMonth, months: selectedMonth }));
+        const end = Number(CoreJS.reduceDate({ date: firstDayOfMonth, months: selectedMonth - 1 })) - 1;
         const sum = {
             customer: '',
             turnover: 0,
@@ -85,19 +86,22 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
 
         await Promise.all([
             Customer.get({ paymentmethods: PaymentMethod.Balance }).then(result => customers = result.sort((a, b) => a.toString().localeCompare(b.toString()))),
-            Balance.getAll().then(result => balances = result),
-            Balance.getAll(start).then(result => transfers = result),
+            Balance.getAll(end).then(result => balances = result),
+            Balance.getAll(start - 1).then(result => transfers = result),
             Finance.get({
                 data: [BalanceEvent.Invoice, BalanceEvent.Tip, BalanceEvent.UndoInvoice, BalanceEvent.UndoTip],
-                start
+                start,
+                end
             }).then(result => turnovers = result),
             Finance.get({
                 data: [BalanceEvent.Deposit],
-                start
+                start,
+                end
             }).then(result => deposits = result),
             Finance.get({
                 data: [BalanceEvent.Withdraw],
-                start
+                start,
+                end
             }).then(result => withdraws = result)
         ]);
 
