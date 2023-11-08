@@ -40,7 +40,7 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
         this.tableViewController.titleLabel.text = '#_title_turnover';
         this.tableViewController.dataSource = this;
 
-        this.monthDropbox.onSelected.on(() => this.reload());
+        this.monthDropbox.onSelected.on(() => this.load());
 
         this.downloadButton.type = FrontendJS.ButtonType.Download;
         this.downloadButton.onClick.on(() => this.download());
@@ -167,6 +167,12 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
         this.data.push(sum);
 
         await super.load();
+    }
+
+    public async unload() {
+        this.monthDropbox.selectedIndex = 0;
+
+        await super.unload();
     }
 
     public numberOfCells(sender: FrontendJS.TableViewController, category: number): number {
