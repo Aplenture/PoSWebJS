@@ -56,11 +56,21 @@ export class CustomersTableViewController extends FrontendJS.ViewController impl
         this.detailViewController.withdrawButton.onClick.on(() => FrontendJS.Client.popupViewController.pushViewController(this.withdrawViewController));
         this.detailViewController.withdrawButton.onClick.on(async () => this.withdrawViewController.max = await Balance.get(this.detailViewController.customer.id));
 
-        this.depositViewController.okButton.onClick.on(() => this.deposit(this.detailViewController.customer, this.depositViewController.amountTextField.numberValue, this.depositViewController.dateTextField.dateValue));
-        this.depositViewController.okButton.onClick.on(() => this.depositViewController.removeFromParent());
+        this.depositViewController.okButton.onClick.on(() => {
+            if (!this.depositViewController.amountTextField.numberValue)
+                return FrontendJS.Client.popupViewController.pushMessage('#_error_deposit_zero', '#_title_deposit');
 
-        this.withdrawViewController.okButton.onClick.on(() => this.withdraw(this.detailViewController.customer, this.withdrawViewController.amountTextField.numberValue, this.withdrawViewController.dateTextField.dateValue));
-        this.withdrawViewController.okButton.onClick.on(() => this.withdrawViewController.removeFromParent());
+            this.deposit(this.detailViewController.customer, this.depositViewController.amountTextField.numberValue, this.depositViewController.dateTextField.dateValue);
+            this.depositViewController.removeFromParent();
+        });
+
+        this.withdrawViewController.okButton.onClick.on(() => {
+            if (!this.withdrawViewController.amountTextField.numberValue)
+                return FrontendJS.Client.popupViewController.pushMessage('#_error_withdraw_zero', '#_title_withdraw');
+
+            this.withdraw(this.detailViewController.customer, this.withdrawViewController.amountTextField.numberValue, this.withdrawViewController.dateTextField.dateValue)
+            this.withdrawViewController.removeFromParent()
+        });
 
         this.appendChild(this.tableViewController);
     }
