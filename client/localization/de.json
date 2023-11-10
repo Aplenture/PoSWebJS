@@ -57,7 +57,6 @@
     "#_error_missing_product_price": "Bitte gib den Preis des Produkte an.",
     "#_error_no_access": "Du hast keine Berechtigung. Du musst dich zunächst anmelden.",
     "#_error_not_enough_payment": "Das ist nicht genug Geld, um die Rechnung zu bezahlen.",
-    "#_error_product_not_bought_lately": "Du hast dieses Produkt noch nicht gekauft.",
     "#_expiration_date": "Ablaufdatum",
     "#_expose": "Aufdecken",
     "#_label": "Beschriftung",
