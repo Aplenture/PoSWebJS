@@ -16,6 +16,7 @@ import { Finance } from "../models/finance";
 import { Order } from "../models/order";
 import { OrderProduct } from "../models/orderProduct";
 import { Product } from "../models/product";
+import { TransactionLabel } from "../models/transactionLabel";
 
 export class RootViewController extends FrontendJS.ViewController {
     public readonly settingsButton = new FrontendJS.Button('settings-button');
@@ -28,7 +29,8 @@ export class RootViewController extends FrontendJS.ViewController {
         Finance,
         Order,
         OrderProduct,
-        Product
+        Product,
+        TransactionLabel
     );
 
     constructor(...classes: string[]) {

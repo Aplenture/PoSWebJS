@@ -11,6 +11,7 @@ import * as FrontendJS from "frontendjs";
 export class DepostiViewController extends FrontendJS.BodyViewController {
     public readonly amountTextField = new FrontendJS.TextField('amount-text-field');
     public readonly dateTextField = new FrontendJS.TextField('date-text-field');
+    public readonly labelDropbox = new FrontendJS.Dropbox('label-dropbox');
 
     public readonly okButton = new FrontendJS.Button('ok-button');
     public readonly cancelButton = new FrontendJS.Button('cancel-button');
@@ -36,6 +37,9 @@ export class DepostiViewController extends FrontendJS.BodyViewController {
         this.dateTextField.onEnterKey.on(() => this.okButton.click());
         this.dateTextField.onEscapeKey.on(() => this.cancelButton.click());
 
+        this.labelDropbox.isHidden = true;
+        this.labelDropbox.title = '#_title_deposit_label';
+
         this.okButton.type = FrontendJS.ButtonType.Done;
         this.okButton.text = '#_ok';
         this.okButton.index = 1;
@@ -52,10 +56,19 @@ export class DepostiViewController extends FrontendJS.BodyViewController {
 
         this.contentView.appendChild(this.amountTextField);
         this.contentView.appendChild(this.dateTextField);
+        this.contentView.appendChild(this.labelDropbox);
 
         this.footerBar.appendChild(this.maxButton);
         this.footerBar.appendChild(this.cancelButton);
         this.footerBar.appendChild(this.okButton);
+    }
+
+    public get selectedLabel(): string { return this.labelDropbox.options[this.labelDropbox.selectedIndex]; }
+
+    public get labels(): readonly string[] { return this.labelDropbox.options; }
+    public set labels(value: readonly string[]) {
+        this.labelDropbox.options = value;
+        this.labelDropbox.isHidden = !value.length;
     }
 
     public get max(): number { return this._max; }
@@ -70,8 +83,10 @@ export class DepostiViewController extends FrontendJS.BodyViewController {
     }
 
     public async load(): Promise<void> {
-        this.amountTextField.numberValue = 0;
         this.dateTextField.dateValue = new Date();
+        this.labelDropbox.selectedIndex = 0;
+
+        this.amountTextField.numberValue = 0;
         this.amountTextField.selectRange();
 
         await super.load();

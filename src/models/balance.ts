@@ -12,6 +12,13 @@ const ROUTE_DEPOSIT = 'depositBalance';
 const ROUTE_WITHDRAW = 'withdrawBalance';
 const ROUTE_GET = 'getBalance';
 
+interface TransferOpitons {
+    readonly customer: number;
+    readonly value: number;
+    readonly date?: Date;
+    readonly label?: string;
+}
+
 export class Balance {
     private static _server: FrontendJS.Server;
 
@@ -37,8 +44,8 @@ export class Balance {
     public static async unload() { }
     public static async start() { }
 
-    public static deposit(customer: number, value: number, date?: Date): Promise<Balance> {
-        return this._server.requestJSON(ROUTE_DEPOSIT, { customer, value, date }).then(data => new Balance(
+    public static deposit(options: TransferOpitons): Promise<Balance> {
+        return this._server.requestJSON(ROUTE_DEPOSIT, options).then(data => new Balance(
             data.timestamp,
             data.account,
             data.customer,
@@ -47,8 +54,8 @@ export class Balance {
         ));
     }
 
-    public static withdraw(customer: number, value: number, date?: Date): Promise<Balance> {
-        return this._server.requestJSON(ROUTE_WITHDRAW, { customer, value, date }).then(data => new Balance(
+    public static withdraw(options: TransferOpitons): Promise<Balance> {
+        return this._server.requestJSON(ROUTE_WITHDRAW, options).then(data => new Balance(
             data.timestamp,
             data.account,
             data.customer,

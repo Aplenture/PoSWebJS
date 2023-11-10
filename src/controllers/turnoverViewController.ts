@@ -12,6 +12,8 @@ import { Finance } from "../models/finance";
 import { PaymentMethod } from "../enums/paymentMethod";
 import { BalanceEvent } from "../enums/balanceEvent";
 import { Balance } from "../models/balance";
+import { TransactionLabel } from "../models/transactionLabel";
+import { TransactionType } from "../enums/TransactionType";
 
 interface Data {
     readonly customer: string;
@@ -52,6 +54,9 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
     }
 
     public async load() {
+        const depositLabels = await TransactionLabel.getAll(TransactionType.Deposit);
+        const withdrawLabels = await TransactionLabel.getAll(TransactionType.Withdraw);
+
         const firstDayOfMonth = CoreJS.calcDate({ monthDay: 1 });
         const selectedMonth = this.monthDropbox.selectedIndex;
         const start = Number(CoreJS.reduceDate({ date: firstDayOfMonth, months: selectedMonth }));
@@ -94,12 +99,16 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
                 end
             }).then(result => turnovers = result),
             Finance.get({
-                data: [BalanceEvent.Deposit],
+                data: depositLabels
+                    .map(data => data.name)
+                    .concat(BalanceEvent.Deposit),
                 start,
                 end
             }).then(result => deposits = result),
             Finance.get({
-                data: [BalanceEvent.Withdraw],
+                data: withdrawLabels
+                    .map(data => data.name)
+                    .concat(BalanceEvent.Withdraw),
                 start,
                 end
             }).then(result => withdraws = result)

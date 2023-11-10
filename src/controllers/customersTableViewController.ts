@@ -15,6 +15,9 @@ import { PaymentMethod } from "../enums/paymentMethod";
 import { Order } from "../models/order";
 import { OrderState } from "../enums/orderState";
 import { DepostiViewController } from "./depositViewController";
+import { TransactionLabel } from "../models/transactionLabel";
+import { TransactionType } from "../enums/TransactionType";
+import { BalanceEvent } from "../enums/balanceEvent";
 
 export class CustomersTableViewController extends FrontendJS.ViewController implements FrontendJS.TableViewControllerDataSource {
     public readonly tableViewController = new FrontendJS.TableViewController();
@@ -68,6 +71,8 @@ export class CustomersTableViewController extends FrontendJS.ViewController impl
     public get isBalanceAllowed(): boolean { return (this.paymentMethods & PaymentMethod.Balance) != 0; }
 
     public async load(): Promise<void> {
+        this.depositViewController.labels = [BalanceEvent.Deposit as string].concat((await TransactionLabel.getAll(TransactionType.Deposit)).map(data => data.name));
+        this.withdrawViewController.labels = [BalanceEvent.Withdraw as string].concat((await TransactionLabel.getAll(TransactionType.Withdraw)).map(data => data.name));
         this.openOrders = await Order.get({ state: OrderState.Open });
         this.balances = await Balance.getAll();
         this.customers = (await Customer.get({ paymentmethods: this.paymentMethods }))
@@ -141,7 +146,15 @@ export class CustomersTableViewController extends FrontendJS.ViewController impl
         if (!value)
             return null;
 
-        const balance = await Balance.deposit(customer.id, value, date);
+        const label = this.depositViewController.selectedLabel;
+
+        const balance = await Balance.deposit({
+            customer: customer.id,
+            value,
+            date,
+            label
+        });
+
         const balanceIndex = this.balances.findIndex(data => data.customer == balance.customer);
 
         if (-1 == balanceIndex)
@@ -160,7 +173,15 @@ export class CustomersTableViewController extends FrontendJS.ViewController impl
         if (!value)
             return null;
 
-        const balance = await Balance.withdraw(customer.id, value, date);
+        const label = this.withdrawViewController.selectedLabel;
+
+        const balance = await Balance.withdraw({
+            customer: customer.id,
+            value,
+            date,
+            label
+        });
+
         const balanceIndex = this.balances.findIndex(data => data.customer == balance.customer);
 
         if (-1 == balanceIndex)
