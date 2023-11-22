@@ -8,7 +8,8 @@
 import * as FrontendJS from "frontendjs";
 import { PaymentMethod } from "../enums/paymentMethod";
 
-const ROUTE_GET = 'getFinances';
+const ROUTE_GET_FINANCES = 'getFinances';
+const ROUTE_GET_TRANSFERS = 'getTransfers';
 
 interface GetOptions {
     readonly customer?: number;
@@ -31,7 +32,7 @@ export class Finance {
     ) { }
 
     public static async prepare(preparer: FrontendJS.ServerPreparer): Promise<void> {
-        preparer.addRoute(ROUTE_GET);
+        preparer.addRoute(ROUTE_GET_FINANCES);
     }
 
     public static async init(server: FrontendJS.Server): Promise<void> {
@@ -42,8 +43,20 @@ export class Finance {
     public static async unload() { }
     public static async start() { }
 
-    public static get(options?: GetOptions): Promise<Finance[]> {
-        return this._server.requestJSON(ROUTE_GET, options).then(data => data.map(data => new Finance(
+    public static getFinances(options?: GetOptions): Promise<Finance[]> {
+        return this._server.requestJSON(ROUTE_GET_FINANCES, options).then(data => data.map(data => new Finance(
+            data.timestamp,
+            data.type,
+            data.customer,
+            data.order,
+            data.paymentMethod,
+            data.value,
+            data.data
+        )));
+    }
+
+    public static getTransfers(options?: GetOptions): Promise<Finance[]> {
+        return this._server.requestJSON(ROUTE_GET_TRANSFERS, options).then(data => data.map(data => new Finance(
             data.timestamp,
             data.type,
             data.customer,

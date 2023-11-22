@@ -39,7 +39,7 @@ export class BillingViewController extends FrontendJS.BodyViewController impleme
     }
 
     public async load() {
-        this.finances = await Finance.get({ customer: this.customer.id });
+        this.finances = await Finance.getFinances({ customer: this.customer.id });
 
         const filteredClosedInvoices = this.finances
             .filter(data => data.data == 'invoice' && this.finances.every(tmp => tmp.order != data.order || tmp.data != 'open_invoice'));

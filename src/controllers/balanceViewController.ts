@@ -29,7 +29,7 @@ export class BalanceViewController extends FrontendJS.ViewController implements 
 
     public async load() {
         const firstDayOfMonth = Number(CoreJS.calcDate({ monthDay: 1 }));
-        const finances = await Finance.get({
+        const finances = await Finance.getFinances({
             customer: this.customer.id,
             start: firstDayOfMonth
         });

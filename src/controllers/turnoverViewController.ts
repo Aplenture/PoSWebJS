@@ -93,19 +93,19 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
             Customer.get({ paymentmethods: PaymentMethod.Balance }).then(result => customers = result.sort((a, b) => a.toString().localeCompare(b.toString()))),
             Balance.getAll(end).then(result => balances = result),
             Balance.getAll(start - 1).then(result => transfers = result),
-            Finance.get({
+            Finance.getFinances({
                 data: [BalanceEvent.Invoice, BalanceEvent.Tip, BalanceEvent.UndoInvoice, BalanceEvent.UndoTip],
                 start,
                 end
             }).then(result => turnovers = result),
-            Finance.get({
+            Finance.getFinances({
                 data: depositLabels
                     .map(data => data.name)
                     .concat(BalanceEvent.Deposit),
                 start,
                 end
             }).then(result => deposits = result),
-            Finance.get({
+            Finance.getFinances({
                 data: withdrawLabels
                     .map(data => data.name)
                     .concat(BalanceEvent.Withdraw),
