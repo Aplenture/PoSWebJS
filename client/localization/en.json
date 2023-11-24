@@ -56,6 +56,7 @@
     "#_error_missing_customer_lastname": "Please type the lastname of the new customer.",
     "#_error_missing_product_name": "Please type the name of the new product.",
     "#_error_missing_product_price": "Please type the price of the new product.",
+    "#_error_missing_transaction_label": "Please select a transaction label",
     "#_error_no_access": "There is no access. You need to login.",
     "#_error_not_enough_payment": "This is not enough money to pay the invoices.",
     "#_error_withdraw_zero": "Amount of withdraw can not be 0.",

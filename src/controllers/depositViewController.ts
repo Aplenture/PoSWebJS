@@ -9,6 +9,8 @@ import * as CoreJS from "corejs";
 import * as FrontendJS from "frontendjs";
 
 export class DepostiViewController extends FrontendJS.BodyViewController {
+    public readonly onEnter = new CoreJS.Event<DepostiViewController, void>("DepostiViewController.onEnter");
+
     public readonly amountTextField = new FrontendJS.TextField('amount-text-field');
     public readonly dateTextField = new FrontendJS.TextField('date-text-field');
     public readonly labelDropbox = new FrontendJS.Dropbox('label-dropbox');
@@ -43,6 +45,7 @@ export class DepostiViewController extends FrontendJS.BodyViewController {
         this.okButton.type = FrontendJS.ButtonType.Done;
         this.okButton.text = '#_ok';
         this.okButton.index = 1;
+        this.okButton.onClick.on(() => this.enter());
 
         this.cancelButton.type = FrontendJS.ButtonType.Cancel;
         this.cancelButton.index = 2;
@@ -84,7 +87,7 @@ export class DepostiViewController extends FrontendJS.BodyViewController {
 
     public async load(): Promise<void> {
         this.dateTextField.dateValue = new Date();
-        this.labelDropbox.selectedIndex = 0;
+        this.labelDropbox.selectedIndex = -1;
 
         this.amountTextField.numberValue = 0;
         this.amountTextField.selectRange();
@@ -94,5 +97,14 @@ export class DepostiViewController extends FrontendJS.BodyViewController {
 
     public focus() {
         this.amountTextField.focus();
+    }
+
+    public enter() {
+        if (0 > this.labelDropbox.selectedIndex) {
+            FrontendJS.Client.popupViewController.pushMessage("#_error_missing_transaction_label", "#_query_title_deposit");
+            return this.labelDropbox.focus();
+        }
+
+        this.onEnter.emit(this);
     }
 }

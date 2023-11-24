@@ -56,6 +56,7 @@
     "#_error_missing_customer_lastname": "Bitte gib den Nachnamen des Kunden ein.",
     "#_error_missing_product_name": "Bitte gib den Namen des Produkte ein.",
     "#_error_missing_product_price": "Bitte gib den Preis des Produkte an.",
+    "#_error_missing_transaction_label": "Bitte wähle die Transaktionsmethode aus",
     "#_error_no_access": "Du hast keine Berechtigung. Du musst dich zunächst anmelden.",
     "#_error_not_enough_payment": "Das ist nicht genug Geld, um die Rechnung zu bezahlen.",
     "#_error_withdraw_zero": "Die Höhe der Auszahlung darf nicht 0 sein.",
