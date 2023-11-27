@@ -14,7 +14,7 @@ import { Balance } from "../models/balance";
 import { PaymentMethod } from "../enums/paymentMethod";
 import { Order } from "../models/order";
 import { OrderState } from "../enums/orderState";
-import { DepostiViewController } from "./depositViewController";
+import { DepositViewController } from "./depositViewController";
 import { TransactionLabel } from "../models/transactionLabel";
 import { TransactionType } from "../enums/TransactionType";
 import { BalanceEvent } from "../enums/balanceEvent";
@@ -23,8 +23,8 @@ export class CustomersTableViewController extends FrontendJS.ViewController impl
     public readonly tableViewController = new FrontendJS.TableViewController();
     public readonly editViewController = new CustomerEditViewController();
     public readonly detailViewController = new CustomerDetailsViewController();
-    public readonly depositViewController = new DepostiViewController();
-    public readonly withdrawViewController = new DepostiViewController('withdraw-view-controller');
+    public readonly depositViewController = new DepositViewController();
+    public readonly withdrawViewController = new DepositViewController('withdraw-view-controller');
 
     public readonly addButton = new FrontendJS.Button('add-button');
 
@@ -52,7 +52,11 @@ export class CustomersTableViewController extends FrontendJS.ViewController impl
         this.editViewController.onCreated.on(() => this.editViewController.removeFromParent());
 
         this.detailViewController.editButton.onClick.on(() => this.edit(this.detailViewController.customer));
+
+        this.detailViewController.depositButton.onClick.on(() => this.depositViewController.customerLabel.text = this.detailViewController.customer.toString());
         this.detailViewController.depositButton.onClick.on(() => FrontendJS.Client.popupViewController.pushViewController(this.depositViewController));
+
+        this.detailViewController.withdrawButton.onClick.on(() => this.withdrawViewController.customerLabel.text = this.detailViewController.customer.toString());
         this.detailViewController.withdrawButton.onClick.on(() => FrontendJS.Client.popupViewController.pushViewController(this.withdrawViewController));
         this.detailViewController.withdrawButton.onClick.on(async () => this.withdrawViewController.max = await Balance.get(this.detailViewController.customer.id));
 

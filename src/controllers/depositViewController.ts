@@ -8,9 +8,10 @@
 import * as CoreJS from "corejs";
 import * as FrontendJS from "frontendjs";
 
-export class DepostiViewController extends FrontendJS.BodyViewController {
-    public readonly onEnter = new CoreJS.Event<DepostiViewController, void>("DepostiViewController.onEnter");
+export class DepositViewController extends FrontendJS.BodyViewController {
+    public readonly onEnter = new CoreJS.Event<DepositViewController, void>("DepostiViewController.onEnter");
 
+    public readonly customerLabel = new FrontendJS.TitledLabel('customer-label');
     public readonly amountTextField = new FrontendJS.TextField('amount-text-field');
     public readonly dateTextField = new FrontendJS.TextField('date-text-field');
     public readonly labelDropbox = new FrontendJS.Dropbox('label-dropbox');
@@ -19,12 +20,16 @@ export class DepostiViewController extends FrontendJS.BodyViewController {
     public readonly cancelButton = new FrontendJS.Button('cancel-button');
     public readonly maxButton = new FrontendJS.Button('max-button');
 
+    public autoReset = true;
+
     private _max = 0;
 
     constructor(...classes: string[]) {
         super(...classes, 'deposit-view-controller');
 
         this.titleBar.titleLabel.text = '#_query_title_deposit';
+
+        this.customerLabel.title = '#_title_customer';
 
         this.amountTextField.type = FrontendJS.TextFieldType.Currency;
         this.amountTextField.title = '#_title_amount_deposit';
@@ -57,6 +62,7 @@ export class DepostiViewController extends FrontendJS.BodyViewController {
         this.maxButton.onClick.on(() => this.amountTextField.numberValue = this.max);
         this.maxButton.onClick.on(() => this.amountTextField.selectRange());
 
+        this.contentView.appendChild(this.customerLabel);
         this.contentView.appendChild(this.amountTextField);
         this.contentView.appendChild(this.dateTextField);
         this.contentView.appendChild(this.labelDropbox);
@@ -86,17 +92,18 @@ export class DepostiViewController extends FrontendJS.BodyViewController {
     }
 
     public async load(): Promise<void> {
-        this.dateTextField.dateValue = new Date();
-        this.labelDropbox.selectedIndex = -1;
-
-        this.amountTextField.numberValue = 0;
-        this.amountTextField.selectRange();
+        if (this.autoReset) {
+            this.dateTextField.dateValue = new Date();
+            this.labelDropbox.selectedIndex = -1;
+            this.amountTextField.numberValue = 0;
+        }
 
         await super.load();
     }
 
     public focus() {
         this.amountTextField.focus();
+        this.amountTextField.selectRange();
     }
 
     public enter() {
