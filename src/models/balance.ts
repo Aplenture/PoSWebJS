@@ -11,6 +11,7 @@ import { PaymentMethod } from "../enums/paymentMethod";
 const ROUTE_DEPOSIT = 'depositBalance';
 const ROUTE_WITHDRAW = 'withdrawBalance';
 const ROUTE_GET = 'getBalance';
+const ROUTE_UNDO_TRANSFER = 'undoTransfer';
 
 interface TransferOpitons {
     readonly customer: number;
@@ -34,6 +35,7 @@ export class Balance {
         preparer.addRoute(ROUTE_DEPOSIT);
         preparer.addRoute(ROUTE_WITHDRAW);
         preparer.addRoute(ROUTE_GET);
+        preparer.addRoute(ROUTE_UNDO_TRANSFER);
     }
 
     public static async init(server: FrontendJS.Server): Promise<void> {
@@ -76,5 +78,15 @@ export class Balance {
             data.paymentMethod,
             data.value
         )));
+    }
+
+    public static undoTransfer(id: number): Promise<Balance> {
+        return this._server.requestJSON(ROUTE_UNDO_TRANSFER, { id }).then(data => new Balance(
+            data.timestamp,
+            data.account,
+            data.customer,
+            data.paymentMethod,
+            data.value
+        ));
     }
 }

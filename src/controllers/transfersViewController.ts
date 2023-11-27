@@ -10,6 +10,8 @@ import * as FrontendJS from "frontendjs";
 import { Customer } from "../models/customer";
 import { Finance } from "../models/finance";
 import { PaymentMethod } from "../enums/paymentMethod";
+import { DepositViewController } from "./depositViewController";
+import { Balance } from "../models/balance";
 
 interface Data {
     readonly customer: Customer;
@@ -21,8 +23,10 @@ export class TransfersViewController extends FrontendJS.BodyViewController imple
 
     public readonly monthDropbox = new FrontendJS.Dropbox('month-dropbox-view');
     public readonly downloadButton = new FrontendJS.Button('download-button-view');
+    public readonly detailViewController = new DepositViewController('detail-view-controller');
 
-    private data: Data[] = [];
+    private _data: Data[] = [];
+    private _selectedIndex: number = null;
 
     constructor(...classes: string[]) {
         super(...classes, 'transfers-view-controller');
@@ -32,16 +36,46 @@ export class TransfersViewController extends FrontendJS.BodyViewController imple
 
         this.tableViewController.titleLabel.text = '#_title_transfers';
         this.tableViewController.dataSource = this;
+        this.tableViewController.selectionMode = FrontendJS.TableSelectionMode.Clickable;
+        this.tableViewController.onSelectedCell.on(cell => this.selectedIndex = cell.index);
 
         this.monthDropbox.onSelected.on(() => this.load());
 
         this.downloadButton.type = FrontendJS.ButtonType.Download;
         this.downloadButton.onClick.on(() => this.download());
 
+        this.detailViewController.autoReset = false;
+        this.detailViewController.onUnloaded.on(() => this.selectedIndex = null);
+        this.detailViewController.onEnter.on(() => this.detailViewController.removeFromParent());
+        this.detailViewController.onEnter.on(() => FrontendJS.Client.popupViewController.pushMessage('Changing transfer properties is not currently implemented.', 'Not implemented'));
+
+        this.detailViewController.cancelButton.type = FrontendJS.ButtonType.Delete;
+        this.detailViewController.cancelButton.onClick.on(() => this.removeAtIndex(this._selectedIndex));
+
         this.titleBar.leftView.appendChild(this.monthDropbox);
         this.titleBar.rightView.appendChild(this.downloadButton);
 
         this.appendChild(this.tableViewController);
+    }
+
+    public get selectedIndex(): number | null { return this._selectedIndex; }
+    public set selectedIndex(value: number | null) {
+        if (value < 0 || this._data.length <= value)
+            throw new Error(`selected index '${value}' is out of bounds [0, ${this._data.length - 1}]`);
+
+        this._selectedIndex = value;
+
+        if (undefined == value)
+            return;
+
+        const data = this._data[value];
+
+        this.detailViewController.customerLabel.text = data.customer.toString();
+        this.detailViewController.titleBar.title = CoreJS.Localization.translate(data.finance.data);
+        this.detailViewController.amountTextField.value = CoreJS.formatCurrency(Math.abs(data.finance.value));
+        this.detailViewController.dateTextField.dateValue = new Date(data.finance.timestamp);
+
+        FrontendJS.Client.popupViewController.pushViewController(this.detailViewController);
     }
 
     public async load() {
@@ -65,7 +99,7 @@ export class TransfersViewController extends FrontendJS.BodyViewController imple
             Finance.getTransfers({ start, end })
         ]);
 
-        this.data = finances.map(finance => ({
+        this._data = finances.map(finance => ({
             customer: customers.find(customer => customer.id == finance.customer),
             finance
         }));
@@ -75,13 +109,13 @@ export class TransfersViewController extends FrontendJS.BodyViewController imple
 
     public async unload() {
         this.monthDropbox.selectedIndex = 0;
-        this.data = [];
+        this._data = [];
 
         await super.unload();
     }
 
     public numberOfCells(sender: FrontendJS.TableViewController, category: number): number {
-        return this.data.length;
+        return this._data.length;
     }
 
     public createHeader?(sender: FrontendJS.TableViewController): FrontendJS.View {
@@ -97,7 +131,7 @@ export class TransfersViewController extends FrontendJS.BodyViewController imple
     }
 
     public updateCell(sender: FrontendJS.TableViewController, cell: Cell, row: number, category: number): void {
-        const data = this.data[row];
+        const data = this._data[row];
 
         cell.dateLabel.text = new Date(data.finance.timestamp).toLocaleDateString();
         cell.customerLabel.text = data.customer.toString();
@@ -119,7 +153,7 @@ export class TransfersViewController extends FrontendJS.BodyViewController imple
             CoreJS.Localization.translate('#_title_amount')
         ]);
 
-        parser.add(...this.data.map(data => [
+        parser.add(...this._data.map(data => [
             new Date(data.finance.timestamp).toLocaleDateString(),
             data.customer.toString(),
             CoreJS.Localization.translate(data.finance.data),
@@ -127,6 +161,15 @@ export class TransfersViewController extends FrontendJS.BodyViewController imple
         ]));
 
         FrontendJS.download(parser);
+    }
+
+    public async removeAtIndex(index: number): Promise<void> {
+        const data = this._data[index];
+
+        if (!(await FrontendJS.Client.popupViewController.queryBoolean('#_query_text_transfer_undo', '#_query_title_transfer_undo')))
+            return;
+
+        await Balance.undoTransfer(data.finance.id);
     }
 }
 
