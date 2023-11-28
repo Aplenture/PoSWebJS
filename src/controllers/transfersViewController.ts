@@ -45,12 +45,11 @@ export class TransfersViewController extends FrontendJS.BodyViewController imple
         this.downloadButton.onClick.on(() => this.download());
 
         this.detailViewController.autoReset = false;
-        this.detailViewController.onUnloaded.on(() => this.selectedIndex = null);
-        this.detailViewController.onEnter.on(() => this.detailViewController.removeFromParent());
+        this.detailViewController.onEnter.on(() => this.selectedIndex = null);
         this.detailViewController.onEnter.on(() => FrontendJS.Client.popupViewController.pushMessage('Changing transfer properties is not currently implemented.', 'Not implemented'));
 
         this.detailViewController.cancelButton.type = FrontendJS.ButtonType.Delete;
-        this.detailViewController.cancelButton.onClick.on(() => this.removeAtIndex(this._selectedIndex));
+        this.detailViewController.cancelButton.onClick.on(() => this.removeAtIndex(this.selectedIndex).then(() => this.selectedIndex = null));
 
         this.titleBar.leftView.appendChild(this.monthDropbox);
         this.titleBar.rightView.appendChild(this.downloadButton);
@@ -60,22 +59,25 @@ export class TransfersViewController extends FrontendJS.BodyViewController imple
 
     public get selectedIndex(): number | null { return this._selectedIndex; }
     public set selectedIndex(value: number | null) {
-        if (value < 0 || this._data.length <= value)
-            throw new Error(`selected index '${value}' is out of bounds [0, ${this._data.length - 1}]`);
+        if (undefined == value) {
+            this._selectedIndex = null;
 
-        this._selectedIndex = value;
+            this.detailViewController.removeFromParent();
+        } else {
+            if (value < 0 || this._data.length <= value)
+                throw new Error(`selected index '${value}' is out of bounds [0, ${this._data.length - 1}]`);
 
-        if (undefined == value)
-            return;
+            const data = this._data[value];
 
-        const data = this._data[value];
+            this._selectedIndex = value;
 
-        this.detailViewController.customerLabel.text = data.customer.toString();
-        this.detailViewController.titleBar.title = CoreJS.Localization.translate(data.finance.data);
-        this.detailViewController.amountTextField.value = CoreJS.formatCurrency(Math.abs(data.finance.value));
-        this.detailViewController.dateTextField.dateValue = new Date(data.finance.timestamp);
+            this.detailViewController.customerLabel.text = data.customer.toString();
+            this.detailViewController.titleBar.title = CoreJS.Localization.translate(data.finance.data);
+            this.detailViewController.amountTextField.value = CoreJS.formatCurrency(Math.abs(data.finance.value));
+            this.detailViewController.dateTextField.dateValue = new Date(data.finance.timestamp);
 
-        FrontendJS.Client.popupViewController.pushViewController(this.detailViewController);
+            FrontendJS.Client.popupViewController.pushViewController(this.detailViewController);
+        }
     }
 
     public async load() {
@@ -83,6 +85,8 @@ export class TransfersViewController extends FrontendJS.BodyViewController imple
         const selectedMonth = this.monthDropbox.selectedIndex;
         const start = Number(CoreJS.reduceDate({ date: firstDayOfMonth, months: selectedMonth }));
         const end = Number(CoreJS.reduceDate({ date: firstDayOfMonth, months: selectedMonth - 1 })) - 1;
+
+        this.selectedIndex = null;
 
         this.monthDropbox.options = Array.from(Array(12).keys()).map(index => {
             const date = CoreJS.reduceDate({ date: firstDayOfMonth, months: index });
@@ -164,12 +168,13 @@ export class TransfersViewController extends FrontendJS.BodyViewController imple
     }
 
     public async removeAtIndex(index: number): Promise<void> {
-        const data = this._data[index];
-
-        if (!(await FrontendJS.Client.popupViewController.queryBoolean('#_query_text_transfer_undo', '#_query_title_transfer_undo')))
+        if (!await FrontendJS.Client.popupViewController.queryBoolean('#_query_text_transfer_undo', '#_query_title_transfer_undo'))
             return;
 
+        const data = this._data[index];
+
         await Balance.undoTransfer(data.finance.id);
+        await this.reload();
     }
 }
 
