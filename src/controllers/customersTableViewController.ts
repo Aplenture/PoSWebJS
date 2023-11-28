@@ -60,7 +60,7 @@ export class CustomersTableViewController extends FrontendJS.ViewController impl
         this.detailViewController.withdrawButton.onClick.on(() => FrontendJS.Client.popupViewController.pushViewController(this.withdrawViewController));
         this.detailViewController.withdrawButton.onClick.on(async () => this.withdrawViewController.max = await Balance.get(this.detailViewController.customer.id));
 
-        this.depositViewController.cancelButton.onClick.on(() => this.removeFromParent());
+        this.depositViewController.cancelButton.onClick.on(() => this.depositViewController.removeFromParent());
         this.depositViewController.onEnter.on(() => {
             if (!this.depositViewController.amountTextField.numberValue)
                 return FrontendJS.Client.popupViewController.pushMessage('#_error_deposit_zero', '#_title_deposit');
@@ -69,7 +69,7 @@ export class CustomersTableViewController extends FrontendJS.ViewController impl
             this.depositViewController.removeFromParent();
         });
 
-        this.withdrawViewController.cancelButton.onClick.on(() => this.removeFromParent());
+        this.withdrawViewController.cancelButton.onClick.on(() => this.withdrawViewController.removeFromParent());
         this.withdrawViewController.onEnter.on(() => {
             if (!this.withdrawViewController.amountTextField.numberValue)
                 return FrontendJS.Client.popupViewController.pushMessage('#_error_withdraw_zero', '#_title_withdraw');
