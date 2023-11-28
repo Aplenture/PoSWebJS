@@ -54,7 +54,6 @@ export class DepositViewController extends FrontendJS.BodyViewController {
 
         this.cancelButton.type = FrontendJS.ButtonType.Cancel;
         this.cancelButton.index = 2;
-        this.cancelButton.onClick.on(() => this.removeFromParent());
 
         this.maxButton.text = '#_title_all';
         this.maxButton.index = 3;
