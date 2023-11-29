@@ -10,6 +10,7 @@ import { CustomersTableViewController } from "./customersTableViewController";
 import { ProductsTableViewController } from "./productsTableViewController";
 import { PaymentMethod } from "../enums/paymentMethod";
 import { TurnoverViewController } from "./turnoverViewController";
+import { TransfersViewController } from "./transfersViewController";
 
 export class AdminViewController extends FrontendJS.BodyViewController {
     public static readonly route = 'admin';
@@ -20,6 +21,7 @@ export class AdminViewController extends FrontendJS.BodyViewController {
     public readonly guestsTableViewController = new CustomersTableViewController();
     public readonly productsTableViewController = new ProductsTableViewController();
     public readonly turnoverViewContoller = new TurnoverViewController();
+    public readonly transfersViewContoller = new TransfersViewController();
 
     constructor(...classes: string[]) {
         super(...classes, 'admin-view-controller');
@@ -44,5 +46,6 @@ export class AdminViewController extends FrontendJS.BodyViewController {
         this.menuViewController.appendChild(this.guestsTableViewController);
         this.menuViewController.appendChild(this.productsTableViewController);
         this.menuViewController.appendChild(this.turnoverViewContoller);
+        this.menuViewController.appendChild(this.transfersViewContoller);
     }
 } 
