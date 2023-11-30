@@ -19,6 +19,9 @@ import { Product } from "../models/product";
 import { TransactionLabel } from "../models/transactionLabel";
 
 export class RootViewController extends FrontendJS.ViewController {
+    public readonly contentViewController = new FrontendJS.ViewController('root-content-view-controller');
+    public readonly loadingViewController = new FrontendJS.LoadingViewController('root-loading-view-controller');
+
     public readonly settingsButton = new FrontendJS.Button('settings-button');
 
     public readonly account = new FrontendJS.Account.Account();
@@ -50,8 +53,8 @@ export class RootViewController extends FrontendJS.ViewController {
         await this.server.init();
 
         // unload previous route
-        FrontendJS.Router.onRouteChanged.on(() => super.unload(), { listener: this });
-        FrontendJS.Router.onRouteChanged.on(() => this.removeAllChildren(), { listener: this });
+        FrontendJS.Router.onRouteChanged.on(() => this.contentViewController.unload(), { listener: this });
+        FrontendJS.Router.onRouteChanged.on(() => this.contentViewController.removeAllChildren(), { listener: this });
 
         // add all routes
         FrontendJS.Router.addRoute(AccessViewController.route, () => this.onAccessRoute(), { listener: this });
@@ -60,7 +63,7 @@ export class RootViewController extends FrontendJS.ViewController {
         FrontendJS.Router.addRoute(SettingsViewController.route, () => this.onSettingsRoute(), { listener: this });
 
         // reload changed route
-        FrontendJS.Router.onRouteChanged.on(() => super.load(), { listener: this });
+        FrontendJS.Router.onRouteChanged.on(() => this.contentViewController.load(), { listener: this });
 
         this.account.onAccessChanged.on(access => {
             if (!access && FrontendJS.Router.route.name != AccessViewController.route)
@@ -72,6 +75,12 @@ export class RootViewController extends FrontendJS.ViewController {
                 else
                     return FrontendJS.Router.changeRoute(MainViewController.route);
         });
+
+        this.server.onRequestingStart.on(() => this.loadingViewController.play());
+        this.server.onRequestingDone.on(() => this.loadingViewController.stop());
+
+        this.appendChild(this.contentViewController);
+        this.appendChild(this.loadingViewController);
 
         await super.init();
     }
@@ -96,7 +105,7 @@ export class RootViewController extends FrontendJS.ViewController {
 
     private onAccessRoute() {
         if (!this.account.access)
-            return this.appendChild(new AccessViewController(this.account));
+            return this.contentViewController.appendChild(new AccessViewController(this.account));
 
         if (this.account.access.hasRights(1 << 0))
             return FrontendJS.Router.changeRoute(AdminViewController.route);
@@ -110,7 +119,7 @@ export class RootViewController extends FrontendJS.ViewController {
 
         const viewController = new MainViewController(this.account);
         viewController.titleBar.rightView.appendChild(this.settingsButton);
-        this.appendChild(viewController);
+        this.contentViewController.appendChild(viewController);
     }
 
     private onAdminRoute() {
@@ -119,7 +128,7 @@ export class RootViewController extends FrontendJS.ViewController {
 
         const viewController = new AdminViewController();
         viewController.titleBar.rightView.appendChild(this.settingsButton);
-        this.appendChild(viewController);
+        this.contentViewController.appendChild(viewController);
     }
 
     private onSettingsRoute() {
@@ -127,6 +136,6 @@ export class RootViewController extends FrontendJS.ViewController {
             return FrontendJS.Router.changeRoute(AccessViewController.route);
 
         const viewController = new SettingsViewController(this.account);
-        this.appendChild(viewController);
+        this.contentViewController.appendChild(viewController);
     }
 }

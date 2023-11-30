@@ -219,6 +219,7 @@ body>.root {
     background-color: transparent !important;
 }
 
+.loading-view-controller,
 .popup-view-controller {
     background-color: #00000088;
 }
