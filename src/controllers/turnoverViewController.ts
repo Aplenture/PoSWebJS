@@ -58,7 +58,6 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
         this.downloadButton.onClick.on(() => this.download());
 
         this.deleteButton.type = FrontendJS.ButtonType.Delete;
-        this.deleteButton.isHidden = true;
         this.deleteButton.onClick.on(() => this.delete());
 
         this.titleBar.leftView.appendChild(this.monthDropbox);
@@ -225,6 +224,8 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
 
         // add sum
         this.data.push(sum);
+        
+        this.deleteButton.isVisible = 1 == this.customerDropbox.selectedIndex;
 
         await super.load();
     }
