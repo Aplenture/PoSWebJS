@@ -304,8 +304,16 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
         FrontendJS.download(parser);
     }
 
-    public delete() {
+    public async delete(): Promise<void> {
+        if (!await FrontendJS.Client.popupViewController.queryBoolean('#_query_text_remove_all_guests', '#_query_title_remove_all_guests'))
+            return;
 
+        await Customer.removeGuests();
+        await this.load();
+        await FrontendJS.Client.notificationViewController.pushNotification({
+            text: '#_notification_guests_removed',
+            title: '#_title_removing_guests'
+        });
     }
 }
 
