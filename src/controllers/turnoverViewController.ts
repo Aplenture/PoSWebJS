@@ -29,7 +29,10 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
     public readonly tableViewController = new FrontendJS.TableViewController();
 
     public readonly monthDropbox = new FrontendJS.Dropbox('month-dropbox-view');
+    public readonly customerDropbox = new FrontendJS.Dropbox('customer-dropbox-view');
+
     public readonly downloadButton = new FrontendJS.Button('download-button-view');
+    public readonly deleteButton = new FrontendJS.Button('delete-button-view');
 
     private data: Data[] = [];
 
@@ -44,13 +47,35 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
 
         this.monthDropbox.onSelected.on(() => this.load());
 
+        this.customerDropbox.onSelected.on(() => this.load());
+        this.customerDropbox.onSelected.on(() => this.deleteButton.isVisible = 1 == this.customerDropbox.selectedIndex);
+        this.customerDropbox.options = [
+            '#_title_members',
+            '#_title_guests'
+        ];
+
         this.downloadButton.type = FrontendJS.ButtonType.Download;
         this.downloadButton.onClick.on(() => this.download());
 
+        this.deleteButton.type = FrontendJS.ButtonType.Delete;
+        this.deleteButton.onClick.on(() => this.delete());
+
         this.titleBar.leftView.appendChild(this.monthDropbox);
+        this.titleBar.leftView.appendChild(this.customerDropbox);
         this.titleBar.rightView.appendChild(this.downloadButton);
 
+        this.footerBar.appendChild(this.deleteButton);
+
         this.appendChild(this.tableViewController);
+    }
+
+    public get paymentMethod(): PaymentMethod {
+        switch (this.customerDropbox.selectedIndex) {
+            case 0: return PaymentMethod.Balance;
+            case 1: return PaymentMethod.Cash;
+
+            default: throw new Error(`unhandled customer type '${this.customerDropbox.options[this.customerDropbox.selectedIndex]}'`);
+        }
     }
 
     public async load() {
@@ -90,77 +115,102 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
         let bonuses: any[] = [];
 
         await Promise.all([
-            Customer.get({ paymentmethods: PaymentMethod.Balance }).then(result => customers = result.sort((a, b) => a.toString().localeCompare(b.toString()))),
+            Customer.get({ paymentmethods: this.paymentMethod }).then(result => customers = result.sort((a, b) => a.toString().localeCompare(b.toString()))),
             Balance.getAll(end).then(result => balances = result),
             Balance.getAll(start - 1).then(result => transfers = result),
             Finance.getFinances({
-                data: [BalanceEvent.Invoice, BalanceEvent.Tip, BalanceEvent.UndoInvoice, BalanceEvent.UndoTip],
                 start,
-                end
+                end,
+                paymentmethod: this.paymentMethod,
+                data: [BalanceEvent.Invoice, BalanceEvent.Tip, BalanceEvent.UndoInvoice, BalanceEvent.UndoTip]
             }).then(result => turnovers = result),
             Finance.getFinances({
+                start,
+                end,
+                paymentmethod: this.paymentMethod,
                 data: depositLabels
                     .map(data => data.name)
-                    .concat(BalanceEvent.Deposit),
-                start,
-                end
+                    .concat(BalanceEvent.Deposit)
             }).then(result => deposits = result),
             Finance.getFinances({
+                start,
+                end,
+                paymentmethod: this.paymentMethod,
                 data: withdrawLabels
                     .map(data => data.name)
-                    .concat(BalanceEvent.Withdraw),
-                start,
-                end
+                    .concat(BalanceEvent.Withdraw)
             }).then(result => withdraws = result)
         ]);
 
-        this.data = customers.map(customer => {
-            const turnover = turnovers.find(data => data.customer == customer.id);
-            const deposit = deposits.find(data => data.customer == customer.id);
-            const withdraw = withdraws.find(data => data.customer == customer.id);
-            const balance = balances.find(data => data.customer == customer.id);
-            const transfer = transfers.find(data => data.customer == customer.id);
-            const bonus = bonuses.find(data => data.customer == customer.id);
+        this.data = customers
+            .filter(customer => customer.paymentMethods & this.paymentMethod)
+            .map(customer => {
+                const turnover = turnovers.find(data => data.customer == customer.id);
+                const deposit = deposits.find(data => data.customer == customer.id);
+                const withdraw = withdraws.find(data => data.customer == customer.id);
+                const balance = balances.find(data => data.customer == customer.id);
+                const transfer = transfers.find(data => data.customer == customer.id);
+                const bonus = bonuses.find(data => data.customer == customer.id);
 
-            return {
-                customer: customer.toString(),
-                turnover: Math.abs(turnover && turnover.value || 0),
-                deposit: Math.abs(deposit && deposit.value || 0),
-                withdraw: Math.abs(withdraw && withdraw.value || 0),
-                balance: balance && balance.value || 0,
-                transfer: transfer && transfer.value || 0,
-                bonus: bonus && bonus.value || 0
-            };
-        });
+                return {
+                    customer: customer.toString(),
+                    turnover: Math.abs(turnover && turnover.value || 0),
+                    deposit: Math.abs(deposit && deposit.value || 0),
+                    withdraw: Math.abs(withdraw && withdraw.value || 0),
+                    balance: balance && balance.value || 0,
+                    transfer: transfer && transfer.value || 0,
+                    bonus: bonus && bonus.value || 0
+                };
+            });
 
-        // add guests and former members
-        this.data.push({
-            customer: CoreJS.Localization.translate('#_unknown_customer'),
-            balance: balances
-                .filter(data => !customers.some(customer => customer.id == data.customer))
-                .map(data => data.value)
-                .reduce((a, b) => Math.abs(a) + Math.abs(b), 0),
-            turnover: turnovers
-                .filter(data => !customers.some(customer => customer.id == data.customer))
-                .map(data => data.value)
-                .reduce((a, b) => Math.abs(a) + Math.abs(b), 0),
-            deposit: deposits
-                .filter(data => !customers.some(customer => customer.id == data.customer))
-                .map(data => data.value)
-                .reduce((a, b) => Math.abs(a) + Math.abs(b), 0),
-            withdraw: withdraws
-                .filter(data => !customers.some(customer => customer.id == data.customer))
-                .map(data => data.value)
-                .reduce((a, b) => Math.abs(a) + Math.abs(b), 0),
-            transfer: transfers
-                .filter(data => !customers.some(customer => customer.id == data.customer))
-                .map(data => data.value)
-                .reduce((a, b) => Math.abs(a) + Math.abs(b), 0),
-            bonus: bonuses
-                .filter(data => !customers.some(customer => customer.id == data.customer))
-                .map(data => data.value)
-                .reduce((a, b) => Math.abs(a) + Math.abs(b), 0)
-        });
+        const unknownBalance = balances
+            .filter(data => (data.paymentMethod & this.paymentMethod) && !customers.some(customer => customer.id == data.customer))
+            .map(data => data.value)
+            .reduce((a, b) => Math.abs(a) + Math.abs(b), 0);
+
+        const unknownTurnovers = turnovers
+            .filter(data => (data.paymentMethod & this.paymentMethod) && !customers.some(customer => customer.id == data.customer))
+            .map(data => data.value)
+            .reduce((a, b) => Math.abs(a) + Math.abs(b), 0);
+
+        const unknownDeposits = deposits
+            .filter(data => (data.paymentMethod & this.paymentMethod) && !customers.some(customer => customer.id == data.customer))
+            .map(data => data.value)
+            .reduce((a, b) => Math.abs(a) + Math.abs(b), 0);
+
+        const unknownWithdraws = withdraws
+            .filter(data => (data.paymentMethod & this.paymentMethod) && !customers.some(customer => customer.id == data.customer))
+            .map(data => data.value)
+            .reduce((a, b) => Math.abs(a) + Math.abs(b), 0);
+
+        const unknownTransfers = transfers
+            .filter(data => (data.paymentMethod & this.paymentMethod) && !customers.some(customer => customer.id == data.customer))
+            .map(data => data.value)
+            .reduce((a, b) => Math.abs(a) + Math.abs(b), 0);
+
+        const unknownBonuses = bonuses
+            .filter(data => (data.paymentMethod & this.paymentMethod) && !customers.some(customer => customer.id == data.customer))
+            .map(data => data.value)
+            .reduce((a, b) => Math.abs(a) + Math.abs(b), 0);
+
+        // add unknown customers
+        // if exists
+        if (0 < unknownBalance
+            || 0 < unknownTurnovers
+            || 0 < unknownDeposits
+            || 0 < unknownWithdraws
+            || 0 < unknownTransfers
+            || 0 < unknownBonuses) {
+            this.data.push({
+                customer: CoreJS.Localization.translate('#_unknown_customer'),
+                balance: unknownBalance,
+                turnover: unknownTurnovers,
+                deposit: unknownDeposits,
+                withdraw: unknownWithdraws,
+                transfer: unknownTransfers,
+                bonus: unknownBonuses
+            });
+        }
 
         // sum all values
         this.data.forEach(data => {
@@ -174,12 +224,15 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
 
         // add sum
         this.data.push(sum);
+        
+        this.deleteButton.isVisible = 1 == this.customerDropbox.selectedIndex;
 
         await super.load();
     }
 
     public async unload() {
         this.monthDropbox.selectedIndex = 0;
+        this.customerDropbox.selectedIndex = 0;
 
         await super.unload();
     }
@@ -250,6 +303,18 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
         ]));
 
         FrontendJS.download(parser);
+    }
+
+    public async delete(): Promise<void> {
+        if (!await FrontendJS.Client.popupViewController.queryBoolean('#_query_text_remove_all_guests', '#_query_title_remove_all_guests'))
+            return;
+
+        await Customer.removeGuests();
+        await this.load();
+        await FrontendJS.Client.notificationViewController.pushNotification({
+            text: '#_notification_guests_removed',
+            title: '#_title_removing_guests'
+        });
     }
 }
 

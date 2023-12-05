@@ -28,6 +28,7 @@ export class AdminViewController extends FrontendJS.BodyViewController {
 
         this.title = '#_title_admin';
         this.titleBar.titleLabel.isHidden = true;
+        this.footerBar.isVisible = false;
 
         this.appendChild(this.menuViewController);
 
@@ -37,7 +38,7 @@ export class AdminViewController extends FrontendJS.BodyViewController {
         this.membersTableViewController.paymentMethods = PaymentMethod.Balance;
         this.membersTableViewController.title = '#_title_members';
         this.membersTableViewController.tableViewController.titleLabel.text = '#_title_members';
-        
+
         this.guestsTableViewController.paymentMethods = PaymentMethod.Cash;
         this.guestsTableViewController.title = '#_title_guests';
         this.guestsTableViewController.tableViewController.titleLabel.text = '#_title_guests';

@@ -10,7 +10,8 @@ import * as FrontendJS from "frontendjs";
 const ROUTE_ADD = 'addCustomer';
 const ROUTE_EDIT = 'editCustomer';
 const ROUTE_GET = 'getCustomers';
-const ROUTE_REMOVE = 'removeCustomer';
+const ROUTE_REMOVE_CUSTOMER = 'removeCustomer';
+const ROUTE_REMOVE_GUESTS = 'removeGuests';
 
 interface AddOptions {
     readonly firstname: string;
@@ -47,7 +48,7 @@ export class Customer {
         preparer.addRoute(ROUTE_ADD);
         preparer.addRoute(ROUTE_EDIT);
         preparer.addRoute(ROUTE_GET);
-        preparer.addRoute(ROUTE_REMOVE);
+        preparer.addRoute(ROUTE_REMOVE_CUSTOMER);
     }
 
     public static async init(server: FrontendJS.Server): Promise<void> {
@@ -82,8 +83,12 @@ export class Customer {
         ));
     }
 
-    public static remove(customer: number): Promise<boolean> {
-        return this._server.requestBool(ROUTE_REMOVE, { customer });
+    public static removeCustomer(customer: number): Promise<boolean> {
+        return this._server.requestBool(ROUTE_REMOVE_CUSTOMER, { customer });
+    }
+
+    public static removeGuests(): Promise<boolean> {
+        return this._server.requestBool(ROUTE_REMOVE_GUESTS);
     }
 
     public static edit(options: EditOptions): Promise<boolean> {
