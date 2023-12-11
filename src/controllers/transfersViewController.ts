@@ -146,8 +146,8 @@ export class TransfersViewController extends FrontendJS.BodyViewController imple
     public download() {
         const firstDayOfMonth = CoreJS.calcDate({ monthDay: 1 });
         const selectedDate = CoreJS.reduceDate({ date: firstDayOfMonth, months: this.monthDropbox.selectedIndex });
-        const formatDate = CoreJS.formatDate(selectedDate).slice(0, -3);
-        const filename = `${CoreJS.Localization.translate('#_title_turnover')}-${formatDate}`;
+        const formatDate = CoreJS.formatDate("YYYY-MM", selectedDate);
+        const filename = `${CoreJS.Localization.translate('#_title_transfers')}-${formatDate}`;
         const parser = new CoreJS.CSVParser(filename);
 
         parser.add([

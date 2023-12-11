@@ -12,15 +12,30 @@ const ROUTE_EDIT = "editProduct";
 const ROUTE_GET = "getProducts";
 const ROUTE_REMOVE = "removeProduct";
 
+interface AddOptions {
+    readonly name: string;
+    readonly price: number;
+    readonly category: string;
+    readonly discount?: number;
+    readonly priority?: number;
+    readonly start?: number;
+    readonly end?: number;
+}
+
 interface EditOptions {
     readonly name?: string;
     readonly price?: number;
     readonly discount?: number;
+    readonly category?: string;
+    readonly priority?: number;
+    readonly start?: number;
+    readonly end?: number;
 }
 
 interface GetOptions {
     readonly firstID?: number;
     readonly lastID?: number;
+    readonly time?: number;
 }
 
 export class Product {
@@ -32,7 +47,11 @@ export class Product {
         public readonly created: number,
         public name: string,
         public price: number,
-        public discount: number
+        public discount: number,
+        public category: string,
+        public priority: number,
+        public start: number,
+        public end: number
     ) { }
 
     public static async prepare(preparer: FrontendJS.ServerPreparer): Promise<void> {
@@ -57,18 +76,29 @@ export class Product {
             data.created,
             data.name,
             data.price,
-            data.discount
-        )));
+            data.discount,
+            data.category,
+            data.priority,
+            data.start,
+            data.end
+        ))
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .sort((a, b) => b.priority - a.priority)
+        );
     }
 
-    public static add(name: string, price: number, discount?: number): Promise<Product> {
-        return this._server.requestJSON(ROUTE_ADD, { name, price, discount }).then(data => new Product(
+    public static add(data: AddOptions): Promise<Product> {
+        return this._server.requestJSON(ROUTE_ADD, data).then(data => new Product(
             data.id,
             data.account,
             data.created,
             data.name,
             data.price,
-            data.discount
+            data.discount,
+            data.category,
+            data.priority,
+            data.start,
+            data.end
         ));
     }
 

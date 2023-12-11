@@ -41,7 +41,7 @@ export class ProductsTableViewController extends FrontendJS.ViewController imple
     }
 
     public async load(): Promise<void> {
-        this.products = (await Product.get()).sort((a, b) => a.name.localeCompare(b.name));
+        this.products = await Product.get();
 
         this.titleBar.leftView.appendChild(this.addButton);
 

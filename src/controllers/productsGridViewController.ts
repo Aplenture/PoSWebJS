@@ -23,12 +23,15 @@ export class ProductsGridViewController extends GridViewController {
 
         this.gridViewController.onSelectedCell.on(cell => this.selectCell(cell.index));
 
+        this.productViewController.priorityTextField.isVisible = false
+        this.productViewController.startSwitch.isVisible = false;
+        this.productViewController.endSwitch.isVisible = false;
         this.productViewController.onCreated.on(() => this.load());
         this.productViewController.onCreated.on(() => this.productViewController.removeFromParent());
     }
 
     public async load(): Promise<void> {
-        this.products = (await Product.get()).sort((a, b) => a.name.localeCompare(b.name));
+        this.products = await Product.get({ time: Number(CoreJS.calcDate()) });
 
         await super.load();
     }
@@ -61,6 +64,10 @@ export class ProductsGridViewController extends GridViewController {
 
     public add(): Promise<void> {
         this.productViewController.product = null;
+        this.productViewController.startSwitch.value = true;
+        this.productViewController.startTextField.dateValue = CoreJS.calcDate();
+        this.productViewController.endSwitch.value = true;
+        this.productViewController.endTextField.dateValue = CoreJS.addDate({ days: 7 });
 
         return FrontendJS.Client.popupViewController.pushViewController(this.productViewController);
     }
