@@ -15,6 +15,7 @@ interface GetOptions {
     readonly customer?: number;
     readonly start?: number;
     readonly end?: number;
+    readonly paymentmethod?: PaymentMethod;
     readonly data?: readonly string[];
 }
 
