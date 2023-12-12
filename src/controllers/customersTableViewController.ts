@@ -15,8 +15,8 @@ import { PaymentMethod } from "../enums/paymentMethod";
 import { Order } from "../models/order";
 import { OrderState } from "../enums/orderState";
 import { DepositViewController } from "./depositViewController";
-import { TransactionLabel } from "../models/transactionLabel";
-import { TransactionType } from "../enums/TransactionType";
+import { Label } from "../models/label";
+import { LabelType } from "../enums/labelType";
 import { BalanceEvent } from "../enums/balanceEvent";
 
 export class CustomersTableViewController extends FrontendJS.ViewController implements FrontendJS.TableViewControllerDataSource {
@@ -87,8 +87,8 @@ export class CustomersTableViewController extends FrontendJS.ViewController impl
     public get isBalanceAllowed(): boolean { return (this.paymentMethods & PaymentMethod.Balance) != 0; }
 
     public async load(): Promise<void> {
-        this.depositViewController.labels = [BalanceEvent.Deposit as string].concat((await TransactionLabel.getAll(TransactionType.Deposit)).map(data => data.name));
-        this.withdrawViewController.labels = [BalanceEvent.Withdraw as string].concat((await TransactionLabel.getAll(TransactionType.Withdraw)).map(data => data.name));
+        this.depositViewController.labels = [BalanceEvent.Deposit as string].concat((await Label.getAll(LabelType.Deposit)).map(data => data.name));
+        this.withdrawViewController.labels = [BalanceEvent.Withdraw as string].concat((await Label.getAll(LabelType.Withdraw)).map(data => data.name));
         this.openOrders = await Order.get({ state: OrderState.Open });
         this.balances = await Balance.getAll();
         this.customers = (await Customer.get({ paymentmethods: this.paymentMethods }))

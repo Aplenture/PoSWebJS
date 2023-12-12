@@ -12,8 +12,8 @@ import { Finance } from "../models/finance";
 import { PaymentMethod } from "../enums/paymentMethod";
 import { BalanceEvent } from "../enums/balanceEvent";
 import { Balance } from "../models/balance";
-import { TransactionLabel } from "../models/transactionLabel";
-import { TransactionType } from "../enums/TransactionType";
+import { Label } from "../models/label";
+import { LabelType } from "../enums/labelType";
 
 interface Data {
     readonly customer: string;
@@ -79,8 +79,8 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
     }
 
     public async load() {
-        const depositLabels = await TransactionLabel.getAll(TransactionType.Deposit);
-        const withdrawLabels = await TransactionLabel.getAll(TransactionType.Withdraw);
+        const depositLabels = await Label.getAll(LabelType.Deposit);
+        const withdrawLabels = await Label.getAll(LabelType.Withdraw);
 
         const firstDayOfMonth = CoreJS.calcDate({ monthDay: 1 });
         const selectedMonth = this.monthDropbox.selectedIndex;

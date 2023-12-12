@@ -5,8 +5,9 @@
  * License https://github.com/Aplenture/PoSWebJS/blob/main/LICENSE
  */
 
-export enum TransactionType {
+export enum LabelType {
     Deposit = 1,
     Withdraw,
-    Invoice
+    Invoice,
+    ProductCategory
 }

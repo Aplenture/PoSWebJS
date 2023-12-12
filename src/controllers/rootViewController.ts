@@ -16,7 +16,7 @@ import { Finance } from "../models/finance";
 import { Order } from "../models/order";
 import { OrderProduct } from "../models/orderProduct";
 import { Product } from "../models/product";
-import { TransactionLabel } from "../models/transactionLabel";
+import { Label } from "../models/label";
 
 export class RootViewController extends FrontendJS.ViewController {
     public readonly contentViewController = new FrontendJS.ViewController('root-content-view-controller');
@@ -33,7 +33,7 @@ export class RootViewController extends FrontendJS.ViewController {
         Order,
         OrderProduct,
         Product,
-        TransactionLabel
+        Label
     );
 
     constructor(...classes: string[]) {

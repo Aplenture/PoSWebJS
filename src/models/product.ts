@@ -15,7 +15,7 @@ const ROUTE_REMOVE = "removeProduct";
 interface AddOptions {
     readonly name: string;
     readonly price: number;
-    readonly category: string;
+    readonly category: number;
     readonly discount?: number;
     readonly priority?: number;
     readonly start?: number;
@@ -26,7 +26,7 @@ interface EditOptions {
     readonly name?: string;
     readonly price?: number;
     readonly discount?: number;
-    readonly category?: string;
+    readonly category?: number;
     readonly priority?: number;
     readonly start?: number;
     readonly end?: number;
@@ -48,7 +48,7 @@ export class Product {
         public name: string,
         public price: number,
         public discount: number,
-        public category: string,
+        public category: number,
         public priority: number,
         public start: number,
         public end: number

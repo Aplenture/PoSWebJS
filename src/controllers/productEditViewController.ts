@@ -8,6 +8,8 @@
 import * as CoreJS from "corejs";
 import * as FrontendJS from "frontendjs";
 import { Product } from "../models/product";
+import { Label } from "../models/label";
+import { LabelType } from "../enums/labelType";
 
 export class ProductEditViewController extends FrontendJS.BodyViewController {
     public readonly onCreated = new CoreJS.Event<ProductEditViewController, Product>('ProductEditViewController.onCreated');
@@ -15,7 +17,7 @@ export class ProductEditViewController extends FrontendJS.BodyViewController {
 
     public readonly nameTextField = new FrontendJS.TextField('name-text-field');
     public readonly priceTextField = new FrontendJS.TextField('price-text-field');
-    public readonly categoryTextField = new FrontendJS.TextField('category-text-field');
+    public readonly categoryDropbox = new FrontendJS.Dropbox('category-dropbox');
     public readonly priorityTextField = new FrontendJS.TextField('priority-text-field');
     public readonly startTextField = new FrontendJS.TextField('start-text-field');
     public readonly endTextField = new FrontendJS.TextField('end-text-field');
@@ -27,6 +29,7 @@ export class ProductEditViewController extends FrontendJS.BodyViewController {
     public readonly updateButton = new FrontendJS.Button('update-button');
 
     private _product: Product = null;
+    private _categories: Label[] = [];
 
     constructor(...classes: string[]) {
         super(...classes, 'create-product-view-controller');
@@ -38,8 +41,8 @@ export class ProductEditViewController extends FrontendJS.BodyViewController {
         this.priceTextField.title = '#_title_price';
         this.priceTextField.onEnterKey.on(() => this.onEnterKey());
 
-        this.categoryTextField.title = '#_title_category';
-        this.categoryTextField.onEnterKey.on(() => this.onEnterKey());
+        this.categoryDropbox.title = '#_title_category';
+        this.categoryDropbox.onEnterKey.on(() => this.onEnterKey());
 
         this.priorityTextField.type = FrontendJS.TextFieldType.Number;
         this.priorityTextField.title = '#_title_priority';
@@ -73,7 +76,7 @@ export class ProductEditViewController extends FrontendJS.BodyViewController {
 
         this.contentView.appendChild(this.nameTextField);
         this.contentView.appendChild(this.priceTextField);
-        this.contentView.appendChild(this.categoryTextField);
+        this.contentView.appendChild(this.categoryDropbox);
         this.contentView.appendChild(this.priorityTextField);
         this.contentView.appendChild(this.startSwitch);
         this.contentView.appendChild(this.startTextField);
@@ -93,6 +96,11 @@ export class ProductEditViewController extends FrontendJS.BodyViewController {
     }
 
     public async load(): Promise<void> {
+        this._categories = await Label.getAll(LabelType.ProductCategory);
+
+        this.categoryDropbox.options = this._categories.map(data => data.name);
+        this.categoryDropbox.selectedIndex = -1;
+
         this.titleBar.titleLabel.text = this.product
             ? this.product.name
             : '#_title_create_product';
@@ -100,7 +108,7 @@ export class ProductEditViewController extends FrontendJS.BodyViewController {
         if (this.product) {
             this.nameTextField.value = this.product.name;
             this.priceTextField.numberValue = this.product.price;
-            this.categoryTextField.value = this.product.category;
+            this.categoryDropbox.selectedIndex = this._categories.findIndex(data => data.id == this.product.category);
             this.priorityTextField.numberValue = this.product.priority;
             this.startSwitch.value = !!this.product.start;
             this.startTextField.isVisible = !!this.product.start;
@@ -116,7 +124,7 @@ export class ProductEditViewController extends FrontendJS.BodyViewController {
     public async unload(): Promise<void> {
         this.nameTextField.value = '';
         this.priceTextField.value = '';
-        this.categoryTextField.value = '';
+        this.categoryDropbox.selectedIndex = -1;
         this.priorityTextField.value = '';
         this.startSwitch.value = false;
         this.startTextField.value = '';
@@ -143,11 +151,11 @@ export class ProductEditViewController extends FrontendJS.BodyViewController {
             return await FrontendJS.Client.popupViewController.pushMessage('#_error_missing_product_price', '#_title_create_product')
                 .then(() => this.priceTextField.focus());
 
-        const category = this.categoryTextField.value;
+        const category = this._categories.find(data => data.name == this.categoryDropbox.options[this.categoryDropbox.selectedIndex]);
 
         if (!category)
             return await FrontendJS.Client.popupViewController.pushMessage('#_error_missing_product_category', '#_title_create_product')
-                .then(() => this.categoryTextField.focus());
+                .then(() => this.categoryDropbox.focus());
 
         const start = this.startSwitch.value ? Number(this.startTextField.dateValue) : null;
         const end = this.endSwitch.value ? Number(this.endTextField.dateValue) : null;
@@ -155,7 +163,7 @@ export class ProductEditViewController extends FrontendJS.BodyViewController {
         this.product = await Product.add({
             name,
             price,
-            category,
+            category: category.id,
             priority: this.priorityTextField.numberValue,
             start: start,
             end: end
@@ -169,13 +177,37 @@ export class ProductEditViewController extends FrontendJS.BodyViewController {
     }
 
     public async update(): Promise<boolean> {
+        const name = this.nameTextField.value;
+
+        if (!name)
+            return await FrontendJS.Client.popupViewController.pushMessage('#_error_missing_product_name', '#_title_create_product')
+                .then(() => this.nameTextField.focus())
+                .then(() => false);
+
+        const price = this.priceTextField.numberValue;
+
+        if (!price)
+            return await FrontendJS.Client.popupViewController.pushMessage('#_error_missing_product_price', '#_title_create_product')
+                .then(() => this.priceTextField.focus())
+                .then(() => false);
+
+        const category = this._categories.find(data => data.name == this.categoryDropbox.options[this.categoryDropbox.selectedIndex]);
+
+        if (!category)
+            return await FrontendJS.Client.popupViewController.pushMessage('#_error_missing_product_category', '#_title_create_product')
+                .then(() => this.categoryDropbox.focus())
+                .then(() => false);
+
+        const start = this.startSwitch.value ? Number(this.startTextField.dateValue) : null;
+        const end = this.endSwitch.value ? Number(this.endTextField.dateValue) : null;
+
         const data = {
-            name: this.nameTextField.value,
-            price: this.priceTextField.numberValue,
-            category: this.categoryTextField.value,
+            name,
+            price,
+            category: category.id,
             priority: this.priorityTextField.numberValue,
-            start: this.startSwitch.value ? Number(this.startTextField.dateValue) : null,
-            end: this.endSwitch.value ? Number(this.endTextField.dateValue) : null
+            start,
+            end
         };
 
         if (!await Product.edit(this.product.id, data))

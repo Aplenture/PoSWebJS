@@ -6,18 +6,18 @@
  */
 
 import * as FrontendJS from "frontendjs";
-import { TransactionType } from "../enums/TransactionType";
+import { LabelType } from "../enums/labelType";
 
-const ROUTE_CREATE = 'createTransactionLabel';
-const ROUTE_GET = 'getTransactionLabels';
+const ROUTE_CREATE = 'createLabel';
+const ROUTE_GET = 'getLabels';
 
-export class TransactionLabel {
+export class Label {
     private static _server: FrontendJS.Server;
 
     constructor(
         public readonly id: number,
         public readonly account: number,
-        public readonly type: TransactionType,
+        public readonly type: LabelType,
         public readonly name: string
     ) { }
 
@@ -34,8 +34,8 @@ export class TransactionLabel {
     public static async unload() { }
     public static async start() { }
 
-    public static getAll(type?: TransactionType): Promise<TransactionLabel[]> {
-        return this._server.requestJSON(ROUTE_GET, { type }).then(data => data.map(data => new TransactionLabel(
+    public static getAll(...type: LabelType[]): Promise<Label[]> {
+        return this._server.requestJSON(ROUTE_GET, { type }).then(data => data.map(data => new Label(
             data.id,
             data.account,
             data.type,
@@ -43,8 +43,8 @@ export class TransactionLabel {
         )));
     }
 
-    public static add(type: TransactionType, name: string): Promise<TransactionLabel> {
-        return this._server.requestJSON(ROUTE_CREATE, { type, name }).then(data => new TransactionLabel(
+    public static add(type: LabelType, name: string): Promise<Label> {
+        return this._server.requestJSON(ROUTE_CREATE, { type, name }).then(data => new Label(
             data.id,
             data.account,
             data.type,
