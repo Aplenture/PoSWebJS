@@ -67,7 +67,7 @@ export class ProductsGridViewController extends GridViewController {
         this.productViewController.startSwitch.value = true;
         this.productViewController.startTextField.dateValue = CoreJS.calcDate();
         this.productViewController.endSwitch.value = true;
-        this.productViewController.endTextField.dateValue = CoreJS.addDate({ days: 7 });
+        this.productViewController.endTextField.dateValue = CoreJS.addDate({ days: 6 });
 
         return FrontendJS.Client.popupViewController.pushViewController(this.productViewController);
     }

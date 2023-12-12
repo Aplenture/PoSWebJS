@@ -58,7 +58,7 @@ export class ProductEditViewController extends FrontendJS.BodyViewController {
         this.endSwitch.title = '#_title_end';
         this.endSwitch.value = false;
         this.endSwitch.onChange.on(value => this.endTextField.isVisible = value);
-        this.endSwitch.onChange.on(() => this.endTextField.dateValue = (this.product && this.product.end && new Date(this.product.end)) || CoreJS.addDate({ days: 7 }));
+        this.endSwitch.onChange.on(() => this.endTextField.dateValue = (this.product && this.product.end && new Date(this.product.end)) || CoreJS.addDate({ days: 6 }));
 
         this.endTextField.type = FrontendJS.TextFieldType.Date;
         this.endTextField.title = '#_title_end';
