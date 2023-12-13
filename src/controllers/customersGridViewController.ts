@@ -14,7 +14,7 @@ import { Order } from "../models/order";
 import { OrderState } from "../enums/orderState";
 
 export class CustomersGridViewController extends GridViewController {
-    public readonly onSelectedCustomer = new CoreJS.Event<CustomersGridViewController, Customer>('CustomersGridViewController.onSelectedCustomer');
+    public readonly onSelected = new CoreJS.Event<CustomersGridViewController, Customer>('CustomersGridViewController.onSelected');
 
     public readonly editViewController = new CustomerEditViewController();
 
@@ -105,7 +105,7 @@ export class CustomersGridViewController extends GridViewController {
         if (index == this._customers.length)
             this.add();
         else
-            this.onSelectedCustomer.emit(this, this._customers[index]);
+            this.onSelected.emit(this, this._customers[index]);
     }
 }
 

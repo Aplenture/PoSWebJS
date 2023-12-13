@@ -97,6 +97,11 @@
     height: 100%;
 }
 
+.category-grid-view-controller .grid-view .cell .label-view,
+.category-grid-view-controller .grid-view .cell .label-view span {
+    height: 100%;
+}
+
 .products-grid-view-controller .grid-view .cell .label-view,
 .products-grid-view-controller .grid-view .cell .label-view span {
     height: 50%;

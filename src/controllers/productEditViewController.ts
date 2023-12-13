@@ -151,7 +151,7 @@ export class ProductEditViewController extends FrontendJS.BodyViewController {
             return await FrontendJS.Client.popupViewController.pushMessage('#_error_missing_product_price', '#_title_create_product')
                 .then(() => this.priceTextField.focus());
 
-        const category = this._categories.find(data => data.name == this.categoryDropbox.options[this.categoryDropbox.selectedIndex]);
+        const category = this._categories[this.categoryDropbox.selectedIndex];
 
         if (!category)
             return await FrontendJS.Client.popupViewController.pushMessage('#_error_missing_product_category', '#_title_create_product')
@@ -191,7 +191,7 @@ export class ProductEditViewController extends FrontendJS.BodyViewController {
                 .then(() => this.priceTextField.focus())
                 .then(() => false);
 
-        const category = this._categories.find(data => data.name == this.categoryDropbox.options[this.categoryDropbox.selectedIndex]);
+        const category = this._categories[this.categoryDropbox.selectedIndex];
 
         if (!category)
             return await FrontendJS.Client.popupViewController.pushMessage('#_error_missing_product_category', '#_title_create_product')
@@ -218,6 +218,10 @@ export class ProductEditViewController extends FrontendJS.BodyViewController {
         this.onUpdated.emit(this, this.product);
 
         return true;
+    }
+
+    public selectCategoryByID(id: number) {
+        this.categoryDropbox.selectedIndex = this._categories.findIndex(data => data.id == id);
     }
 
     private onEnterKey() {

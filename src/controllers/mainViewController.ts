@@ -20,6 +20,7 @@ import { OrderState } from "../enums/orderState";
 import { OrderProduct } from "../models/orderProduct";
 import { BalanceViewController } from "./balanceViewController";
 import { BillingViewController } from "./billingViewController";
+import { CategoryGridViewController } from "./categoryGridViewController";
 
 const KEY_RESET_DELAY = "resetDelay";
 
@@ -28,9 +29,11 @@ export class MainViewController extends FrontendJS.BodyViewController {
 
     public readonly stackViewController = new FrontendJS.StackViewController();
     public readonly customerMenuViewController = new FrontendJS.MenuViewController('customer-menu-view-controller');
+    public readonly categoryMenuViewController = new FrontendJS.MenuViewController('category-menu-view-controller');
     public readonly productMenuViewController = new FrontendJS.MenuViewController('product-menu-view-controller');
     public readonly membersViewController = new CustomersGridViewController('members-grid-view-controller');
     public readonly guestsViewController = new CustomersGridViewController('guests-grid-view-controller');
+    public readonly categoryViewController = new CategoryGridViewController();
     public readonly productsViewController = new ProductsGridViewController();
     public readonly purchaseViewController = new PurchaseProductViewController();
     public readonly openOrdersViewController = new OrdersViewController('open-orders-view-controller');
@@ -68,19 +71,24 @@ export class MainViewController extends FrontendJS.BodyViewController {
 
         this.customerMenuViewController.onSelected.on(() => this.titleBar.titleLabel.text = this.customerMenuViewController.selectedViewController.title);
         this.productMenuViewController.onSelected.on(() => this.titleBar.titleLabel.text = this.productMenuViewController.selectedViewController.title);
+        this.categoryMenuViewController.onSelected.on(() => this.titleBar.titleLabel.text = this.categoryMenuViewController.selectedViewController.title);
 
         this.membersViewController.paymentMethods = PaymentMethod.Balance;
         this.membersViewController.title = '#_title_select_member';
-        this.membersViewController.onSelectedCustomer.on(customer => this.selectCustomer(customer));
+        this.membersViewController.onSelected.on(customer => this.selectCustomer(customer));
 
         this.guestsViewController.paymentMethods = PaymentMethod.Cash;
         this.guestsViewController.isAddAllowed = true;
         this.guestsViewController.title = '#_title_select_guest';
-        this.guestsViewController.onSelectedCustomer.on(customer => this.selectCustomer(customer));
+        this.guestsViewController.onSelected.on(customer => this.selectCustomer(customer));
+
+        this.categoryViewController.title = '#_title_select_category';
+        this.categoryViewController.onSelected.on(label => this.productsViewController.category = label.id);
+        this.categoryViewController.onSelected.on(() => this.stackViewController.pushViewController(this.productMenuViewController));
 
         this.productsViewController.title = '#_title_select_product';
-        this.productsViewController.onSelectedProduct.on(product => this.selectedProduct = product);
-        this.productsViewController.onSelectedProduct.on(async product => {
+        this.productsViewController.onSelected.on(product => this.selectedProduct = product);
+        this.productsViewController.onSelected.on(async product => {
             if (!await this.buy(product, this.selectedCustomer))
                 return;
 
@@ -144,6 +152,8 @@ export class MainViewController extends FrontendJS.BodyViewController {
 
         this.customerMenuViewController.appendChild(this.membersViewController, '#_title_members');
         this.customerMenuViewController.appendChild(this.guestsViewController, '#_title_guests');
+
+        this.categoryMenuViewController.appendChild(this.categoryViewController, '#_title_category');
 
         this.productMenuViewController.appendChild(this.productsViewController, '#_title_buy');
         this.productMenuViewController.appendChild(this.openOrdersViewController, '#_title_order');
@@ -243,7 +253,7 @@ export class MainViewController extends FrontendJS.BodyViewController {
 
         if (customer) await this.openOrdersViewController.load();
         await this.updateBalance();
-        if (customer) await this.stackViewController.pushViewController(this.productMenuViewController);
+        if (customer) await this.stackViewController.pushViewController(this.categoryMenuViewController);
     }
 
     public async displayPurchase(product: Product): Promise<void> {

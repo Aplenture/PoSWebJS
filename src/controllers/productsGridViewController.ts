@@ -12,11 +12,13 @@ import { ProductEditViewController } from "./productEditViewController";
 import { GridViewController } from "./gridViewController";
 
 export class ProductsGridViewController extends GridViewController {
-    public readonly onSelectedProduct = new CoreJS.Event<ProductsGridViewController, Product>('ProductsGridViewController.onSelectedProduct');
+    public readonly onSelected = new CoreJS.Event<ProductsGridViewController, Product>('ProductsGridViewController.onSelected');
 
     public readonly productViewController = new ProductEditViewController();
 
-    private products: readonly Product[] = [];
+    public category: number = null;
+
+    private _products: readonly Product[] = [];
 
     constructor(...classes: string[]) {
         super(...classes, "products-grid-view-controller");
@@ -28,10 +30,14 @@ export class ProductsGridViewController extends GridViewController {
         this.productViewController.endSwitch.isVisible = false;
         this.productViewController.onCreated.on(() => this.load());
         this.productViewController.onCreated.on(() => this.productViewController.removeFromParent());
+        this.productViewController.onLoaded.on(() => this.productViewController.selectCategoryByID(this.category));
     }
 
     public async load(): Promise<void> {
-        this.products = await Product.get({ time: Number(CoreJS.calcDate()) });
+        this._products = await Product.get({
+            time: Number(CoreJS.calcDate()),
+            category: this.category
+        });
 
         await super.load();
     }
@@ -45,7 +51,7 @@ export class ProductsGridViewController extends GridViewController {
     }
 
     public numberOfCells(sender: FrontendJS.GridViewController): number {
-        return this.products.length + 1;
+        return this._products.length + 1;
     }
 
     public createCell(sender: FrontendJS.GridViewController, index: number): FrontendJS.View {
@@ -53,30 +59,30 @@ export class ProductsGridViewController extends GridViewController {
     }
 
     public updateCell(sender: FrontendJS.GridViewController, cell: Cell, index: number): void {
-        if (index == this.products.length)
+        if (index == this._products.length)
             return;
 
-        const product = this.products[index];
+        const product = this._products[index];
 
         cell.nameLabel.text = product.name;
         cell.priceLabel.text = CoreJS.formatCurrency(product.price);
     }
 
-    public add(): Promise<void> {
+    public async add(): Promise<void> {
         this.productViewController.product = null;
         this.productViewController.startSwitch.value = true;
         this.productViewController.startTextField.dateValue = CoreJS.calcDate();
         this.productViewController.endSwitch.value = true;
         this.productViewController.endTextField.dateValue = CoreJS.addDate({ days: 6 });
 
-        return FrontendJS.Client.popupViewController.pushViewController(this.productViewController);
+        await FrontendJS.Client.popupViewController.pushViewController(this.productViewController);
     }
 
     public selectCell(index: number) {
-        if (index == this.products.length)
+        if (index == this._products.length)
             this.add();
         else
-            this.onSelectedProduct.emit(this, this.products[index]);
+            this.onSelected.emit(this, this._products[index]);
     }
 }
 

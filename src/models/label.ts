@@ -18,7 +18,8 @@ export class Label {
         public readonly id: number,
         public readonly account: number,
         public readonly type: LabelType,
-        public readonly name: string
+        public readonly name: string,
+        public readonly priority: number
     ) { }
 
     public static async prepare(preparer: FrontendJS.ServerPreparer): Promise<void> {
@@ -39,8 +40,11 @@ export class Label {
             data.id,
             data.account,
             data.type,
-            data.name
-        )));
+            data.name,
+            data.priority
+        ))
+            .sort((a, b) => b.priority - a.priority)
+        );
     }
 
     public static add(type: LabelType, name: string): Promise<Label> {
@@ -48,7 +52,8 @@ export class Label {
             data.id,
             data.account,
             data.type,
-            data.name
+            data.name,
+            data.priority
         ));
     }
 

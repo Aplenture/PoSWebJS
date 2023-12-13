@@ -36,6 +36,7 @@ interface GetOptions {
     readonly firstID?: number;
     readonly lastID?: number;
     readonly time?: number;
+    readonly category?: number;
 }
 
 export class Product {
