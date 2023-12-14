@@ -157,8 +157,8 @@ export class ProductEditViewController extends FrontendJS.BodyViewController {
             return await FrontendJS.Client.popupViewController.pushMessage('#_error_missing_product_category', '#_title_create_product')
                 .then(() => this.categoryDropbox.focus());
 
-        const start = this.startSwitch.value ? Number(this.startTextField.dateValue) : null;
-        const end = this.endSwitch.value ? Number(this.endTextField.dateValue) : null;
+        const start = this.startSwitch.value ? this.startTextField.numberValue : null;
+        const end = this.endSwitch.value ? this.endTextField.numberValue : null;
 
         this.product = await Product.add({
             name,
@@ -198,8 +198,8 @@ export class ProductEditViewController extends FrontendJS.BodyViewController {
                 .then(() => this.categoryDropbox.focus())
                 .then(() => false);
 
-        const start = this.startSwitch.value ? Number(this.startTextField.dateValue) : null;
-        const end = this.endSwitch.value ? Number(this.endTextField.dateValue) : null;
+        const start = this.startSwitch.value ? this.startTextField.numberValue : null;
+        const end = this.endSwitch.value ? this.endTextField.numberValue : null;
 
         const data = {
             name,

@@ -75,7 +75,10 @@ export class ProductsTableViewController extends FrontendJS.ViewController imple
         this.categoryDropbox.options = this._categories.map(data => data.name);
         this.categoryDropbox.selectedIndex = selectedCategory;
 
-        this._products = await Product.get({ time: Number(this.dateTextField.dateValue), category: this.selectedCategory });
+        this._products = await Product.get({
+            time: this.dateTextField.numberValue,
+            category: this.selectedCategory
+        });
 
         this.titleBar.leftView.appendChild(this.addButton);
 
