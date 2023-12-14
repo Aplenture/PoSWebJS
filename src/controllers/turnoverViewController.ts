@@ -79,8 +79,8 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
     }
 
     public async load() {
-        const depositLabels = await Label.getAll(LabelType.Deposit);
-        const withdrawLabels = await Label.getAll(LabelType.Withdraw);
+        const depositLabels = await Label.getAll(LabelType.Default, LabelType.Deposit);
+        const withdrawLabels = await Label.getAll(LabelType.Default, LabelType.Withdraw);
 
         const firstDayOfMonth = CoreJS.calcDate({ monthDay: 1 });
         const selectedMonth = this.monthDropbox.selectedIndex;
@@ -224,7 +224,7 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
 
         // add sum
         this.data.push(sum);
-        
+
         this.deleteButton.isVisible = 1 == this.customerDropbox.selectedIndex;
 
         await super.load();
