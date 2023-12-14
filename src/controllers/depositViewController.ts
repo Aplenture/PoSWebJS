@@ -71,7 +71,7 @@ export class DepositViewController extends FrontendJS.BodyViewController {
         this.footerBar.appendChild(this.okButton);
     }
 
-    public get selectedLabel(): string { return this.labelDropbox.options[this.labelDropbox.selectedIndex]; }
+    public get selectedLabel(): number { return this.labelDropbox.selectedIndex; }
 
     public get labels(): readonly string[] { return this.labelDropbox.options; }
     public set labels(value: readonly string[]) {

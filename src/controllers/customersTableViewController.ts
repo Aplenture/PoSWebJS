@@ -31,6 +31,8 @@ export class CustomersTableViewController extends FrontendJS.ViewController impl
     private customers: readonly Customer[] = [];
     private balances: Balance[] = [];
     private openOrders: readonly Order[] = [];
+    private depositLabels: string[] = [];
+    private withdrawLabels: string[] = [];
 
     constructor(...classes: string[]) {
         super(...classes, 'customers-table-view-controller');
@@ -87,12 +89,15 @@ export class CustomersTableViewController extends FrontendJS.ViewController impl
     public get isBalanceAllowed(): boolean { return (this.paymentMethods & PaymentMethod.Balance) != 0; }
 
     public async load(): Promise<void> {
-        this.depositViewController.labels = [BalanceEvent.Deposit as string].concat((await Label.getAll(LabelType.Deposit)).map(data => data.name));
-        this.withdrawViewController.labels = [BalanceEvent.Withdraw as string].concat((await Label.getAll(LabelType.Withdraw)).map(data => data.name));
+        this.depositLabels = [BalanceEvent.Deposit as string].concat((await Label.getAll(LabelType.Deposit)).map(data => data.name));
+        this.withdrawLabels = [BalanceEvent.Withdraw as string].concat((await Label.getAll(LabelType.Withdraw)).map(data => data.name));
         this.openOrders = await Order.get({ state: OrderState.Open });
         this.balances = await Balance.getAll();
         this.customers = (await Customer.get({ paymentmethods: this.paymentMethods }))
             .sort((a, b) => a.toString().localeCompare(b.toString()));
+
+        this.depositViewController.labels = this.depositLabels;
+        this.withdrawViewController.labels = this.withdrawLabels;
 
         this.titleBar.leftView.appendChild(this.addButton);
 
@@ -162,7 +167,7 @@ export class CustomersTableViewController extends FrontendJS.ViewController impl
         if (!value)
             return null;
 
-        const label = this.depositViewController.selectedLabel;
+        const label = this.depositLabels[this.depositViewController.selectedLabel];
 
         const balance = await Balance.deposit({
             customer: customer.id,
@@ -189,7 +194,7 @@ export class CustomersTableViewController extends FrontendJS.ViewController impl
         if (!value)
             return null;
 
-        const label = this.withdrawViewController.selectedLabel;
+        const label = this.withdrawLabels[this.withdrawViewController.selectedLabel];
 
         const balance = await Balance.withdraw({
             customer: customer.id,
