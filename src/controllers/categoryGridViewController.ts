@@ -23,7 +23,7 @@ export class CategoryGridViewController extends GridViewController {
     }
 
     public async load(): Promise<void> {
-        this._data = await Label.getAll(LabelType.ProductCategory);
+        this._data = await Label.getAll(LabelType.Default, LabelType.ProductCategory);
 
         await super.load();
     }

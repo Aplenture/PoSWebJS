@@ -6,7 +6,8 @@
  */
 
 export enum LabelType {
-    Deposit = 1,
+    Default = 0,
+    Deposit,
     Withdraw,
     Invoice,
     ProductCategory

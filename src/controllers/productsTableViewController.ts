@@ -70,7 +70,7 @@ export class ProductsTableViewController extends FrontendJS.ViewController imple
     public async load(): Promise<void> {
         const selectedCategory = this.categoryDropbox.selectedIndex;
 
-        this._categories = await Label.getAll(LabelType.ProductCategory);
+        this._categories = await Label.getAll(LabelType.Default, LabelType.ProductCategory);
 
         this.categoryDropbox.options = this._categories.map(data => data.name);
         this.categoryDropbox.selectedIndex = selectedCategory;
