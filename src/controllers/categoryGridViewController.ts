@@ -29,7 +29,7 @@ export class CategoryGridViewController extends GridViewController {
     }
 
     public numberOfCells(sender: FrontendJS.GridViewController): number {
-        return this._data.length;
+        return this._data.length + 1;
     }
 
     public createCell(sender: FrontendJS.GridViewController, index: number): FrontendJS.View {
@@ -38,6 +38,9 @@ export class CategoryGridViewController extends GridViewController {
 
     public updateCell(sender: FrontendJS.GridViewController, cell: Cell, index: number): void {
         const data = this._data[index];
+
+        if (!data)
+            return;
 
         cell.nameLabel.text = data.name;
     }
@@ -48,6 +51,8 @@ class Cell extends FrontendJS.View {
 
     constructor(...classes: string[]) {
         super(...classes);
+
+        this.nameLabel.text = "#_title_all";
 
         this.appendChild(this.nameLabel);
     }

@@ -27,10 +27,10 @@ export class OrdersViewController extends FrontendJS.BodyViewController implemen
 
     public readonly payButton = new FrontendJS.Button('pay-button');
     public readonly correctButton = new FrontendJS.Button('correct-button');
+    public readonly monthDropbox = new FrontendJS.Dropbox('month-dropbox-view');
 
     public customer: Customer;
     public state: OrderState;
-    public date: Date;
 
     private _openOrders: readonly Order[] = [];
     private _closedOrders: readonly Order[] = [];
@@ -50,8 +50,11 @@ export class OrdersViewController extends FrontendJS.BodyViewController implemen
         this.payButton.text = '#_title_pay';
         this.correctButton.text = '#_title_pay_correct';
 
+        this.monthDropbox.onSelected.on(() => this.load());
+
         this.appendChild(this.tableViewController);
 
+        this.footerBar.appendChild(this.monthDropbox);
         this.footerBar.appendChild(this.correctButton);
         this.footerBar.appendChild(this.payButton);
     }
@@ -60,10 +63,27 @@ export class OrdersViewController extends FrontendJS.BodyViewController implemen
     public get closedOrders(): readonly Order[] { return this._closedOrders; }
 
     public async load() {
+        const selectedMonth = this.monthDropbox.selectedIndex;
+        const firstDayOfMonth = CoreJS.calcDate({ monthDay: 1 });
+
+        this.monthDropbox.options = Array.from(Array(12).keys()).map(index => {
+            const date = CoreJS.reduceDate({ date: firstDayOfMonth, months: index });
+
+            return date.toLocaleString(CoreJS.Localization.language, {
+                month: 'long',
+                year: 'numeric'
+            });
+        });
+        this.monthDropbox.selectedIndex = selectedMonth;
+
+        const start = Number(CoreJS.reduceDate({ date: firstDayOfMonth, months: selectedMonth }));
+        const end = Number(CoreJS.reduceDate({ date: firstDayOfMonth, months: selectedMonth - 1 })) - 1;
+
         const products = await Product.get();
         const allOrders = await Order.get({
             customer: this.customer.id,
-            start: this.date && Number(this.date)
+            start,
+            end
         });
 
         const stateOrders = this.state
@@ -101,6 +121,12 @@ export class OrdersViewController extends FrontendJS.BodyViewController implemen
         this.correctButton.isDisabled = !this.closedOrders.length;
 
         await super.load();
+    }
+
+    public async unload(): Promise<void> {
+        this.monthDropbox.selectedIndex = 0;
+
+        await super.unload();
     }
 
     public numberOfCells(sender: FrontendJS.TableViewController, category: number): number {

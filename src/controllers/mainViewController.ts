@@ -29,7 +29,6 @@ export class MainViewController extends FrontendJS.BodyViewController {
 
     public readonly stackViewController = new FrontendJS.StackViewController();
     public readonly customerMenuViewController = new FrontendJS.MenuViewController('customer-menu-view-controller');
-    public readonly categoryMenuViewController = new FrontendJS.MenuViewController('category-menu-view-controller');
     public readonly productMenuViewController = new FrontendJS.MenuViewController('product-menu-view-controller');
     public readonly membersViewController = new CustomersGridViewController('members-grid-view-controller');
     public readonly guestsViewController = new CustomersGridViewController('guests-grid-view-controller');
@@ -71,7 +70,6 @@ export class MainViewController extends FrontendJS.BodyViewController {
 
         this.customerMenuViewController.onSelected.on(() => this.titleBar.titleLabel.text = this.customerMenuViewController.selectedViewController.title);
         this.productMenuViewController.onSelected.on(() => this.titleBar.titleLabel.text = this.productMenuViewController.selectedViewController.title);
-        this.categoryMenuViewController.onSelected.on(() => this.titleBar.titleLabel.text = this.categoryMenuViewController.selectedViewController.title);
 
         this.membersViewController.paymentMethods = PaymentMethod.Balance;
         this.membersViewController.title = '#_title_select_member';
@@ -83,8 +81,8 @@ export class MainViewController extends FrontendJS.BodyViewController {
         this.guestsViewController.onSelected.on(customer => this.selectCustomer(customer));
 
         this.categoryViewController.title = '#_title_select_category';
-        this.categoryViewController.onSelected.on(label => this.productsViewController.category = label.id);
-        this.categoryViewController.onSelected.on(() => this.stackViewController.pushViewController(this.productMenuViewController));
+        this.categoryViewController.onSelected.on(label => this.productsViewController.category = label && label.id || null);
+        this.categoryViewController.onSelected.on(() => this.productMenuViewController.selectedViewController = this.productsViewController);
 
         this.productsViewController.title = '#_title_select_product';
         this.productsViewController.onSelected.on(product => this.selectedProduct = product);
@@ -102,6 +100,7 @@ export class MainViewController extends FrontendJS.BodyViewController {
         });
 
         this.openOrdersViewController.state = OrderState.Open;
+        this.openOrdersViewController.monthDropbox.isHidden = true;
         this.openOrdersViewController.tableViewController.titleLabel.text = '#_title_open_order';
         this.openOrdersViewController.onProductSelected.on(product => this.selectedProduct = product);
         this.openOrdersViewController.onProductSelected.on(product => this.displayPurchase(product));
@@ -111,6 +110,8 @@ export class MainViewController extends FrontendJS.BodyViewController {
         this.openOrdersViewController.correctButton.onClick.on(() => this.correctPayment().then(result => result && this.pay()));
 
         this.monthOrdersViewController.tableViewController.titleLabel.text = '#_title_month';
+        this.monthOrdersViewController.correctButton.isHidden = true;
+        this.monthOrdersViewController.payButton.isHidden = true;
         this.monthOrdersViewController.onProductSelected.on(product => this.selectedProduct = product);
         this.monthOrdersViewController.onProductSelected.on(product => this.displayPurchase(product));
         this.monthOrdersViewController.payButton.onClick.on(() => this.productMenuViewController.selectedViewController = this.billingViewController);
@@ -153,9 +154,8 @@ export class MainViewController extends FrontendJS.BodyViewController {
         this.customerMenuViewController.appendChild(this.membersViewController, '#_title_members');
         this.customerMenuViewController.appendChild(this.guestsViewController, '#_title_guests');
 
-        this.categoryMenuViewController.appendChild(this.categoryViewController, '#_title_category');
-
-        this.productMenuViewController.appendChild(this.productsViewController, '#_title_buy');
+        this.productMenuViewController.appendChild(this.categoryViewController, '#_title_categories');
+        this.productMenuViewController.appendChild(this.productsViewController, '#_title_products');
         this.productMenuViewController.appendChild(this.openOrdersViewController, '#_title_order');
         this.productMenuViewController.appendChild(this.monthOrdersViewController, '#_title_month');
         this.productMenuViewController.appendChild(this.balanceViewControlelr, '#_title_balance');
@@ -171,17 +171,17 @@ export class MainViewController extends FrontendJS.BodyViewController {
     public set selectedCustomer(value: Customer) {
         this.openOrdersViewController.customer = value;
         this.monthOrdersViewController.customer = value;
-        this.monthOrdersViewController.date = CoreJS.calcDate({ monthDay: 1 });
         this.balanceViewControlelr.customer = value;
         this.billingViewController.customer = value;
         this.balanceLabel.isHidden = !value;
         this.openOrdersViewController.footerBar.isVisible = value && this.canPayWithCash;
-        this.monthOrdersViewController.footerBar.isVisible = value && this.canPayWithCash;
+        // this.monthOrdersViewController.footerBar.isVisible = value && this.canPayWithCash;
         this.productMenuViewController.showViewController(this.balanceViewControlelr, value && this.canPayWithBalance);
         this.productMenuViewController.showViewController(this.billingViewController, value && this.canPayWithCash);
 
         if (value) {
             this.customerLabel.text = value.toString();
+            this.productMenuViewController.showViewController(this.monthOrdersViewController, this.canPayWithBalance);
             this.payButton.isVisible = this.canPayWithCash;
             this.openOrdersViewController.payButton.isVisible = this.canPayWithCash;
             this.monthOrdersViewController.payButton.isVisible = this.canPayWithCash;
@@ -250,10 +250,11 @@ export class MainViewController extends FrontendJS.BodyViewController {
 
     public async selectCustomer(customer: Customer): Promise<void> {
         this.selectedCustomer = customer;
+        this.productsViewController.category = null;
 
         if (customer) await this.openOrdersViewController.load();
         await this.updateBalance();
-        if (customer) await this.stackViewController.pushViewController(this.categoryMenuViewController);
+        if (customer) await this.stackViewController.pushViewController(this.productMenuViewController);
     }
 
     public async displayPurchase(product: Product): Promise<void> {
