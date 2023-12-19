@@ -112,7 +112,7 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
         let turnovers: Finance[];
         let deposits: Finance[];
         let withdraws: Finance[];
-        let bonuses: any[] = [];
+        let bonuses: Finance[] = [];
 
         await Promise.all([
             Customer.get({ paymentmethods: this.paymentMethod }).then(result => customers = result.sort((a, b) => a.toString().localeCompare(b.toString()))),
@@ -124,6 +124,12 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
                 paymentmethod: this.paymentMethod,
                 data: [BalanceEvent.Invoice, BalanceEvent.Tip, BalanceEvent.UndoInvoice, BalanceEvent.UndoTip]
             }).then(result => turnovers = result),
+            Finance.getFinances({
+                start,
+                end,
+                paymentmethod: this.paymentMethod,
+                data: [BalanceEvent.Bonus]
+            }).then(result => bonuses = result),
             Finance.getFinances({
                 start,
                 end,
@@ -157,7 +163,8 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
                     turnover: Math.abs(turnover && turnover.value || 0),
                     deposit: Math.abs(deposit && deposit.value || 0),
                     withdraw: Math.abs(withdraw && withdraw.value || 0),
-                    balance: balance && balance.value || 0,
+                    // reduce balance by bonus
+                    balance: (balance && balance.value || 0) - (bonus && bonus.value || 0),
                     transfer: transfer && transfer.value || 0,
                     bonus: bonus && bonus.value || 0
                 };
@@ -203,7 +210,8 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
             || 0 < unknownBonuses) {
             this.data.push({
                 customer: CoreJS.Localization.translate('#_unknown_customer'),
-                balance: unknownBalance,
+                // reduce balance by bonus
+                balance: unknownBalance - unknownBonuses,
                 turnover: unknownTurnovers,
                 deposit: unknownDeposits,
                 withdraw: unknownWithdraws,
@@ -217,7 +225,8 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
             sum.turnover += data.turnover;
             sum.deposit += data.deposit;
             sum.withdraw += data.withdraw;
-            sum.balance += data.balance;
+            // reduce balance by bonus
+            sum.balance += data.balance - data.bonus;
             sum.transfer += data.transfer;
             sum.bonus += data.bonus;
         });
