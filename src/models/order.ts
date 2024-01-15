@@ -15,6 +15,7 @@ const ROUTE_CLOSE = "closeOrder";
 const ROUTE_REOPEN = "reopenOrder";
 const ROUTE_DELETE = "deleteOrder";
 const ROUTE_GET = "getOrders";
+const ROUTE_GET_OPEN = "getOpenOrders";
 
 interface GetOptions {
     readonly customer?: number;
@@ -97,6 +98,24 @@ export class Order {
 
     public static get(args?: GetOptions): Promise<Order[]> {
         return this._server.requestJSON(ROUTE_GET, args).then(data => data.map(data => new Order(
+            data.id,
+            data.account,
+            data.updated,
+            data.state,
+            data.customer,
+            data.paymentMethod,
+            data.tip,
+            data.products.map(data => new OrderProduct(
+                data.order,
+                data.product,
+                data.price,
+                data.amount
+            )),
+        )));
+    }
+
+    public static getOpen(customer?: number): Promise<Order[]> {
+        return this._server.requestJSON(ROUTE_GET_OPEN, { customer }).then(data => data.map(data => new Order(
             data.id,
             data.account,
             data.updated,

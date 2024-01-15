@@ -43,7 +43,7 @@ export class CustomerDetailsViewController extends FrontendJS.BodyViewController
         this.titleBar.titleLabel.text = this.customer.toString();
 
         if (this.customer.paymentMethods & PaymentMethod.Balance) {
-            const openOrders = await Order.get({ customer: this.customer.id, state: OrderState.Open });
+            const openOrders = await Order.getOpen(this.customer.id);
 
             const balance = await Balance.get(this.customer.id)
                 - (openOrders[0] && openOrders[0].invoice || 0);

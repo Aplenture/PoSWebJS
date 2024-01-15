@@ -39,7 +39,7 @@ export class CustomersGridViewController extends GridViewController {
     public set paymentMethods(value: number) { this.editViewController.paymentMethods = value; }
 
     public async load(): Promise<void> {
-        this._openOrders = await Order.get({ state: OrderState.Open });
+        this._openOrders = await Order.getOpen();
 
         const allCustomers = await Customer.get({ paymentmethods: this.paymentMethods });
 

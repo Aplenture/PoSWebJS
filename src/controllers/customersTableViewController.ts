@@ -91,7 +91,7 @@ export class CustomersTableViewController extends FrontendJS.ViewController impl
     public async load(): Promise<void> {
         this.depositLabels = [BalanceEvent.Deposit as string].concat((await Label.getAll(LabelType.Deposit)).map(data => data.name));
         this.withdrawLabels = [BalanceEvent.Withdraw as string].concat((await Label.getAll(LabelType.Withdraw)).map(data => data.name));
-        this.openOrders = await Order.get({ state: OrderState.Open });
+        this.openOrders = await Order.getOpen();
         this.balances = await Balance.getAll();
         this.customers = (await Customer.get({ paymentmethods: this.paymentMethods }))
             .sort((a, b) => a.toString().localeCompare(b.toString()));
