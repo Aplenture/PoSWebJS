@@ -303,12 +303,12 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
 
         parser.add(...this.data.map(data => [
             data.customer,
-            CoreJS.formatCurrency(data.transfer),
-            CoreJS.formatCurrency(data.deposit),
-            CoreJS.formatCurrency(data.withdraw),
-            CoreJS.formatCurrency(data.turnover),
-            CoreJS.formatCurrency(data.balance),
-            CoreJS.formatCurrency(data.bonus)
+            CoreJS.formatCurrency(data.transfer, { style: null }),
+            CoreJS.formatCurrency(data.deposit, { style: null }),
+            CoreJS.formatCurrency(data.withdraw, { style: null }),
+            CoreJS.formatCurrency(data.turnover, { style: null }),
+            CoreJS.formatCurrency(data.balance, { style: null }),
+            CoreJS.formatCurrency(data.bonus, { style: null })
         ]));
 
         FrontendJS.download(parser);

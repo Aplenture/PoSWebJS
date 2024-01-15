@@ -161,7 +161,7 @@ export class TransfersViewController extends FrontendJS.BodyViewController imple
             new Date(data.finance.timestamp).toLocaleDateString(),
             data.customer.toString(),
             CoreJS.Localization.translate(data.finance.data),
-            CoreJS.formatCurrency(Math.abs(data.finance.value))
+            CoreJS.formatCurrency(Math.abs(data.finance.value), { style: null })
         ]));
 
         FrontendJS.download(parser);
