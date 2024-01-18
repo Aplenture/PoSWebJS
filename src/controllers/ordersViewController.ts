@@ -66,16 +66,6 @@ export class OrdersViewController extends FrontendJS.BodyViewController implemen
         const selectedMonth = this.monthDropbox.selectedIndex;
         const firstDayOfMonth = CoreJS.calcDate({ monthDay: 1 });
 
-        this.monthDropbox.options = Array.from(Array(12).keys()).map(index => {
-            const date = CoreJS.reduceDate({ date: firstDayOfMonth, months: index });
-
-            return date.toLocaleString(CoreJS.Localization.language, {
-                month: 'long',
-                year: 'numeric'
-            });
-        });
-        this.monthDropbox.selectedIndex = selectedMonth;
-
         const start = Number(CoreJS.reduceDate({ date: firstDayOfMonth, months: selectedMonth }));
         const end = Number(CoreJS.reduceDate({ date: firstDayOfMonth, months: selectedMonth - 1 })) - 1;
 
@@ -85,6 +75,16 @@ export class OrdersViewController extends FrontendJS.BodyViewController implemen
             start,
             end
         });
+
+        this.monthDropbox.options = Array.from(Array(12).keys()).map(index => {
+            const date = CoreJS.reduceDate({ date: firstDayOfMonth, months: index });
+
+            return date.toLocaleString(CoreJS.Localization.language, {
+                month: 'long',
+                year: 'numeric'
+            });
+        });
+        this.monthDropbox.selectedIndex = selectedMonth;
 
         if (!allOrders.some(order => order.state === OrderState.Open))
             await Order.getOpen(this.customer.id)
