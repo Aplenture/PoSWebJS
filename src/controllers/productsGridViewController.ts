@@ -28,6 +28,8 @@ export class ProductsGridViewController extends GridViewController {
         this.productViewController.priorityTextField.isVisible = false
         this.productViewController.startSwitch.isVisible = false;
         this.productViewController.endSwitch.isVisible = false;
+        this.productViewController.discountTextField.isVisible = false;
+        this.productViewController.discountTextField.numberValue = 0;
         this.productViewController.onCreated.on(() => this.load());
         this.productViewController.onCreated.on(() => this.productViewController.removeFromParent());
         this.productViewController.onLoaded.on(() => this.productViewController.selectCategoryByID(this.category));

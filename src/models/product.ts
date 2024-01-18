@@ -16,7 +16,7 @@ interface AddOptions {
     readonly name: string;
     readonly price: number;
     readonly category: number;
-    readonly discount?: number;
+    readonly discount: number;
     readonly priority?: number;
     readonly start?: number;
     readonly end?: number;

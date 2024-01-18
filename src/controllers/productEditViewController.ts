@@ -18,6 +18,7 @@ export class ProductEditViewController extends FrontendJS.BodyViewController {
     public readonly nameTextField = new FrontendJS.TextField('name-text-field');
     public readonly priceTextField = new FrontendJS.TextField('price-text-field');
     public readonly categoryDropbox = new FrontendJS.Dropbox('category-dropbox');
+    public readonly discountTextField = new FrontendJS.TextField('discount-text-field');
     public readonly priorityTextField = new FrontendJS.TextField('priority-text-field');
     public readonly startTextField = new FrontendJS.TextField('start-text-field');
     public readonly endTextField = new FrontendJS.TextField('end-text-field');
@@ -43,6 +44,11 @@ export class ProductEditViewController extends FrontendJS.BodyViewController {
 
         this.categoryDropbox.title = '#_title_category';
         this.categoryDropbox.onEnterKey.on(() => this.onEnterKey());
+
+        this.discountTextField.type = FrontendJS.TextFieldType.Number;
+        this.discountTextField.title = '#_title_discount';
+        this.discountTextField.numberValue = FrontendJS.Client.config.get("discount");
+        this.discountTextField.onEnterKey.on(() => this.onEnterKey());
 
         this.priorityTextField.type = FrontendJS.TextFieldType.Number;
         this.priorityTextField.title = '#_title_priority';
@@ -77,6 +83,7 @@ export class ProductEditViewController extends FrontendJS.BodyViewController {
         this.contentView.appendChild(this.nameTextField);
         this.contentView.appendChild(this.priceTextField);
         this.contentView.appendChild(this.categoryDropbox);
+        this.contentView.appendChild(this.discountTextField);
         this.contentView.appendChild(this.priorityTextField);
         this.contentView.appendChild(this.startSwitch);
         this.contentView.appendChild(this.startTextField);
@@ -109,6 +116,7 @@ export class ProductEditViewController extends FrontendJS.BodyViewController {
             this.nameTextField.value = this.product.name;
             this.priceTextField.numberValue = this.product.price;
             this.categoryDropbox.selectedIndex = this._categories.findIndex(data => data.id == this.product.category);
+            this.discountTextField.numberValue = this.product.discount;
             this.priorityTextField.numberValue = this.product.priority;
             this.startSwitch.value = !!this.product.start;
             this.startTextField.isVisible = !!this.product.start;
@@ -125,6 +133,7 @@ export class ProductEditViewController extends FrontendJS.BodyViewController {
         this.nameTextField.value = '';
         this.priceTextField.value = '';
         this.categoryDropbox.selectedIndex = -1;
+        this.discountTextField.numberValue = FrontendJS.Client.config.get("discount");
         this.priorityTextField.value = '';
         this.startSwitch.value = false;
         this.startTextField.value = '';
@@ -164,6 +173,7 @@ export class ProductEditViewController extends FrontendJS.BodyViewController {
             name,
             price,
             category: category.id,
+            discount: this.discountTextField.numberValue,
             priority: this.priorityTextField.numberValue,
             start: start,
             end: end
@@ -205,6 +215,7 @@ export class ProductEditViewController extends FrontendJS.BodyViewController {
             name,
             price,
             category: category.id,
+            discount: this.discountTextField.numberValue,
             priority: this.priorityTextField.numberValue,
             start,
             end

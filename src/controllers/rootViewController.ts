@@ -5,6 +5,7 @@
  * License https://github.com/Aplenture/PoSWebJS/blob/main/LICENSE
  */
 
+import * as CoreJS from "corejs";
 import * as FrontendJS from "frontendjs";
 import { AccessViewController } from "./accessViewController";
 import { MainViewController } from "./mainViewController";
@@ -45,6 +46,8 @@ export class RootViewController extends FrontendJS.ViewController {
     }
 
     public async prepare(preparer: FrontendJS.ClientPreparer): Promise<void> {
+        preparer.add(new CoreJS.NumberParameter("discount", "default product discount", 30));
+
         await this.server.prepare(preparer);
         await super.prepare(preparer);
     }
