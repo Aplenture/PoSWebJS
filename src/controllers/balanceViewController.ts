@@ -10,8 +10,10 @@ import * as FrontendJS from "frontendjs";
 import { Customer } from "../models/customer";
 import { Finance } from "../models/finance";
 
-export class BalanceViewController extends FrontendJS.ViewController implements FrontendJS.TableViewControllerDataSource {
+export class BalanceViewController extends FrontendJS.BodyViewController implements FrontendJS.TableViewControllerDataSource {
     public readonly tableViewController = new FrontendJS.TableViewController();
+
+    public readonly monthDropbox = new FrontendJS.Dropbox('month-dropbox-view');
 
     public customer: Customer;
 
@@ -21,18 +23,40 @@ export class BalanceViewController extends FrontendJS.ViewController implements 
     constructor(...classes: string[]) {
         super(...classes, 'balance-view-controller');
 
+        this.titleBar.isHidden = true;
+        
         this.tableViewController.titleLabel.text = '#_title_balance';
         this.tableViewController.dataSource = this;
 
         this.appendChild(this.tableViewController);
+
+        this.monthDropbox.onSelected.on(() => this.load());
+
+        this.footerBar.appendChild(this.monthDropbox);
     }
 
     public async load() {
-        const firstDayOfMonth = Number(CoreJS.calcDate({ monthDay: 1 }));
+        const selectedMonth = this.monthDropbox.selectedIndex;
+        const firstDayOfMonth = CoreJS.calcDate({ monthDay: 1 });
+
+        const start = Number(CoreJS.reduceDate({ date: firstDayOfMonth, months: selectedMonth }));
+        const end = Number(CoreJS.reduceDate({ date: firstDayOfMonth, months: selectedMonth - 1 })) - 1;
+
         const finances = await Finance.getFinances({
             customer: this.customer.id,
-            start: firstDayOfMonth
+            start,
+            end
         });
+
+        this.monthDropbox.options = Array.from(Array(12).keys()).map(index => {
+            const date = CoreJS.reduceDate({ date: firstDayOfMonth, months: index });
+
+            return date.toLocaleString(CoreJS.Localization.language, {
+                month: 'long',
+                year: 'numeric'
+            });
+        });
+        this.monthDropbox.selectedIndex = selectedMonth;
 
         this.finances = finances
             .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
@@ -43,6 +67,12 @@ export class BalanceViewController extends FrontendJS.ViewController implements 
             .reduce((a, b) => a + b, 0);
 
         await super.load();
+    }
+
+    public async unload(): Promise<void> {
+        this.monthDropbox.selectedIndex = 0;
+
+        await super.unload();
     }
 
     public numberOfCells(sender: FrontendJS.TableViewController, category: number): number {
