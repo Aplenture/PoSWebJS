@@ -225,8 +225,7 @@ export class TurnoverViewController extends FrontendJS.BodyViewController implem
             sum.turnover += data.turnover;
             sum.deposit += data.deposit;
             sum.withdraw += data.withdraw;
-            // reduce balance by bonus
-            sum.balance += data.balance - data.bonus;
+            sum.balance += data.balance;
             sum.transfer += data.transfer;
             sum.bonus += data.bonus;
         });
