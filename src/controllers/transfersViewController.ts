@@ -106,7 +106,7 @@ export class TransfersViewController extends FrontendJS.BodyViewController imple
         this._data = finances.map(finance => ({
             customer: customers.find(customer => customer.id == finance.customer),
             finance
-        }));
+        })).filter(data => !!data.customer);
 
         await super.load();
     }
