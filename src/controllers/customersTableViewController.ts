@@ -54,6 +54,7 @@ export class CustomersTableViewController extends FrontendJS.ViewController impl
         this.editViewController.onCreated.on(() => this.editViewController.removeFromParent());
 
         this.detailViewController.editButton.onClick.on(() => this.edit(this.detailViewController.customer));
+        this.detailViewController.removeButton.onClick.on(() => this.removeCustomer(this.detailViewController.customer));
 
         this.detailViewController.depositButton.onClick.on(() => this.depositViewController.customerLabel.text = this.detailViewController.customer.toString());
         this.detailViewController.depositButton.onClick.on(() => FrontendJS.Client.popupViewController.pushViewController(this.depositViewController));
@@ -161,6 +162,21 @@ export class CustomersTableViewController extends FrontendJS.ViewController impl
         this.editViewController.customer = customer;
 
         return FrontendJS.Client.popupViewController.pushViewController(this.editViewController);
+    }
+
+    public async removeCustomer(customer: Customer): Promise<void> {
+        if (await Balance.get(customer.id))
+            return await FrontendJS.Client.popupViewController.pushMessage('#_error_customer_remove_invalid', '#_title_customer_balance_not_zero');
+
+        if (!await FrontendJS.Client.popupViewController.queryBoolean('#_query_text_customer_remove', CoreJS.Localization.translate('#_query_title_customer_remove', { '$1': customer.toString() })))
+            return;
+
+        if (!await Customer.removeCustomer(customer.id))
+            return;
+
+        this.detailViewController.removeFromParent();
+
+        await this.load();
     }
 
     public async deposit(customer: Customer, value: number, date?: Date): Promise<number> {

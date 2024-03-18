@@ -19,6 +19,7 @@ export class CustomerDetailsViewController extends FrontendJS.BodyViewController
     public readonly withdrawButton = new FrontendJS.Button('withdraw-button');
     public readonly depositButton = new FrontendJS.Button('deposit-button');
     public readonly editButton = new FrontendJS.Button('edit-button');
+    public readonly removeButton = new FrontendJS.Button('remove-button');
 
     public customer: Customer = null;
 
@@ -29,6 +30,9 @@ export class CustomerDetailsViewController extends FrontendJS.BodyViewController
         this.depositButton.text = '#_title_deposit';
         this.editButton.text = '#_title_edit';
 
+        this.removeButton.type = FrontendJS.ButtonType.Delete;
+        this.removeButton.text = '#_title_remove';
+
         this.balanceLabel.type = FrontendJS.TitledLabelType.Balance;
         this.balanceLabel.title = '#_title_balance';
 
@@ -37,6 +41,7 @@ export class CustomerDetailsViewController extends FrontendJS.BodyViewController
         this.footerBar.appendChild(this.withdrawButton);
         this.footerBar.appendChild(this.depositButton);
         this.footerBar.appendChild(this.editButton);
+        this.footerBar.appendChild(this.removeButton);
     }
 
     public async load(): Promise<void> {
