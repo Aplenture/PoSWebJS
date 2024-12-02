@@ -77,6 +77,10 @@ export class ProductsGridViewController extends GridViewController {
         this.productViewController.endSwitch.value = true;
         this.productViewController.endTextField.dateValue = CoreJS.addDate({ days: 6 });
 
+        // set discount to 0
+        // to avoid discount on daily offers
+        this.productViewController.discountTextField.numberValue = 0;
+
         await FrontendJS.Client.popupViewController.pushViewController(this.productViewController);
     }
 
