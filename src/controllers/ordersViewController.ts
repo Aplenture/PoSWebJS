@@ -88,7 +88,7 @@ export class OrdersViewController extends FrontendJS.BodyViewController implemen
 
         if (!allOrders.some(order => order.state === OrderState.Open))
             await Order.getOpen(this.customer.id)
-                .then(orders => console.log(orders, orders.length && allOrders.push(...orders)));
+                .then(orders => orders.length && allOrders.push(...orders));
 
         const stateOrders = this.state
             ? allOrders.filter(order => order.state == this.state)
