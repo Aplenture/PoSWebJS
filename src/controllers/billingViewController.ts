@@ -9,6 +9,7 @@ import * as CoreJS from "corejs";
 import * as FrontendJS from "frontendjs";
 import { Customer } from "../models/customer";
 import { Finance } from "../models/finance";
+import { PaymentMethod } from "../enums/paymentMethod";
 
 export class BillingViewController extends FrontendJS.BodyViewController implements FrontendJS.TableViewControllerDataSource {
     public readonly tableViewController = new FrontendJS.TableViewController();
@@ -39,7 +40,12 @@ export class BillingViewController extends FrontendJS.BodyViewController impleme
     }
 
     public async load() {
-        this.finances = await Finance.getFinances({ customer: this.customer.id });
+        const isGuest = (this.customer.paymentMethods & PaymentMethod.Cash) > 0;
+
+        this.finances = await Finance.getFinances({
+            customer: this.customer.id,
+            endless: isGuest
+        });
 
         const filteredClosedInvoices = this.finances
             .filter(data => data.data == 'invoice' && this.finances.every(tmp => tmp.order != data.order || tmp.data != 'open_invoice'));

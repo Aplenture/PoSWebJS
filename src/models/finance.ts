@@ -16,6 +16,7 @@ interface GetOptions {
     readonly start?: number;
     readonly end?: number;
     readonly paymentmethod?: PaymentMethod;
+    readonly endless?: boolean;
     readonly data?: readonly string[];
 }
 
@@ -47,6 +48,10 @@ export class Finance {
     public static async start() { }
 
     public static getFinances(options?: GetOptions): Promise<Finance[]> {
+        // workaround to parse 'true' to 1 and 'false' to 0 for crypto signing algorithm
+        if (options)
+            (options.endless as any) = options.endless ? 1 : 0;
+
         return this._server.requestJSON(ROUTE_GET_FINANCES, options).then(data => data.map(data => new Finance(
             data.id,
             data.timestamp,
